@@ -1,0 +1,145 @@
+<Window x:Class="KLCMC.Pos.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="KLCMC POS"
+        Height="680"
+        Width="1100"
+        MinHeight="620"
+        MinWidth="980">
+  <Grid Margin="12">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <Border Grid.Row="0" BorderThickness="1" BorderBrush="#DDD" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="150" />
+          <ColumnDefinition Width="220" />
+          <ColumnDefinition Width="95" />
+          <ColumnDefinition Width="95" />
+          <ColumnDefinition Width="95" />
+          <ColumnDefinition Width="95" />
+          <ColumnDefinition Width="95" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Connection Mode" />
+        <ComboBox Grid.Column="1"
+                  Margin="8,0,12,0"
+                  ItemsSource="{Binding ConnectionModes}"
+                  SelectedItem="{Binding ConnectionOptions.Mode}" />
+
+        <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="Endpoint" />
+        <TextBox Grid.Column="3"
+                 Margin="8,0,12,0"
+                 Grid.ColumnSpan="2"
+                 Text="{Binding ConnectionOptions.Endpoint, UpdateSourceTrigger=PropertyChanged}" />
+
+        <TextBlock Grid.Column="5" VerticalAlignment="Center" Text="Baud" />
+        <TextBox Grid.Column="6" Margin="8,0,12,0" Text="{Binding ConnectionOptions.BaudRate}" />
+
+        <StackPanel Grid.Column="7" Orientation="Horizontal" Margin="0,0,12,0">
+          <TextBlock VerticalAlignment="Center" Text="DataBits" />
+          <TextBox Width="50" Margin="8,0,0,0" Text="{Binding ConnectionOptions.DataBits}" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="8" Orientation="Horizontal" Margin="0,0,12,0">
+          <TextBlock VerticalAlignment="Center" Text="StopBits" />
+          <TextBox Width="50" Margin="8,0,0,0" Text="{Binding ConnectionOptions.StopBits}" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="9" Orientation="Horizontal" HorizontalAlignment="Right">
+          <Button Width="90"
+                  Margin="0,0,8,0"
+                  Command="{Binding ConnectPrinterCommand}"
+                  Content="Connect" />
+          <Button Width="90"
+                  Margin="0,0,8,0"
+                  Command="{Binding DisconnectPrinterCommand}"
+                  Content="Disconnect" />
+          <TextBlock VerticalAlignment="Center"
+                     FontWeight="SemiBold"
+                     Text="{Binding ConnectionStateText}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="320" />
+        <ColumnDefinition Width="10" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <Border Grid.Column="0" BorderThickness="1" BorderBrush="#DDD" CornerRadius="4" Padding="10">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Top" Margin="0,0,0,8" FontSize="16" FontWeight="SemiBold" Text="Preset Items" />
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding PresetItems}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Button Margin="0,0,0,8"
+                          Padding="8"
+                          HorizontalContentAlignment="Left"
+                          Command="{Binding DataContext.AddItemCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                          CommandParameter="{Binding}">
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                      </Grid.ColumnDefinitions>
+                      <TextBlock Grid.Column="0" Text="{Binding Name}" />
+                      <TextBlock Grid.Column="1" FontWeight="SemiBold" Text="{Binding DefaultPrice, StringFormat=RM {0:F2}}" />
+                    </Grid>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </DockPanel>
+      </Border>
+
+      <Border Grid.Column="2" BorderThickness="1" BorderBrush="#DDD" CornerRadius="4" Padding="10">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Top" Margin="0,0,0,8" FontSize="16" FontWeight="SemiBold" Text="Cart" />
+          <DataGrid ItemsSource="{Binding CartLines}"
+                    SelectedItem="{Binding SelectedCartLine}"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Item" Binding="{Binding Name}" IsReadOnly="True" Width="2*" />
+              <DataGridTextColumn Header="Qty" Binding="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+              <DataGridTextColumn Header="Unit Price" Binding="{Binding UnitPrice, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:F2}}" Width="*" />
+              <DataGridTextColumn Header="Line Total" Binding="{Binding LineTotal, StringFormat={}{0:F2}}" IsReadOnly="True" Width="*" />
+            </DataGrid.Columns>
+          </DataGrid>
+        </DockPanel>
+      </Border>
+    </Grid>
+
+    <Border Grid.Row="2" BorderThickness="1" BorderBrush="#DDD" CornerRadius="4" Padding="10" Margin="0,10,0,0">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Column="0" VerticalAlignment="Center" Foreground="#555" Text="{Binding StatusMessage}" />
+        <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0" FontSize="18" FontWeight="SemiBold" Text="{Binding TotalText}" />
+        <Button Grid.Column="2" Width="100" Margin="0,0,8,0" Command="{Binding ClearCartCommand}" Content="Clear" />
+        <Button Grid.Column="3" Width="140" Command="{Binding PrintReceiptCommand}" Content="Print Receipt" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>
