@@ -1,6 +1,6 @@
 using System.Windows.Input;
 
-namespace KLCMC.Pos.App.ViewModels;
+namespace KLCMC.Pos.Core.ViewModels;
 
 public sealed class RelayCommand : ICommand
 {

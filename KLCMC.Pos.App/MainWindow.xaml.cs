@@ -1,6 +1,6 @@
 using System.Windows;
-using KLCMC.Pos.App.Services;
-using KLCMC.Pos.App.ViewModels;
+using KLCMC.Pos.Core.ViewModels;
+using KLCMC.Pos.Printer.Windows;
 
 namespace KLCMC.Pos.App;
 

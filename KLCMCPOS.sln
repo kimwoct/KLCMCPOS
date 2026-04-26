@@ -5,6 +5,14 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KLCMC.Pos.App", "KLCMC.Pos.App\KLCMC.Pos.App.csproj", "{0C06A6C8-6BEF-4F25-9D78-1D8A2A38D8D2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KLCMC.Pos.Core", "KLCMC.Pos.Core\KLCMC.Pos.Core.csproj", "{45D43866-38F6-42BD-ABAF-6B0839DC3C63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KLCMC.Pos.Printer.Mock", "KLCMC.Pos.Printer.Mock\KLCMC.Pos.Printer.Mock.csproj", "{1643DDCB-79BC-47D0-B6F7-30FC8E621069}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KLCMC.Pos.Printer.Windows", "KLCMC.Pos.Printer.Windows\KLCMC.Pos.Printer.Windows.csproj", "{6E182355-A859-43D4-B25F-7862A6965566}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KLCMC.Pos.Maui", "KLCMC.Pos.Maui\KLCMC.Pos.Maui.csproj", "{092CC40D-D72C-4E7C-ABC2-D28EF0FDBF69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +23,22 @@ Global
 		{0C06A6C8-6BEF-4F25-9D78-1D8A2A38D8D2}.Debug|x64.Build.0 = Debug|x64
 		{0C06A6C8-6BEF-4F25-9D78-1D8A2A38D8D2}.Release|x64.ActiveCfg = Release|x64
 		{0C06A6C8-6BEF-4F25-9D78-1D8A2A38D8D2}.Release|x64.Build.0 = Release|x64
+		{45D43866-38F6-42BD-ABAF-6B0839DC3C63}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{45D43866-38F6-42BD-ABAF-6B0839DC3C63}.Debug|x64.Build.0 = Debug|Any CPU
+		{45D43866-38F6-42BD-ABAF-6B0839DC3C63}.Release|x64.ActiveCfg = Release|Any CPU
+		{45D43866-38F6-42BD-ABAF-6B0839DC3C63}.Release|x64.Build.0 = Release|Any CPU
+		{1643DDCB-79BC-47D0-B6F7-30FC8E621069}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1643DDCB-79BC-47D0-B6F7-30FC8E621069}.Debug|x64.Build.0 = Debug|Any CPU
+		{1643DDCB-79BC-47D0-B6F7-30FC8E621069}.Release|x64.ActiveCfg = Release|Any CPU
+		{1643DDCB-79BC-47D0-B6F7-30FC8E621069}.Release|x64.Build.0 = Release|Any CPU
+		{6E182355-A859-43D4-B25F-7862A6965566}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6E182355-A859-43D4-B25F-7862A6965566}.Debug|x64.Build.0 = Debug|Any CPU
+		{6E182355-A859-43D4-B25F-7862A6965566}.Release|x64.ActiveCfg = Release|Any CPU
+		{6E182355-A859-43D4-B25F-7862A6965566}.Release|x64.Build.0 = Release|Any CPU
+		{092CC40D-D72C-4E7C-ABC2-D28EF0FDBF69}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{092CC40D-D72C-4E7C-ABC2-D28EF0FDBF69}.Debug|x64.Build.0 = Debug|Any CPU
+		{092CC40D-D72C-4E7C-ABC2-D28EF0FDBF69}.Release|x64.ActiveCfg = Release|Any CPU
+		{092CC40D-D72C-4E7C-ABC2-D28EF0FDBF69}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

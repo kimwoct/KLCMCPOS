@@ -1,13 +1,13 @@
-using KLCMC.Pos.App.Models;
-using POSDLL;
+using KLCMC.Pos.Core.Models;
+using KLCMC.Pos.Core.Services;
 
-namespace KLCMC.Pos.App.Services;
+namespace KLCMC.Pos.Printer.Windows;
 
 public sealed class PosDllPrinterService : IPrinterService
 {
-    public bool IsOpen => Pos.POS_IsOpen();
+    public bool IsOpen => global::POSDLL.Pos.POS_IsOpen();
 
-    public string? LastError => string.IsNullOrWhiteSpace(Pos.lasterror) ? null : Pos.lasterror;
+    public string? LastError => string.IsNullOrWhiteSpace(global::POSDLL.Pos.lasterror) ? null : global::POSDLL.Pos.lasterror;
 
     public void Open(PrinterConnectionOptions options)
     {
@@ -19,7 +19,7 @@ public sealed class PosDllPrinterService : IPrinterService
         switch (options.Mode)
         {
             case PrinterConnectionMode.Serial:
-                Pos.POS_Open(
+                global::POSDLL.Pos.POS_Open(
                     options.Endpoint,
                     options.BaudRate,
                     options.DataBits,
@@ -28,16 +28,16 @@ public sealed class PosDllPrinterService : IPrinterService
                     options.FlowControl);
                 break;
             case PrinterConnectionMode.Lan:
-                Pos.POS_Open(options.Endpoint, 0, 0, 0, 0, 2);
+                global::POSDLL.Pos.POS_Open(options.Endpoint, 0, 0, 0, 0, 2);
                 break;
             case PrinterConnectionMode.Usb:
-                Pos.POS_Open(options.Endpoint, 0, 0, 0, 0, 3);
+                global::POSDLL.Pos.POS_Open(options.Endpoint, 0, 0, 0, 0, 3);
                 break;
             default:
                 throw new InvalidOperationException($"Unsupported connection mode: {options.Mode}");
         }
 
-        if (!Pos.POS_IsOpen())
+        if (!global::POSDLL.Pos.POS_IsOpen())
         {
             throw new InvalidOperationException(LastError ?? "Failed to open printer connection.");
         }
@@ -45,15 +45,15 @@ public sealed class PosDllPrinterService : IPrinterService
 
     public void Close()
     {
-        if (Pos.POS_IsOpen())
+        if (global::POSDLL.Pos.POS_IsOpen())
         {
-            Pos.POS_Close();
+            global::POSDLL.Pos.POS_Close();
         }
     }
 
     public void PrintReceipt(IReadOnlyList<ReceiptLine> lines)
     {
-        if (!Pos.POS_IsOpen())
+        if (!global::POSDLL.Pos.POS_IsOpen())
         {
             throw new InvalidOperationException("Printer is not connected.");
         }
@@ -63,15 +63,14 @@ public sealed class PosDllPrinterService : IPrinterService
             throw new InvalidOperationException("Cannot print an empty receipt.");
         }
 
-        Pos.POS_SetMode(0x00);
-
+        global::POSDLL.Pos.POS_SetMode(0x00);
         foreach (var line in lines)
         {
-            Pos.POS_S_TextOut(line.Text + "\n", 0, 0, 0, 0x00, 0x00);
+            global::POSDLL.Pos.POS_S_TextOut(line.Text + "\n", 0, 0, 0, 0x00, 0x00);
         }
 
-        Pos.POS_FeedLine();
-        Pos.POS_FeedLine();
-        Pos.POS_CutPaper(0x01, 80);
+        global::POSDLL.Pos.POS_FeedLine();
+        global::POSDLL.Pos.POS_FeedLine();
+        global::POSDLL.Pos.POS_CutPaper(0x01, 80);
     }
 }

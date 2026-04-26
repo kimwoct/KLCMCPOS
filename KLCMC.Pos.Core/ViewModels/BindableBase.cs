@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace KLCMC.Pos.App.ViewModels;
+namespace KLCMC.Pos.Core.ViewModels;
 
 public abstract class BindableBase : INotifyPropertyChanged
 {

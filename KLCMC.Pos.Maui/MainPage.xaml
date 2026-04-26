@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="KLCMC.Pos.Maui.MainPage"
+             Title="KLCMC POS"
+             BackgroundColor="#031425">
+  <Grid RowDefinitions="Auto,*"
+        RowSpacing="14"
+        Padding="16">
+    <Border Stroke="#2A3B4C"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 14"
+            BackgroundColor="#0F2131">
+      <Grid Padding="14,10"
+            ColumnDefinitions="Auto,*,Auto"
+            ColumnSpacing="14">
+        <VerticalStackLayout Spacing="0">
+          <Label Text="KLCMC POS"
+                 TextColor="#D2E4FB"
+                 FontSize="22"
+                 FontAttributes="Bold" />
+          <Label Text="Dashboard"
+                 TextColor="#8EA0B9"
+                 FontSize="13" />
+        </VerticalStackLayout>
+
+        <Border Grid.Column="1"
+                Stroke="#253648"
+                StrokeShape="RoundRectangle 10"
+                BackgroundColor="#1A2B3C"
+                Padding="10,6">
+          <Grid ColumnDefinitions="Auto,*"
+                ColumnSpacing="8">
+            <Label Text="🔎"
+                   VerticalOptions="Center"
+                   TextColor="#8EA0B9" />
+            <Entry Grid.Column="1"
+                   Placeholder="Search products..."
+                   PlaceholderColor="#8EA0B9"
+                   TextColor="#D2E4FB"
+                   BackgroundColor="Transparent"
+                   ClearButtonVisibility="WhileEditing" />
+          </Grid>
+        </Border>
+
+        <Border Grid.Column="2"
+                Stroke="#364E00"
+                StrokeShape="RoundRectangle 999"
+                BackgroundColor="#1C2A0B"
+                Padding="12,6"
+                VerticalOptions="Center">
+          <HorizontalStackLayout Spacing="8">
+            <Label Text="Printer"
+                   TextColor="#D2E4FB"
+                   VerticalOptions="Center" />
+            <Label Text="{Binding ConnectionStateText}"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center">
+              <Label.Triggers>
+                <DataTrigger TargetType="Label"
+                             Binding="{Binding ConnectionStateText}"
+                             Value="Connected">
+                  <Setter Property="TextColor"
+                          Value="#BDEE62" />
+                </DataTrigger>
+                <DataTrigger TargetType="Label"
+                             Binding="{Binding ConnectionStateText}"
+                             Value="Disconnected">
+                  <Setter Property="TextColor"
+                          Value="#FFB4AB" />
+                </DataTrigger>
+              </Label.Triggers>
+            </Label>
+          </HorizontalStackLayout>
+        </Border>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1"
+          ColumnDefinitions="1*,1.5*"
+          ColumnSpacing="14">
+      <Border Grid.Column="1"
+              Stroke="#2A3B4C"
+              StrokeThickness="1"
+              StrokeShape="RoundRectangle 14"
+              BackgroundColor="#0F2131"
+              Padding="14">
+        <VerticalStackLayout Spacing="12">
+          <Label Text="Products"
+                 TextColor="#D2E4FB"
+                 FontSize="24"
+                 FontAttributes="Bold" />
+
+          <ScrollView Orientation="Horizontal">
+            <HorizontalStackLayout Spacing="8">
+              <Border BackgroundColor="#209DC0"
+                      StrokeShape="RoundRectangle 999"
+                      Padding="14,6">
+                <Label Text="All Products"
+                       TextColor="White"
+                       FontAttributes="Bold" />
+              </Border>
+              <Border BackgroundColor="#1A2B3C"
+                      Stroke="#2A3B4C"
+                      StrokeShape="RoundRectangle 999"
+                      Padding="14,6">
+                <Label Text="Beverages"
+                       TextColor="#C4D4E8" />
+              </Border>
+              <Border BackgroundColor="#1A2B3C"
+                      Stroke="#2A3B4C"
+                      StrokeShape="RoundRectangle 999"
+                      Padding="14,6">
+                <Label Text="Snacks"
+                       TextColor="#C4D4E8" />
+              </Border>
+            </HorizontalStackLayout>
+          </ScrollView>
+
+          <CollectionView ItemsSource="{Binding PresetItems}"
+                          SelectionMode="None">
+            <CollectionView.ItemTemplate>
+              <DataTemplate>
+                <Border Stroke="#253648"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="#1A2B3C"
+                        Padding="12,10"
+                        Margin="0,0,0,8">
+                  <Grid ColumnDefinitions="*,Auto"
+                        ColumnSpacing="10">
+                    <VerticalStackLayout Spacing="2">
+                      <Label Text="{Binding Name}"
+                             FontSize="18"
+                             FontAttributes="Bold"
+                             TextColor="#D2E4FB" />
+                      <Label Text="{Binding DefaultPrice, StringFormat='HKD $ {0:F2}'}"
+                             TextColor="#69D4F8"
+                             FontAttributes="Bold" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1"
+                            Text="Add"
+                            BackgroundColor="#A2D149"
+                            TextColor="#243600"
+                            FontAttributes="Bold"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AddItemCommand}"
+                            CommandParameter="{Binding}" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </CollectionView.ItemTemplate>
+          </CollectionView>
+        </VerticalStackLayout>
+      </Border>
+
+      <Grid Grid.Column="0"
+            RowDefinitions="Auto,*,Auto,Auto"
+            RowSpacing="10">
+        <Border Stroke="#2A3B4C"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 14"
+                BackgroundColor="#0F2131"
+                Padding="12">
+          <VerticalStackLayout Spacing="10">
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="10">
+              <VerticalStackLayout Spacing="2">
+                <Label Text="Printer Connection"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="#D2E4FB" />
+                <Label Text="{Binding ConnectionStateText}">
+                  <Label.Triggers>
+                    <DataTrigger TargetType="Label"
+                                 Binding="{Binding ConnectionStateText}"
+                                 Value="Connected">
+                      <Setter Property="TextColor"
+                              Value="#BDEE62" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Label"
+                                 Binding="{Binding ConnectionStateText}"
+                                 Value="Disconnected">
+                      <Setter Property="TextColor"
+                              Value="#FFB4AB" />
+                    </DataTrigger>
+                  </Label.Triggers>
+                </Label>
+              </VerticalStackLayout>
+              <Button Grid.Column="1"
+                      Text="{Binding PrinterPanelToggleText}"
+                      FontSize="12"
+                      BackgroundColor="#1A2B3C"
+                      TextColor="#D2E4FB"
+                      Command="{Binding TogglePrinterPanelCommand}" />
+            </Grid>
+
+            <Grid IsVisible="{Binding IsPrinterPanelExpanded}"
+                  RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                  ColumnDefinitions="*,*"
+                  ColumnSpacing="8"
+                  RowSpacing="8">
+              <Picker Grid.Row="0"
+                      Grid.Column="0"
+                      Title="Mode"
+                      ItemsSource="{Binding ConnectionModes}"
+                      SelectedItem="{Binding ConnectionOptions.Mode}" />
+              <Entry Grid.Row="0"
+                     Grid.Column="1"
+                     Placeholder="Endpoint"
+                     Text="{Binding ConnectionOptions.Endpoint}" />
+              <Entry Grid.Row="1"
+                     Grid.Column="0"
+                     Placeholder="Baud Rate"
+                     Keyboard="Numeric"
+                     Text="{Binding ConnectionOptions.BaudRate}" />
+              <Entry Grid.Row="1"
+                     Grid.Column="1"
+                     Placeholder="Data Bits"
+                     Keyboard="Numeric"
+                     Text="{Binding ConnectionOptions.DataBits}" />
+              <Entry Grid.Row="2"
+                     Grid.Column="0"
+                     Placeholder="Stop Bits"
+                     Keyboard="Numeric"
+                     Text="{Binding ConnectionOptions.StopBits}" />
+              <Entry Grid.Row="2"
+                     Grid.Column="1"
+                     Placeholder="Parity"
+                     Keyboard="Numeric"
+                     Text="{Binding ConnectionOptions.Parity}" />
+              <Entry Grid.Row="3"
+                     Grid.Column="0"
+                     Placeholder="Flow Control"
+                     Keyboard="Numeric"
+                     Text="{Binding ConnectionOptions.FlowControl}" />
+              <HorizontalStackLayout Grid.Row="4"
+                                     Grid.ColumnSpan="2"
+                                     Spacing="8">
+                <Button Text="Connect"
+                        BackgroundColor="#209DC0"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        Command="{Binding ConnectPrinterCommand}" />
+                <Button Text="Disconnect"
+                        BackgroundColor="#253648"
+                        TextColor="#D2E4FB"
+                        FontAttributes="Bold"
+                        Command="{Binding DisconnectPrinterCommand}" />
+              </HorizontalStackLayout>
+            </Grid>
+          </VerticalStackLayout>
+        </Border>
+
+        <Border Grid.Row="1"
+                Stroke="#2A3B4C"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 14"
+                BackgroundColor="#0F2131"
+                Padding="12">
+          <Grid RowDefinitions="Auto,*,Auto"
+                RowSpacing="10">
+            <HorizontalStackLayout Spacing="8"
+                                   VerticalOptions="Center">
+              <Label Text="Current Sale"
+                     FontSize="20"
+                     FontAttributes="Bold"
+                     TextColor="#D2E4FB" />
+              <Label Text="{Binding TotalText}"
+                     TextColor="#A6D64D"
+                     VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding CartLines}"
+                            SelectionMode="Single"
+                            SelectedItem="{Binding SelectedCartLine}">
+              <CollectionView.ItemTemplate>
+                <DataTemplate>
+                  <Border Stroke="#253648"
+                          StrokeThickness="1"
+                          StrokeShape="RoundRectangle 10"
+                          BackgroundColor="#1A2B3C"
+                          Padding="10"
+                          Margin="0,0,0,8">
+                    <Grid ColumnDefinitions="2*,Auto,Auto,Auto"
+                          ColumnSpacing="8">
+                      <Label Text="{Binding Name}"
+                             FontAttributes="Bold"
+                             TextColor="#D2E4FB" />
+                      <Label Grid.Column="1"
+                             Text="{Binding Quantity, StringFormat='x{0}'}"
+                             TextColor="#C4D4E8" />
+                      <Label Grid.Column="2"
+                             Text="{Binding UnitPrice, StringFormat='HKD $ {0:F2}'}"
+                             TextColor="#69D4F8" />
+                      <Label Grid.Column="3"
+                             Text="{Binding LineTotal, StringFormat='HKD $ {0:F2}'}"
+                             TextColor="#D2E4FB"
+                             FontAttributes="Bold" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Grid Grid.Row="2"
+                  RowDefinitions="Auto,Auto"
+                  RowSpacing="8">
+              <Label Text="{Binding StatusMessage}"
+                     TextColor="#C4D4E8"
+                     LineBreakMode="WordWrap" />
+              <HorizontalStackLayout Grid.Row="1"
+                                     Spacing="8">
+                <Button Text="Clear"
+                        BackgroundColor="#253648"
+                        TextColor="#D2E4FB"
+                        Command="{Binding ClearCartCommand}" />
+                <Button Text="Print Receipt"
+                        BackgroundColor="#A2D149"
+                        TextColor="#243600"
+                        FontAttributes="Bold"
+                        Command="{Binding PrintReceiptCommand}" />
+              </HorizontalStackLayout>
+            </Grid>
+          </Grid>
+        </Border>
+
+        <Border Grid.Row="2"
+                Stroke="#2A3B4C"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 14"
+                BackgroundColor="#0F2131"
+                Padding="12">
+          <VerticalStackLayout Spacing="10">
+            <Label Text="Product Control"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="#D2E4FB" />
+            <Label Text="{Binding SelectedCartLineName}"
+                   TextColor="#C4D4E8"
+                   FontAttributes="Bold" />
+            <Label Text="{Binding SelectedCartLineTotalText}"
+                   TextColor="#8EA0B9"
+                   FontSize="12" />
+
+            <Border Stroke="#253648"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#1A2B3C"
+                    Padding="12,8">
+              <Label Text="{Binding PricePadInputText, StringFormat='HKD $ {0}'}"
+                     TextColor="#BDEE62"
+                     FontSize="28"
+                     FontAttributes="Bold"
+                     HorizontalTextAlignment="End" />
+            </Border>
+
+            <Grid ColumnDefinitions="1*,1*"
+                  ColumnSpacing="8"
+                  IsEnabled="{Binding HasSelectedCartLine}">
+              <Grid.Resources>
+                <Style TargetType="Button">
+                  <Setter Property="HeightRequest" Value="64" />
+                  <Setter Property="FontSize" Value="22" />
+                  <Setter Property="FontAttributes" Value="Bold" />
+                  <Setter Property="BackgroundColor" Value="#1A2B3C" />
+                  <Setter Property="TextColor" Value="#D2E4FB" />
+                  <Setter Property="BorderColor" Value="#2A3B4C" />
+                  <Setter Property="BorderWidth" Value="1" />
+                  <Setter Property="CornerRadius" Value="10" />
+                </Style>
+              </Grid.Resources>
+              <Grid RowDefinitions="*,*,*,*"
+                    ColumnDefinitions="*,*,*"
+                    ColumnSpacing="8"
+                    RowSpacing="8">
+                <Button Grid.Row="0"
+                        Grid.Column="0"
+                        Text="1"
+                        Command="{Binding PricePadInputCommand}"
+                        CommandParameter="1" />
+                <Button Grid.Row="0"
+                        Grid.Column="1"
+                        Text="2"
+                        Command="{Binding PricePadInputCommand}"
+                        CommandParameter="2" />
+                <Button Grid.Row="0"
+                        Grid.Column="2"
+                        Text="3"
+                        Command="{Binding PricePadInputCommand}"
+                        CommandParameter="3" />
+                <Button Grid.Row="1"
+                        Grid.Column="0"
+                        Text="4"
+                        Command="{Binding PricePadInputCommand}"
+                        CommandParameter="4" />
+                <Button Grid.Row="1"
+                        Grid.Column="1"
+                        Text="5"
+                        Command="{Binding PricePadInputCommand}"
+                        CommandParameter="5" />
+                <Button Grid.Row="1"
+                        Grid.Column="2"
+                        Text="6"
+                        Command="{Binding PricePadInputCommand}"
+                        CommandParameter="6" />
+                <Button Grid.Row="2"
+                        Grid.Column="0"
+                        Text="7"
+                        Command="{Binding PricePadInputCommand}"
+                        CommandParameter="7" />
+                <Button Grid.Row="2"
+                        Grid.Column="1"
+                        Text="8"
+                        Command="{Binding PricePadInputCommand}"
+                        CommandParameter="8" />
+                <Button Grid.Row="2"
+                        Grid.Column="2"
+                        Text="9"
+                        Command="{Binding PricePadInputCommand}"
+                        CommandParameter="9" />
+                <Button Grid.Row="3"
+                        Grid.Column="0"
+                        Text="CLR"
+                        Command="{Binding PricePadClearCommand}" />
+                <Button Grid.Row="3"
+                        Grid.Column="1"
+                        Text="0"
+                        Command="{Binding PricePadInputCommand}"
+                        CommandParameter="0" />
+                <Button Grid.Row="3"
+                        Grid.Column="2"
+                        Text="."
+                        Command="{Binding PricePadInputCommand}"
+                        CommandParameter="." />
+              </Grid>
+
+              <Button Grid.Column="1"
+                      Text="Apply Price"
+                      Command="{Binding ApplyFinalPriceCommand}"
+                      BackgroundColor="#A2D149"
+                      TextColor="#243600"
+                      FontSize="22"
+                      FontAttributes="Bold"
+                      CornerRadius="10" />
+            </Grid>
+          </VerticalStackLayout>
+        </Border>
+
+        <Label Grid.Row="3"
+               Text="On macOS, current default printer implementation is mock/file output."
+               FontSize="12"
+               TextColor="#8EA0B9"
+               Opacity="0.9" />
+      </Grid>
+    </Grid>
+  </Grid>
+</ContentPage>

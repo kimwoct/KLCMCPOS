@@ -97,7 +97,7 @@
                         <ColumnDefinition Width="Auto" />
                       </Grid.ColumnDefinitions>
                       <TextBlock Grid.Column="0" Text="{Binding Name}" />
-                      <TextBlock Grid.Column="1" FontWeight="SemiBold" Text="{Binding DefaultPrice, StringFormat=RM {0:F2}}" />
+                      <TextBlock Grid.Column="1" FontWeight="SemiBold" Text="{Binding DefaultPrice, StringFormat=HKD $ {0:F2}}" />
                     </Grid>
                   </Button>
                 </DataTemplate>

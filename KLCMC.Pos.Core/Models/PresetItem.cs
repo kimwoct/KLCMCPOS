@@ -1,4 +1,4 @@
-namespace KLCMC.Pos.App.Models;
+namespace KLCMC.Pos.Core.Models;
 
 public sealed class PresetItem
 {

@@ -1,6 +1,6 @@
-using KLCMC.Pos.App.Models;
+using KLCMC.Pos.Core.Models;
 
-namespace KLCMC.Pos.App.Services;
+namespace KLCMC.Pos.Core.Services;
 
 public interface IPrinterService
 {

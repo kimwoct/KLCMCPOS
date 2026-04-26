@@ -1,38 +1,44 @@
 # KLCMCPOS
 
-KLCMCPOS is a .NET 8 WPF POS starter app with phase-1 receipt printing through `POSDLL.dll`.
+KLCMCPOS is being migrated to a cross-platform architecture for **Windows 10 + macOS** on .NET 8.
 
-## Project layout
+## Projects
 
-- `KLCMCPOS.sln` - solution file
-- `KLCMC.Pos.App/` - WPF application
-- `KLCMC.Pos.App/libs/POSDLL.dll` - vendor SDK dependency copied from sample SDK
+- `KLCMC.Pos.Core` (`net8.0`)
+  - Shared POS domain models
+  - Cart and receipt composition logic
+  - Shared `IPrinterService` and `MainViewModel`
+- `KLCMC.Pos.Printer.Windows` (`net8.0-windows`)
+  - Real printer integration through `POSDLL.dll`
+- `KLCMC.Pos.Printer.Mock` (`net8.0`)
+  - Mock/file printer for macOS and non-hardware testing
+- `KLCMC.Pos.Maui` (`net8.0-maccatalyst;net8.0-windows10.0.19041.0`)
+  - Cross-platform UI shell (migration target)
+- `KLCMC.Pos.App` (`net8.0-windows`, WPF)
+  - Existing Windows UI retained temporarily as migration reference
 
-## Build requirements
+## Platform behavior
 
-1. .NET 8 SDK
-2. Windows-targeting build support (`EnableWindowsTargeting=true` is set in project)
-3. `POSDLL.dll` compatible with x64 runtime
-4. Printer driver installed for USB/driver mode
+- **Windows 10**: real `POSDLL.dll` hardware printing path is supported.
+- **macOS**: app flow uses mock printer output; real POSDLL hardware printing is not available on macOS.
 
-## Run
-
-1. Open `KLCMCPOS.sln` in Visual Studio or Rider on Windows.
-2. Build `KLCMC.Pos.App` (x64).
-3. Start app and configure printer connection:
-   - Serial: endpoint like `COM1`
-   - LAN: endpoint as printer IP
-   - USB: endpoint as installed printer name
-4. Add preset items, optionally override quantity/price in cart, then print receipt.
-
-## POSDLL phase-1 API usage
+## Printer API usage (Windows)
 
 - Open/close/status: `POS_Open`, `POS_IsOpen`, `POS_Close`
 - Print flow: `POS_SetMode(0x00)`, `POS_S_TextOut`, `POS_FeedLine`, `POS_CutPaper`
 
+## Build notes
+
+1. `KLCMC.Pos.Core`, `KLCMC.Pos.Printer.Mock`, and `KLCMC.Pos.Printer.Windows` build with .NET 8 SDK.
+2. `KLCMC.Pos.Maui` requires MAUI workloads/tooling support in your local .NET installation.
+3. `KLCMC.Pos.App` (WPF) requires Windows desktop build support.
+
 ## Smoke checklist
 
-1. Connect with valid endpoint and confirm status shows `Connected`.
-2. Add at least one item and edit quantity/price in cart.
-3. Print receipt and verify lines, total, feed, and cut behavior.
-4. Disconnect and confirm status shows `Disconnected`.
+1. Build `KLCMC.Pos.Core` and `KLCMC.Pos.Printer.Mock`.
+2. Run UI on target platform:
+   - MAUI (target architecture path)
+   - WPF (temporary Windows fallback/reference)
+3. Verify cart operations and total calculation.
+4. On macOS, verify mock receipt file output.
+5. On Windows 10, verify `POSDLL` connect/print/feed/cut flow with hardware.

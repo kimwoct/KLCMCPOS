@@ -1,16 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
     <PlatformTarget>x64</PlatformTarget>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\KLCMC.Pos.Core\KLCMC.Pos.Core.csproj" />
-    <ProjectReference Include="..\KLCMC.Pos.Printer.Windows\KLCMC.Pos.Printer.Windows.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="POSDLL">
+      <HintPath>libs\POSDLL.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
   </ItemGroup>
 </Project>
