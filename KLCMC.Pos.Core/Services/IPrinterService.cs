@@ -9,5 +9,6 @@ public interface IPrinterService
 
     void Open(PrinterConnectionOptions options);
     void Close();
+    void OpenDrawer();
     void PrintReceipt(IReadOnlyList<ReceiptLine> lines);
 }

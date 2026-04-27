@@ -14,14 +14,19 @@ public sealed class MainViewModel : BindableBase
     private readonly IPrinterSettingsRepository _printerSettingsRepository;
     private readonly RelayCommand _addNewProductCommand;
     private readonly RelayCommand _clearCartCommand;
+    private readonly RelayCommand _editCartLineCommand;
+    private readonly RelayCommand _removeCartLineCommand;
     private readonly RelayCommand _printReceiptCommand;
     private readonly RelayCommand _applyFinalPriceCommand;
     private readonly RelayCommand _addPaymentCommand;
     private readonly RelayCommand _confirmCheckoutCommand;
+    private readonly RelayCommand _openDrawerCommand;
+    private readonly RelayCommand _printPrinterTestCommand;
     private CartLine? _selectedCartLine;
     private bool _isPrinterPanelExpanded = true;
     private bool _isAddProductPopupVisible;
     private bool _isCheckoutPopupVisible;
+    private bool _isProductControlVisible;
     private string _newProductName = string.Empty;
     private string _newProductPriceText = string.Empty;
     private string _pricePadInputText = "0";
@@ -60,7 +65,11 @@ public sealed class MainViewModel : BindableBase
         TogglePrinterPanelCommand = new RelayCommand(_ => TogglePrinterPanel());
         ConnectPrinterCommand = new RelayCommand(_ => ConnectPrinter());
         DisconnectPrinterCommand = new RelayCommand(_ => DisconnectPrinter());
+        _openDrawerCommand = new RelayCommand(_ => OpenDrawer());
+        _printPrinterTestCommand = new RelayCommand(_ => PrintPrinterTest());
         _clearCartCommand = new RelayCommand(_ => ClearCart(), _ => CartLines.Count > 0);
+        _editCartLineCommand = new RelayCommand(EditCartLine);
+        _removeCartLineCommand = new RelayCommand(RemoveCartLine);
         _printReceiptCommand = new RelayCommand(_ => OpenCheckout(), _ => CartLines.Count > 0);
         PricePadInputCommand = new RelayCommand(AppendPricePadInput, _ => HasSelectedCartLine);
         PricePadBackspaceCommand = new RelayCommand(_ => BackspacePricePadInput(), _ => HasSelectedCartLine);
@@ -72,6 +81,7 @@ public sealed class MainViewModel : BindableBase
         MoneyPadBackspaceCommand = new RelayCommand(_ => BackspaceMoneyPadInput());
         MoneyPadClearCommand = new RelayCommand(_ => ClearMoneyPadInput());
         MoneyPadQuickAmountCommand = new RelayCommand(SetMoneyPadAmount);
+        SelectPaymentMethodCommand = new RelayCommand(SelectPaymentMethod);
         _addPaymentCommand = new RelayCommand(_ => AddPayment(), _ => CanAddPayment());
         RemovePaymentCommand = new RelayCommand(RemovePayment);
         _confirmCheckoutCommand = new RelayCommand(_ => ConfirmCheckout(), _ => CanConfirmCheckout());
@@ -85,6 +95,10 @@ public sealed class MainViewModel : BindableBase
             if (_selectedCartLine is not null && !CartLines.Contains(_selectedCartLine))
             {
                 SelectedCartLine = null;
+            }
+            if (CartLines.Count == 0)
+            {
+                IsProductControlVisible = false;
             }
         };
     }
@@ -112,7 +126,17 @@ public sealed class MainViewModel : BindableBase
             RaisePropertyChanged(nameof(SelectedCartLineName));
             RaisePropertyChanged(nameof(SelectedCartLineTotalText));
             RaisePricePadCommandStateChanged();
+            if (_selectedCartLine is null)
+            {
+                IsProductControlVisible = false;
+            }
         }
+    }
+
+    public bool IsProductControlVisible
+    {
+        get => _isProductControlVisible;
+        private set => SetProperty(ref _isProductControlVisible, value);
     }
 
     public string StatusMessage
@@ -206,6 +230,10 @@ public sealed class MainViewModel : BindableBase
 
     public RelayCommand DisconnectPrinterCommand { get; }
 
+    public RelayCommand OpenDrawerCommand => _openDrawerCommand;
+
+    public RelayCommand PrintPrinterTestCommand => _printPrinterTestCommand;
+
     public RelayCommand PricePadInputCommand { get; }
 
     public RelayCommand PricePadBackspaceCommand { get; }
@@ -217,6 +245,10 @@ public sealed class MainViewModel : BindableBase
     public RelayCommand ApplyFinalPriceCommand => _applyFinalPriceCommand;
 
     public RelayCommand ClearCartCommand => _clearCartCommand;
+
+    public RelayCommand EditCartLineCommand => _editCartLineCommand;
+
+    public RelayCommand RemoveCartLineCommand => _removeCartLineCommand;
 
     public RelayCommand PrintReceiptCommand => _printReceiptCommand;
 
@@ -350,6 +382,56 @@ public sealed class MainViewModel : BindableBase
         RaisePropertyChanged(nameof(PrinterPanelToggleText));
     }
 
+    private void OpenDrawer()
+    {
+        try
+        {
+            _printerSettingsRepository.Save(ConnectionOptions);
+            _printerService.OpenDrawer();
+            StatusMessage = "Cash drawer opened.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            StatusMessage = $"Open drawer failed: {ex.Message}";
+        }
+        catch (DllNotFoundException ex)
+        {
+            StatusMessage = $"POSDLL load failed: {ex.Message}";
+        }
+        catch (BadImageFormatException ex)
+        {
+            StatusMessage = $"POSDLL architecture mismatch: {ex.Message}";
+        }
+    }
+
+    private void PrintPrinterTest()
+    {
+        try
+        {
+            _printerSettingsRepository.Save(ConnectionOptions);
+            _printerService.PrintReceipt(
+            [
+                new ReceiptLine { Text = "KLCMC POS" },
+                new ReceiptLine { Text = "Printer Test" },
+                new ReceiptLine { Text = $"Connection: {ConnectionOptions.Mode} {ConnectionOptions.Endpoint}" },
+                new ReceiptLine { Text = $"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}" }
+            ]);
+            StatusMessage = "Printer test sent.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            StatusMessage = $"Printer test failed: {ex.Message}";
+        }
+        catch (DllNotFoundException ex)
+        {
+            StatusMessage = $"POSDLL load failed: {ex.Message}";
+        }
+        catch (BadImageFormatException ex)
+        {
+            StatusMessage = $"POSDLL architecture mismatch: {ex.Message}";
+        }
+    }
+
     private void AppendPricePadInput(object? parameter)
     {
         if (SelectedCartLine is null || parameter is not string key)
@@ -459,6 +541,8 @@ public sealed class MainViewModel : BindableBase
         SelectedCartLine.UnitPrice = finalPrice / SelectedCartLine.Quantity;
         StatusMessage = $"{SelectedCartLine.Name} final price updated to HKD ${finalPrice:F2}.";
         RaisePropertyChanged(nameof(SelectedCartLineTotalText));
+        IsProductControlVisible = false;
+        SelectedCartLine = null;
     }
 
     private void SyncPricePadFromSelectedLine()
@@ -479,7 +563,41 @@ public sealed class MainViewModel : BindableBase
     {
         CartLines.Clear();
         SelectedCartLine = null;
+        IsProductControlVisible = false;
         StatusMessage = "Cart cleared.";
+    }
+
+    private void EditCartLine(object? parameter)
+    {
+        if (parameter is not CartLine line)
+        {
+            return;
+        }
+
+        SelectedCartLine = line;
+        IsProductControlVisible = true;
+        StatusMessage = $"Editing {line.Name}.";
+    }
+
+    private void RemoveCartLine(object? parameter)
+    {
+        if (parameter is not CartLine line)
+        {
+            return;
+        }
+
+        if (!CartLines.Remove(line))
+        {
+            return;
+        }
+
+        if (ReferenceEquals(SelectedCartLine, line))
+        {
+            SelectedCartLine = null;
+            IsProductControlVisible = false;
+        }
+
+        StatusMessage = $"{line.Name} removed from cart.";
     }
 
     private void PrintReceipt()
@@ -521,6 +639,10 @@ public sealed class MainViewModel : BindableBase
             if (SetProperty(ref _selectedNewPaymentMethod, value))
             {
                 RaisePropertyChanged(nameof(IsCashMethodSelected));
+                RaisePropertyChanged(nameof(IsCardMethodSelected));
+                RaisePropertyChanged(nameof(IsOctopusMethodSelected));
+                RaisePropertyChanged(nameof(IsFpsMethodSelected));
+                RaisePropertyChanged(nameof(IsOtherMethodSelected));
                 RaisePropertyChanged(nameof(MoneyPadLabelText));
                 RaisePropertyChanged(nameof(ChangePreviewText));
                 _addPaymentCommand.RaiseCanExecuteChanged();
@@ -529,6 +651,14 @@ public sealed class MainViewModel : BindableBase
     }
 
     public bool IsCashMethodSelected => SelectedNewPaymentMethod == PaymentMethod.Cash;
+
+    public bool IsCardMethodSelected => SelectedNewPaymentMethod == PaymentMethod.Card;
+
+    public bool IsOctopusMethodSelected => SelectedNewPaymentMethod == PaymentMethod.Octopus;
+
+    public bool IsFpsMethodSelected => SelectedNewPaymentMethod == PaymentMethod.FPS;
+
+    public bool IsOtherMethodSelected => SelectedNewPaymentMethod == PaymentMethod.Other;
 
     public string MoneyPadLabelText =>
         IsCashMethodSelected ? "Money Received (HKD)" : "Charge Amount (HKD)";
@@ -548,7 +678,7 @@ public sealed class MainViewModel : BindableBase
 
     public string AmountDueText => $"Amount Due: HKD ${Total:F2}";
 
-    public decimal PaidTotal => Payments.Sum(p => p.Amount);
+    public decimal PaidTotal => Payments.Sum(p => p.TenderedAmount ?? p.Amount);
 
     public string PaidTotalText => $"Paid: HKD ${PaidTotal:F2}";
 
@@ -556,12 +686,20 @@ public sealed class MainViewModel : BindableBase
     {
         get
         {
-            var outstanding = Total - PaidTotal;
-            return outstanding < 0m ? 0m : outstanding;
+            return Total - PaidTotal;
         }
     }
 
     public string OutstandingText => $"Outstanding: HKD ${OutstandingAmount:F2}";
+
+    private decimal RemainingAmount
+    {
+        get
+        {
+            var remaining = Total - Payments.Sum(p => p.Amount);
+            return remaining < 0m ? 0m : remaining;
+        }
+    }
 
     public string ChangePreviewText
     {
@@ -581,7 +719,7 @@ public sealed class MainViewModel : BindableBase
                 return string.Empty;
             }
 
-            var change = tendered - OutstandingAmount;
+            var change = tendered - RemainingAmount;
             return change > 0m ? $"Change preview: HKD ${change:F2}" : string.Empty;
         }
     }
@@ -593,6 +731,8 @@ public sealed class MainViewModel : BindableBase
     public RelayCommand MoneyPadClearCommand { get; }
 
     public RelayCommand MoneyPadQuickAmountCommand { get; }
+
+    public RelayCommand SelectPaymentMethodCommand { get; }
 
     public RelayCommand AddPaymentCommand => _addPaymentCommand;
 
@@ -689,7 +829,7 @@ public sealed class MainViewModel : BindableBase
 
         if (string.Equals(raw, "EXACT", StringComparison.OrdinalIgnoreCase))
         {
-            MoneyPadInputText = OutstandingAmount.ToString("0.##", CultureInfo.InvariantCulture);
+            MoneyPadInputText = RemainingAmount.ToString("0.##", CultureInfo.InvariantCulture);
             return;
         }
 
@@ -701,7 +841,7 @@ public sealed class MainViewModel : BindableBase
 
     private bool CanAddPayment()
     {
-        if (OutstandingAmount <= 0m)
+        if (RemainingAmount <= 0m)
         {
             return false;
         }
@@ -718,6 +858,19 @@ public sealed class MainViewModel : BindableBase
         return amount > 0m;
     }
 
+    private void SelectPaymentMethod(object? parameter)
+    {
+        if (parameter is PaymentMethod pm)
+        {
+            SelectedNewPaymentMethod = pm;
+            return;
+        }
+        if (parameter is string s && Enum.TryParse<PaymentMethod>(s, true, out var parsed))
+        {
+            SelectedNewPaymentMethod = parsed;
+        }
+    }
+
     private void AddPayment()
     {
         if (!CanAddPayment())
@@ -726,7 +879,7 @@ public sealed class MainViewModel : BindableBase
         }
 
         var input = decimal.Parse(MoneyPadInputText, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-        var outstanding = OutstandingAmount;
+        var outstanding = RemainingAmount;
 
         CheckoutPaymentLine line;
         if (SelectedNewPaymentMethod == PaymentMethod.Cash)
@@ -753,7 +906,7 @@ public sealed class MainViewModel : BindableBase
 
         Payments.Add(line);
         RaiseCheckoutTotalsChanged();
-        MoneyPadInputText = OutstandingAmount.ToString("0.##", CultureInfo.InvariantCulture);
+        MoneyPadInputText = RemainingAmount.ToString("0.##", CultureInfo.InvariantCulture);
         StatusMessage = $"Added {line.DisplayText}.";
     }
 
@@ -766,12 +919,12 @@ public sealed class MainViewModel : BindableBase
 
         Payments.Remove(line);
         RaiseCheckoutTotalsChanged();
-        MoneyPadInputText = OutstandingAmount.ToString("0.##", CultureInfo.InvariantCulture);
+        MoneyPadInputText = RemainingAmount.ToString("0.##", CultureInfo.InvariantCulture);
     }
 
     private bool CanConfirmCheckout()
     {
-        return IsCheckoutPopupVisible && CartLines.Count > 0 && PaidTotal >= Total && Total > 0m;
+        return IsCheckoutPopupVisible && CartLines.Count > 0 && RemainingAmount <= 0m && Total > 0m;
     }
 
     private void ConfirmCheckout()

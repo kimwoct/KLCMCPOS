@@ -51,6 +51,17 @@ public sealed class PosDllPrinterService : IPrinterService
         }
     }
 
+    public void OpenDrawer()
+    {
+        if (!global::POSDLL.Pos.POS_IsOpen())
+        {
+            throw new InvalidOperationException("Printer is not connected.");
+        }
+
+        global::POSDLL.Pos.POS_SetMode(0x00);
+        global::POSDLL.Pos.POS_S_TextOut("\x1B\x70\x00\x3C\xFF", 0, 0, 0, 0x00, 0x00);
+    }
+
     public void PrintReceipt(IReadOnlyList<ReceiptLine> lines)
     {
         if (!global::POSDLL.Pos.POS_IsOpen())

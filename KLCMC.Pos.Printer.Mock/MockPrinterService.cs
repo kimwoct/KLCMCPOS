@@ -36,6 +36,20 @@ public sealed class MockPrinterService : IPrinterService
         _isOpen = false;
     }
 
+    public void OpenDrawer()
+    {
+        if (!_isOpen)
+        {
+            _lastError = "Printer is not connected.";
+            throw new InvalidOperationException(_lastError);
+        }
+
+        var fileName = $"drawer-open-{DateTime.Now:yyyyMMdd-HHmmss}.txt";
+        var outputPath = Path.Combine(_outputDirectory, fileName);
+        File.WriteAllText(outputPath, "Drawer open triggered.", Encoding.UTF8);
+        _lastError = null;
+    }
+
     public void PrintReceipt(IReadOnlyList<ReceiptLine> lines)
     {
         if (!_isOpen)

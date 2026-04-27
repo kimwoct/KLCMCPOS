@@ -112,9 +112,15 @@
       </Border>
 
       <Border Grid.Column="2" BorderThickness="1" BorderBrush="#DDD" CornerRadius="4" Padding="10">
-        <DockPanel>
-          <TextBlock DockPanel.Dock="Top" Margin="0,0,0,8" FontSize="16" FontWeight="SemiBold" Text="Cart" />
-          <DataGrid ItemsSource="{Binding CartLines}"
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <TextBlock Grid.Row="0" Margin="0,0,0,8" FontSize="16" FontWeight="SemiBold" Text="Cart" />
+          <DataGrid Grid.Row="1"
+                    ItemsSource="{Binding CartLines}"
                     SelectedItem="{Binding SelectedCartLine}"
                     AutoGenerateColumns="False"
                     CanUserAddRows="False"
@@ -126,7 +132,188 @@
               <DataGridTextColumn Header="Line Total" Binding="{Binding LineTotal, StringFormat={}{0:F2}}" IsReadOnly="True" Width="*" />
             </DataGrid.Columns>
           </DataGrid>
-        </DockPanel>
+
+          <!-- Inline checkout panel (under cart) -->
+          <Border Grid.Row="2"
+                  Margin="0,10,0,0"
+                  Padding="10"
+                  BorderBrush="#CCC"
+                  BorderThickness="1"
+                  CornerRadius="4"
+                  Background="#F7F9FC"
+                  Visibility="{Binding IsCheckoutPopupVisible, Converter={StaticResource BoolToVis}}">
+            <StackPanel>
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                  <TextBlock Text="Amount Due" Foreground="#666" FontSize="11" />
+                  <TextBlock Text="{Binding AmountDueText}" FontSize="16" FontWeight="Bold" Foreground="#2E7D32" />
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                  <TextBlock Text="Paid" Foreground="#666" FontSize="11" />
+                  <TextBlock Text="{Binding PaidTotalText}" FontSize="16" FontWeight="Bold" />
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                  <TextBlock Text="Outstanding" Foreground="#666" FontSize="11" />
+                  <TextBlock Text="{Binding OutstandingText}" FontSize="16" FontWeight="Bold" Foreground="#C77800" />
+                </StackPanel>
+                <Button Grid.Column="3" Content="✕" Width="28" Height="28" Padding="0"
+                        FontWeight="Bold" Foreground="#B00020" Background="#FCE4E4"
+                        BorderBrush="#F0BFBF" VerticalAlignment="Top"
+                        Command="{Binding CancelCheckoutCommand}" />
+              </Grid>
+
+              <UniformGrid Rows="1" Columns="5" Margin="0,8,0,0">
+                <UniformGrid.Resources>
+                  <Style x:Key="TileBtn" TargetType="Button">
+                    <Setter Property="Margin" Value="2" />
+                    <Setter Property="Height" Value="42" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="Background" Value="#E5ECF4" />
+                    <Setter Property="BorderBrush" Value="#C7D3E0" />
+                  </Style>
+                </UniformGrid.Resources>
+                <Button Content="💵 Cash" Style="{StaticResource TileBtn}"
+                        Command="{Binding SelectPaymentMethodCommand}" CommandParameter="Cash">
+                  <Button.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource TileBtn}">
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsCashMethodSelected}" Value="True">
+                          <Setter Property="Background" Value="#1F3D5C" />
+                          <Setter Property="Foreground" Value="White" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Button.Resources>
+                </Button>
+                <Button Content="💳 Card" Style="{StaticResource TileBtn}"
+                        Command="{Binding SelectPaymentMethodCommand}" CommandParameter="Card">
+                  <Button.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource TileBtn}">
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsCardMethodSelected}" Value="True">
+                          <Setter Property="Background" Value="#1F3D5C" />
+                          <Setter Property="Foreground" Value="White" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Button.Resources>
+                </Button>
+                <Button Content="🐙 Octopus" Style="{StaticResource TileBtn}"
+                        Command="{Binding SelectPaymentMethodCommand}" CommandParameter="Octopus">
+                  <Button.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource TileBtn}">
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsOctopusMethodSelected}" Value="True">
+                          <Setter Property="Background" Value="#1F3D5C" />
+                          <Setter Property="Foreground" Value="White" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Button.Resources>
+                </Button>
+                <Button Content="📱 FPS" Style="{StaticResource TileBtn}"
+                        Command="{Binding SelectPaymentMethodCommand}" CommandParameter="FPS">
+                  <Button.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource TileBtn}">
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsFpsMethodSelected}" Value="True">
+                          <Setter Property="Background" Value="#1F3D5C" />
+                          <Setter Property="Foreground" Value="White" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Button.Resources>
+                </Button>
+                <Button Content="… Other" Style="{StaticResource TileBtn}"
+                        Command="{Binding SelectPaymentMethodCommand}" CommandParameter="Other">
+                  <Button.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource TileBtn}">
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsOtherMethodSelected}" Value="True">
+                          <Setter Property="Background" Value="#1F3D5C" />
+                          <Setter Property="Foreground" Value="White" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Button.Resources>
+                </Button>
+              </UniformGrid>
+
+              <Border Margin="0,8,0,0" BorderBrush="#DDD" BorderThickness="1" CornerRadius="4" Padding="6" MinHeight="50" Background="White">
+                <ItemsControl ItemsSource="{Binding Payments}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="*" />
+                          <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding DisplayText}" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Content="Remove"
+                                Command="{Binding DataContext.RemovePaymentCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Border>
+
+              <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                  <TextBlock Text="{Binding MoneyPadLabelText}" FontWeight="SemiBold" />
+                  <Border BorderBrush="#CCC" BorderThickness="1" CornerRadius="4" Padding="8,4" Margin="0,2" Background="White">
+                    <TextBlock Text="{Binding MoneyPadInputText}" FontSize="18" FontWeight="Bold" TextAlignment="Right" />
+                  </Border>
+                  <TextBlock Text="{Binding ChangePreviewText}" Foreground="#2E7D32" FontWeight="Bold" />
+                </StackPanel>
+                <UniformGrid Grid.Column="1" Rows="5" Columns="4" Margin="6,0,0,0">
+                  <Button Content="7" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="7" />
+                  <Button Content="8" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="8" />
+                  <Button Content="9" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="9" />
+                  <Button Content="20" Margin="2" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="20" />
+                  <Button Content="4" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="4" />
+                  <Button Content="5" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="5" />
+                  <Button Content="6" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="6" />
+                  <Button Content="50" Margin="2" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="50" />
+                  <Button Content="1" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="1" />
+                  <Button Content="2" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="2" />
+                  <Button Content="3" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="3" />
+                  <Button Content="100" Margin="2" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="100" />
+                  <Button Content="0" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="0" />
+                  <Button Content="00" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="00" />
+                  <Button Content="." Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="." />
+                  <Button Content="500" Margin="2" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="500" />
+                  <Button Content="C" Margin="2" Command="{Binding MoneyPadClearCommand}" />
+                  <Button Content="⌫" Margin="2" Command="{Binding MoneyPadBackspaceCommand}" />
+                  <Button Content="Exact" FontWeight="Bold" Margin="2" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="EXACT" Grid.ColumnSpan="2" />
+                  <Button Content="" Margin="2" IsEnabled="False" Visibility="Hidden" />
+                </UniformGrid>
+              </Grid>
+
+              <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Add Payment" Height="36" Margin="0,0,4,0" FontWeight="Bold"
+                        Background="#1F3D5C" Foreground="White"
+                        Command="{Binding AddPaymentCommand}" />
+                <Button Grid.Column="1" Content="Confirm and Print" Height="36" Margin="4,0,0,0" FontWeight="Bold"
+                        Background="#A2D149" Command="{Binding ConfirmCheckoutCommand}" />
+              </Grid>
+            </StackPanel>
+          </Border>
+        </Grid>
       </Border>
     </Grid>
 
@@ -148,91 +335,5 @@
       </Grid>
     </Border>
 
-    <!-- Checkout popup overlay -->
-    <Grid Grid.Row="0" Grid.RowSpan="3"
-          Background="#A0000000"
-          Visibility="{Binding IsCheckoutPopupVisible, Converter={StaticResource BoolToVis}}">
-      <Border Background="White" BorderBrush="#CCC" BorderThickness="1" CornerRadius="6"
-              Padding="16" HorizontalAlignment="Center" VerticalAlignment="Center"
-              MinWidth="640" MaxWidth="820">
-        <StackPanel>
-          <TextBlock Text="Checkout" FontSize="22" FontWeight="Bold" />
-          <TextBlock Text="{Binding AmountDueText}" FontSize="18" FontWeight="Bold" Foreground="#2E7D32" Margin="0,8,0,0" />
-          <TextBlock Text="{Binding PaidTotalText}" FontSize="14" Margin="0,2,0,0" />
-          <TextBlock Text="{Binding OutstandingText}" FontSize="14" FontWeight="Bold" Foreground="#C77800" Margin="0,2,0,8" />
-
-          <Border BorderBrush="#DDD" BorderThickness="1" CornerRadius="4" Padding="6" MinHeight="60">
-            <ItemsControl ItemsSource="{Binding Payments}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                  <Grid Margin="0,2">
-                    <Grid.ColumnDefinitions>
-                      <ColumnDefinition Width="*" />
-                      <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding DisplayText}" VerticalAlignment="Center" />
-                    <Button Grid.Column="1" Content="Remove"
-                            Command="{Binding DataContext.RemovePaymentCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                            CommandParameter="{Binding}" />
-                  </Grid>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </Border>
-
-          <Grid Margin="0,10,0,0">
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="*" />
-              <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Column="0" Margin="0,0,8,0">
-              <TextBlock Text="Payment Method" FontWeight="SemiBold" />
-              <ComboBox ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding SelectedNewPaymentMethod}" Margin="0,4" />
-              <TextBlock Text="{Binding MoneyPadLabelText}" FontWeight="SemiBold" Margin="0,8,0,0" />
-              <Border BorderBrush="#CCC" BorderThickness="1" CornerRadius="4" Padding="10,6" Margin="0,4">
-                <TextBlock Text="{Binding MoneyPadInputText}" FontSize="22" FontWeight="Bold" TextAlignment="Right" />
-              </Border>
-              <TextBlock Text="{Binding ChangePreviewText}" Foreground="#2E7D32" FontWeight="Bold" />
-              <Button Content="Add Payment" Height="40" Margin="0,8,0,0" FontWeight="Bold"
-                      Command="{Binding AddPaymentCommand}" />
-            </StackPanel>
-
-            <UniformGrid Grid.Column="1" Rows="5" Columns="4" Margin="8,0,0,0">
-              <Button Content="7" FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="7" />
-              <Button Content="8" FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="8" />
-              <Button Content="9" FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="9" />
-              <Button Content="20" FontSize="14" Margin="2" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="20" />
-              <Button Content="4" FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="4" />
-              <Button Content="5" FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="5" />
-              <Button Content="6" FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="6" />
-              <Button Content="50" FontSize="14" Margin="2" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="50" />
-              <Button Content="1" FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="1" />
-              <Button Content="2" FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="2" />
-              <Button Content="3" FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="3" />
-              <Button Content="100" FontSize="14" Margin="2" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="100" />
-              <Button Content="0" FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="0" />
-              <Button Content="00" FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="00" />
-              <Button Content="." FontSize="16" Margin="2" Command="{Binding MoneyPadInputCommand}" CommandParameter="." />
-              <Button Content="500" FontSize="14" Margin="2" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="500" />
-              <Button Content="C" FontSize="14" Margin="2" Command="{Binding MoneyPadClearCommand}" />
-              <Button Content="⌫" FontSize="14" Margin="2" Command="{Binding MoneyPadBackspaceCommand}" />
-              <Button Content="Exact" FontSize="14" FontWeight="Bold" Margin="2" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="EXACT" Grid.ColumnSpan="2" />
-              <Button Content="" Margin="2" IsEnabled="False" Visibility="Hidden" />
-            </UniformGrid>
-          </Grid>
-
-          <Grid Margin="0,12,0,0">
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="*" />
-              <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="Cancel" Height="44" Margin="0,0,6,0" Command="{Binding CancelCheckoutCommand}" />
-            <Button Grid.Column="1" Content="Confirm and Print" Height="44" Margin="6,0,0,0" FontWeight="Bold"
-                    Background="#A2D149" Command="{Binding ConfirmCheckoutCommand}" />
-          </Grid>
-        </StackPanel>
-      </Border>
-    </Grid>
   </Grid>
 </Window>

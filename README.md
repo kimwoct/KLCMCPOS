@@ -33,6 +33,38 @@ KLCMCPOS is being migrated to a cross-platform architecture for **Windows 10 + m
 2. `KLCMC.Pos.Maui` requires MAUI workloads/tooling support in your local .NET installation.
 3. `KLCMC.Pos.App` (WPF) requires Windows desktop build support.
 
+### VS Code / C# Dev Kit on macOS
+
+If `ms-dotnettools.csdevkit.Projects.log` shows errors like:
+- `The target platform identifier maccatalyst was not recognized`
+- `Could not resolve SDK "Microsoft.NET.Sdk.WindowsDesktop"`
+
+then VS Code is usually resolving to Homebrew `dotnet` instead of the SDK at
+`/usr/local/share/dotnet` (which has the MAUI workloads used by this repo).
+
+This repository pins the SDK in three layers:
+
+1. `global.json` requires SDK `9.0.100` (`rollForward: latestMajor`). This makes
+   the .NET host skip Homebrew `dotnet@8` (8.0.125) and resolve to
+   `/usr/local/share/dotnet`, which ships the MAUI workloads and the
+   `Microsoft.NET.Sdk.WindowsDesktop` targets used by the WPF host.
+2. `.vscode/settings.json` pins C# / C# Dev Kit / .NET runtime acquisition to
+   `/usr/local/share/dotnet/dotnet` and forces the terminal to use the same
+   `DOTNET_ROOT` and `PATH`.
+3. `~/.zshrc` exports `DOTNET_ROOT=/usr/local/share/dotnet` and prefixes
+   `PATH` so CLI builds outside VS Code use the same SDK.
+
+If VS Code is launched from the Dock/Spotlight (not from a terminal), GUI apps
+do not read `~/.zshrc`. Run this once so launchd-spawned VS Code inherits the
+correct env, then quit and relaunch VS Code:
+
+```sh
+launchctl setenv DOTNET_ROOT /usr/local/share/dotnet
+```
+
+After any of these changes, run **Developer: Reload Window** in VS Code to
+make the C# Dev Kit re-evaluate projects.
+
 ## Smoke checklist
 
 1. Build `KLCMC.Pos.Core` and `KLCMC.Pos.Printer.Mock`.
