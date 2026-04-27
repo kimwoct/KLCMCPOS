@@ -30,7 +30,17 @@ public static class DatabaseInitializer
 
         if (!db.PrinterSettings.Any())
         {
-            db.PrinterSettings.Add(new PrinterSettingEntity { Id = 1 });
+            db.PrinterSettings.Add(new PrinterSettingEntity
+            {
+                Id = 1,
+                Mode = KLCMC.Pos.Core.Models.PrinterConnectionMode.Usb,
+                Endpoint = "USB001",
+                BaudRate = 9600,
+                DataBits = 8,
+                StopBits = 0,
+                Parity = 0,
+                FlowControl = 1
+            });
             db.SaveChanges();
         }
     }

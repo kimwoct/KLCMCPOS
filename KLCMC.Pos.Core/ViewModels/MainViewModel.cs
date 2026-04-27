@@ -33,6 +33,7 @@ public sealed class MainViewModel : BindableBase
     private string _moneyPadInputText = "0";
     private PaymentMethod _selectedNewPaymentMethod = PaymentMethod.Cash;
     private string _statusMessage = "Ready.";
+    private readonly ObservableCollection<string> _printerConsoleEntries = [];
 
     public MainViewModel(
         IPrinterService printerService,
@@ -86,6 +87,7 @@ public sealed class MainViewModel : BindableBase
         RemovePaymentCommand = new RelayCommand(RemovePayment);
         _confirmCheckoutCommand = new RelayCommand(_ => ConfirmCheckout(), _ => CanConfirmCheckout());
         CancelCheckoutCommand = new RelayCommand(_ => CancelCheckout());
+        AppendPrinterConsole("Printer console ready.");
 
         CartLines.CollectionChanged += (_, _) =>
         {
@@ -211,6 +213,8 @@ public sealed class MainViewModel : BindableBase
     public string PrinterPanelToggleText => IsPrinterPanelExpanded ? "Hide details" : "Show details";
 
     public string ConnectionStateText => _printerService.IsOpen ? "Connected" : "Disconnected";
+
+    public string PrinterConsoleText => string.Join(Environment.NewLine, _printerConsoleEntries);
 
     public decimal Total => CartLines.Sum(line => line.LineTotal);
 
@@ -350,21 +354,25 @@ public sealed class MainViewModel : BindableBase
             _printerSettingsRepository.Save(ConnectionOptions);
             _printerService.Open(ConnectionOptions);
             StatusMessage = "Printer connected.";
+            AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));
         }
         catch (InvalidOperationException ex)
         {
             StatusMessage = $"Connection failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));
         }
         catch (DllNotFoundException ex)
         {
             StatusMessage = $"POSDLL load failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));
         }
         catch (BadImageFormatException ex)
         {
             StatusMessage = $"POSDLL architecture mismatch: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));
         }
     }
@@ -373,6 +381,7 @@ public sealed class MainViewModel : BindableBase
     {
         _printerService.Close();
         StatusMessage = "Printer disconnected.";
+        AppendPrinterConsole(StatusMessage);
         RaisePropertyChanged(nameof(ConnectionStateText));
     }
 
@@ -389,18 +398,22 @@ public sealed class MainViewModel : BindableBase
             _printerSettingsRepository.Save(ConnectionOptions);
             _printerService.OpenDrawer();
             StatusMessage = "Cash drawer opened.";
+            AppendPrinterConsole(StatusMessage);
         }
         catch (InvalidOperationException ex)
         {
             StatusMessage = $"Open drawer failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
         }
         catch (DllNotFoundException ex)
         {
             StatusMessage = $"POSDLL load failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
         }
         catch (BadImageFormatException ex)
         {
             StatusMessage = $"POSDLL architecture mismatch: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
         }
     }
 
@@ -417,19 +430,35 @@ public sealed class MainViewModel : BindableBase
                 new ReceiptLine { Text = $"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}" }
             ]);
             StatusMessage = "Printer test sent.";
+            AppendPrinterConsole(StatusMessage);
         }
         catch (InvalidOperationException ex)
         {
             StatusMessage = $"Printer test failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
         }
         catch (DllNotFoundException ex)
         {
             StatusMessage = $"POSDLL load failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
         }
         catch (BadImageFormatException ex)
         {
             StatusMessage = $"POSDLL architecture mismatch: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
         }
+    }
+
+    private void AppendPrinterConsole(string message)
+    {
+        var line = $"[{DateTime.Now:HH:mm:ss}] {message}";
+        _printerConsoleEntries.Add(line);
+        while (_printerConsoleEntries.Count > 120)
+        {
+            _printerConsoleEntries.RemoveAt(0);
+        }
+
+        RaisePropertyChanged(nameof(PrinterConsoleText));
     }
 
     private void AppendPricePadInput(object? parameter)

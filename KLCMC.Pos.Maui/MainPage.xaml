@@ -631,7 +631,7 @@
             </Grid>
             <Grid x:Name="ConfigureTabContent"
                   IsVisible="False"
-                  RowDefinitions="Auto,Auto,*"
+                  RowDefinitions="Auto,Auto,*,Auto"
                   RowSpacing="14">
               <Label Text="Printer Configure"
                      FontSize="32"
@@ -707,7 +707,29 @@
                 </Grid>
               </Border>
 
-              <Label Grid.Row="2"
+              <Border Grid.Row="2"
+                      Stroke="#2A3B4C"
+                      StrokeShape="RoundRectangle 14"
+                      BackgroundColor="#0F2131"
+                      Padding="12">
+                <Grid RowDefinitions="Auto,*"
+                      RowSpacing="8">
+                  <Label Text="Printer Console"
+                         FontSize="16"
+                         FontAttributes="Bold"
+                         TextColor="#D2E4FB" />
+                  <ScrollView Grid.Row="1"
+                              HeightRequest="170">
+                    <Label Text="{Binding PrinterConsoleText}"
+                           TextColor="#8EA0B9"
+                           FontFamily="Courier New"
+                           FontSize="13"
+                           LineBreakMode="WordWrap" />
+                  </ScrollView>
+                </Grid>
+              </Border>
+
+              <Label Grid.Row="3"
                      Text="{Binding StatusMessage}"
                      TextColor="#8EA0B9"
                      FontSize="13"

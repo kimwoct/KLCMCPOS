@@ -19,8 +19,31 @@ public sealed class PrinterSettingsRepository : IPrinterSettingsRepository
         var entity = db.PrinterSettings.Find(1);
         if (entity is null)
         {
-            entity = new PrinterSettingEntity { Id = 1 };
+            entity = new PrinterSettingEntity
+            {
+                Id = 1,
+                Mode = PrinterConnectionMode.Usb,
+                Endpoint = "USB001",
+                BaudRate = 9600,
+                DataBits = 8,
+                StopBits = 0,
+                Parity = 0,
+                FlowControl = 1
+            };
             db.PrinterSettings.Add(entity);
+            db.SaveChanges();
+        }
+        else if (entity.Mode == PrinterConnectionMode.Serial &&
+                 string.Equals(entity.Endpoint, "COM1", StringComparison.OrdinalIgnoreCase) &&
+                 entity.BaudRate == 115200 &&
+                 entity.DataBits == 8 &&
+                 entity.StopBits == 0 &&
+                 entity.Parity == 0 &&
+                 entity.FlowControl == 1)
+        {
+            entity.Mode = PrinterConnectionMode.Usb;
+            entity.Endpoint = "USB001";
+            entity.BaudRate = 9600;
             db.SaveChanges();
         }
 
