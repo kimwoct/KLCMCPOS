@@ -129,6 +129,9 @@ day-end view:
 
 - macOS: `./scripts/install-sqlite-mac.sh`
 - Windows 10: `powershell -ExecutionPolicy Bypass -File .\scripts\install-sqlite-windows10.ps1`
+  - Optional MAUI target mode:
+    - `-MauiTarget windows10` (default; sets Windows-only MAUI target on Windows)
+    - `-MauiTarget macos` (restores dual target: macOS + Windows)
 
 Inspect with:
 
