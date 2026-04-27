@@ -25,45 +25,18 @@ function Set-MauiTargetConfiguration {
     )
 
     $repoRoot = Split-Path -Parent $PSScriptRoot
-    $csprojPath = Join-Path $repoRoot 'KLCMC.Pos.Maui\KLCMC.Pos.Maui.csproj'
-    if (-not (Test-Path $csprojPath)) {
-        Write-Warning "KLCMC.Pos.Maui.csproj not found at: $csprojPath"
-        return
-    }
-
     Write-Host "==> Applying MAUI target configuration: $Target"
-    $content = Get-Content -Path $csprojPath -Raw
+    $propsPath = Join-Path $repoRoot 'Directory.Build.props'
+    $propsContent = @"
+<Project>
+  <PropertyGroup>
+    <KLCMCMauiTarget>$Target</KLCMCMauiTarget>
+  </PropertyGroup>
+</Project>
+"@
 
-    if ($Target -eq 'windows10') {
-        $windowsTfms = '<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform(''windows''))">net8.0-windows10.0.19041.0</TargetFrameworks>'
-    } else {
-        $windowsTfms = '<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform(''windows''))">net8.0-maccatalyst;net8.0-windows10.0.19041.0</TargetFrameworks>'
-    }
-
-    $nonWindowsTfms = '<TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform(''windows''))">net8.0-maccatalyst</TargetFrameworks>'
-    $maccatRids = '<RuntimeIdentifiers Condition="$([MSBuild]::GetTargetPlatformIdentifier(''$(TargetFramework)'')) == ''maccatalyst''">maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>'
-
-    $content = [regex]::Replace(
-        $content,
-        '<TargetFrameworks Condition="\$\(\[MSBuild\]::IsOSPlatform\(''windows''\)\)">.*?</TargetFrameworks>',
-        $windowsTfms)
-
-    $content = [regex]::Replace(
-        $content,
-        '<TargetFrameworks Condition="!\$\(\[MSBuild\]::IsOSPlatform\(''windows''\)\)">.*?</TargetFrameworks>',
-        $nonWindowsTfms)
-
-    if ($content -match '<RuntimeIdentifiers[^>]*>') {
-        $content = [regex]::Replace(
-            $content,
-            '<RuntimeIdentifiers[^>]*>.*?</RuntimeIdentifiers>',
-            $maccatRids)
-    } else {
-        $content = $content -replace '(?s)(<SingleProject>true</SingleProject>\s*)', "`$1    $maccatRids`r`n"
-    }
-
-    Set-Content -Path $csprojPath -Value $content -Encoding UTF8
-    Write-Host "==> Updated: $csprojPath"
+    Set-Content -Path $propsPath -Value $propsContent -Encoding UTF8
+    Write-Host "==> Updated: $propsPath"
 }
 
 Set-MauiTargetConfiguration -Target $MauiTarget
