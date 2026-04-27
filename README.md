@@ -42,3 +42,64 @@ KLCMCPOS is being migrated to a cross-platform architecture for **Windows 10 + m
 3. Verify cart operations and total calculation.
 4. On macOS, verify mock receipt file output.
 5. On Windows 10, verify `POSDLL` connect/print/feed/cut flow with hardware.
+
+## Local database (SQLite)
+
+Persistent state is stored in a local SQLite database via EF Core
+(`Microsoft.EntityFrameworkCore.Sqlite 8.0.x`).
+
+Persisted tables:
+- `Products` — product catalog (seeded on first run with the default items)
+- `Sales` / `SaleLines` — every confirmed checkout is recorded
+- `SalePayments` — payment lines per sale (method, amount, tendered, change)
+- `PrinterSettings` — single-row printer connection options
+
+DB file location:
+- macOS (MAUI): `<MAUI AppDataDirectory>/klcmcpos.db`
+- Windows (MAUI / WPF): `%LOCALAPPDATA%\com.klcmc.pos\klcmcpos.db`
+
+The schema is created via `EnsureCreated` at startup — no migrations are
+shipped yet. If you change an entity, delete the `.db` file during dev or
+introduce migrations.
+
+> ⚠️ The Multi-Payment Checkout feature added a new `SalePayments` table
+> and removed `Sales.PaymentMethod`. Dev databases created before this
+> change must be deleted before first run (delete the `klcmcpos.db` file
+> at the path above).
+
+## Checkout & Daily Account
+
+Tap **Checkout** on the dashboard to open the multi-payment popup:
+
+- Total / Paid / Outstanding update live as you add payment lines.
+- Pick a method (Cash, Card, Octopus, FPS, Other) and enter the amount on
+  the on-screen money pad. Quick buttons for 20/50/100/500 and **Exact**
+  (auto-fills the outstanding amount) make split tenders fast.
+- For **Cash** the input is treated as money received: the system applies
+  only the outstanding portion and records the rest as change. The change
+  preview updates as you type.
+- Add as many payment lines as needed (e.g. cash + card). **Confirm &
+  Print** is enabled once Paid ≥ Total. The receipt prints with the
+  payment breakdown and total change, the sale is persisted, and the
+  cart clears.
+
+Tap **Daily Account** in the header (MAUI) or footer (WPF) to open the
+day-end view:
+
+- Date picker plus Prev / Today / Next buttons (uses local calendar date).
+- Summary cards: transaction count and gross total.
+- "By Payment Method" tiles totalling each method for the day.
+- Transactions list with timestamp, total, and per-payment chips.
+- **Print Daily Report** prints a Z-style summary to the connected
+  printer.
+
+### Install the SQLite CLI (optional, for inspection)
+
+- macOS: `./scripts/install-sqlite-mac.sh`
+- Windows 10: `powershell -ExecutionPolicy Bypass -File .\scripts\install-sqlite-windows10.ps1`
+
+Inspect with:
+
+```
+sqlite3 "<path-to>/klcmcpos.db" ".tables"
+```

@@ -21,6 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\KLCMC.Pos.Core\KLCMC.Pos.Core.csproj" />
     <ProjectReference Include="..\KLCMC.Pos.Printer.Mock\KLCMC.Pos.Printer.Mock.csproj" />
   </ItemGroup>

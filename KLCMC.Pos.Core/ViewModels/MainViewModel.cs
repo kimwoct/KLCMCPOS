@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using KLCMC.Pos.Core.Data.Repositories;
 using KLCMC.Pos.Core.Models;
 using KLCMC.Pos.Core.Services;
 
@@ -8,42 +9,73 @@ namespace KLCMC.Pos.Core.ViewModels;
 public sealed class MainViewModel : BindableBase
 {
     private readonly IPrinterService _printerService;
+    private readonly IProductRepository _productRepository;
+    private readonly ISaleRepository _saleRepository;
+    private readonly IPrinterSettingsRepository _printerSettingsRepository;
+    private readonly RelayCommand _addNewProductCommand;
     private readonly RelayCommand _clearCartCommand;
     private readonly RelayCommand _printReceiptCommand;
     private readonly RelayCommand _applyFinalPriceCommand;
+    private readonly RelayCommand _addPaymentCommand;
+    private readonly RelayCommand _confirmCheckoutCommand;
     private CartLine? _selectedCartLine;
     private bool _isPrinterPanelExpanded = true;
+    private bool _isAddProductPopupVisible;
+    private bool _isCheckoutPopupVisible;
+    private string _newProductName = string.Empty;
+    private string _newProductPriceText = string.Empty;
     private string _pricePadInputText = "0";
+    private string _moneyPadInputText = "0";
+    private PaymentMethod _selectedNewPaymentMethod = PaymentMethod.Cash;
     private string _statusMessage = "Ready.";
 
-    public MainViewModel(IPrinterService printerService)
+    public MainViewModel(
+        IPrinterService printerService,
+        IProductRepository productRepository,
+        ISaleRepository saleRepository,
+        IPrinterSettingsRepository printerSettingsRepository)
     {
         _printerService = printerService;
+        _productRepository = productRepository;
+        _saleRepository = saleRepository;
+        _printerSettingsRepository = printerSettingsRepository;
 
-        PresetItems = new ReadOnlyCollection<PresetItem>(new[]
-        {
-            new PresetItem { Name = "Americano", DefaultPrice = 6.50m },
-            new PresetItem { Name = "Latte", DefaultPrice = 8.90m },
-            new PresetItem { Name = "Cappuccino", DefaultPrice = 8.90m },
-            new PresetItem { Name = "Sandwich", DefaultPrice = 12.00m },
-            new PresetItem { Name = "Muffin", DefaultPrice = 5.00m },
-            new PresetItem { Name = "Mineral Water", DefaultPrice = 2.00m }
-        });
+        PresetItems = new ObservableCollection<PresetItem>(
+            _productRepository.GetAll().Select(p => new PresetItem
+            {
+                Name = p.Name,
+                DefaultPrice = p.DefaultPrice
+            }));
 
         ConnectionModes = Enum.GetValues<PrinterConnectionMode>();
-        ConnectionOptions = new PrinterConnectionOptions();
+        ConnectionOptions = _printerSettingsRepository.Load();
         CartLines = new ObservableCollection<CartLine>();
+        Payments = new ObservableCollection<CheckoutPaymentLine>();
+        PaymentMethods = Enum.GetValues<PaymentMethod>();
 
         AddItemCommand = new RelayCommand(AddPresetItem);
+        _addNewProductCommand = new RelayCommand(_ => AddNewProduct(), _ => CanAddNewProduct());
+        OpenAddProductPopupCommand = new RelayCommand(_ => OpenAddProductPopup());
+        CloseAddProductPopupCommand = new RelayCommand(_ => CloseAddProductPopup());
         TogglePrinterPanelCommand = new RelayCommand(_ => TogglePrinterPanel());
         ConnectPrinterCommand = new RelayCommand(_ => ConnectPrinter());
         DisconnectPrinterCommand = new RelayCommand(_ => DisconnectPrinter());
         _clearCartCommand = new RelayCommand(_ => ClearCart(), _ => CartLines.Count > 0);
-        _printReceiptCommand = new RelayCommand(_ => PrintReceipt(), _ => CartLines.Count > 0);
+        _printReceiptCommand = new RelayCommand(_ => OpenCheckout(), _ => CartLines.Count > 0);
         PricePadInputCommand = new RelayCommand(AppendPricePadInput, _ => HasSelectedCartLine);
         PricePadBackspaceCommand = new RelayCommand(_ => BackspacePricePadInput(), _ => HasSelectedCartLine);
         PricePadClearCommand = new RelayCommand(_ => ClearPricePadInput(), _ => HasSelectedCartLine);
+        SetPricePadAmountCommand = new RelayCommand(SetPricePadAmount, _ => HasSelectedCartLine);
         _applyFinalPriceCommand = new RelayCommand(_ => ApplyFinalPriceToSelectedLine(), _ => CanApplyFinalPrice());
+
+        MoneyPadInputCommand = new RelayCommand(AppendMoneyPadInput);
+        MoneyPadBackspaceCommand = new RelayCommand(_ => BackspaceMoneyPadInput());
+        MoneyPadClearCommand = new RelayCommand(_ => ClearMoneyPadInput());
+        MoneyPadQuickAmountCommand = new RelayCommand(SetMoneyPadAmount);
+        _addPaymentCommand = new RelayCommand(_ => AddPayment(), _ => CanAddPayment());
+        RemovePaymentCommand = new RelayCommand(RemovePayment);
+        _confirmCheckoutCommand = new RelayCommand(_ => ConfirmCheckout(), _ => CanConfirmCheckout());
+        CancelCheckoutCommand = new RelayCommand(_ => CancelCheckout());
 
         CartLines.CollectionChanged += (_, _) =>
         {
@@ -57,7 +89,7 @@ public sealed class MainViewModel : BindableBase
         };
     }
 
-    public ReadOnlyCollection<PresetItem> PresetItems { get; }
+    public ObservableCollection<PresetItem> PresetItems { get; }
 
     public Array ConnectionModes { get; }
 
@@ -111,6 +143,40 @@ public sealed class MainViewModel : BindableBase
 
     public bool HasSelectedCartLine => SelectedCartLine is not null;
 
+    public bool IsAddProductPopupVisible
+    {
+        get => _isAddProductPopupVisible;
+        private set => SetProperty(ref _isAddProductPopupVisible, value);
+    }
+
+    public string NewProductName
+    {
+        get => _newProductName;
+        set
+        {
+            if (!SetProperty(ref _newProductName, value))
+            {
+                return;
+            }
+
+            _addNewProductCommand.RaiseCanExecuteChanged();
+        }
+    }
+
+    public string NewProductPriceText
+    {
+        get => _newProductPriceText;
+        set
+        {
+            if (!SetProperty(ref _newProductPriceText, value))
+            {
+                return;
+            }
+
+            _addNewProductCommand.RaiseCanExecuteChanged();
+        }
+    }
+
     public string SelectedCartLineName => SelectedCartLine?.Name ?? "No product selected";
 
     public string SelectedCartLineTotalText =>
@@ -128,6 +194,12 @@ public sealed class MainViewModel : BindableBase
 
     public RelayCommand AddItemCommand { get; }
 
+    public RelayCommand AddNewProductCommand => _addNewProductCommand;
+
+    public RelayCommand OpenAddProductPopupCommand { get; }
+
+    public RelayCommand CloseAddProductPopupCommand { get; }
+
     public RelayCommand TogglePrinterPanelCommand { get; }
 
     public RelayCommand ConnectPrinterCommand { get; }
@@ -139,6 +211,8 @@ public sealed class MainViewModel : BindableBase
     public RelayCommand PricePadBackspaceCommand { get; }
 
     public RelayCommand PricePadClearCommand { get; }
+
+    public RelayCommand SetPricePadAmountCommand { get; }
 
     public RelayCommand ApplyFinalPriceCommand => _applyFinalPriceCommand;
 
@@ -181,10 +255,67 @@ public sealed class MainViewModel : BindableBase
         SelectedCartLine = cartLine;
     }
 
+    private bool CanAddNewProduct()
+    {
+        return !string.IsNullOrWhiteSpace(NewProductName) &&
+               decimal.TryParse(NewProductPriceText, NumberStyles.Number, CultureInfo.InvariantCulture, out var price) &&
+               price >= 0m;
+    }
+
+    private void AddNewProduct()
+    {
+        if (!CanAddNewProduct())
+        {
+            StatusMessage = "Enter a valid product name and price.";
+            return;
+        }
+
+        var name = NewProductName.Trim();
+        if (PresetItems.Any(item => string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase)))
+        {
+            StatusMessage = $"Product '{name}' already exists.";
+            return;
+        }
+
+        var price = decimal.Parse(NewProductPriceText, NumberStyles.Number, CultureInfo.InvariantCulture);
+        try
+        {
+            _productRepository.Add(name, price);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Failed to save product: {ex.Message}";
+            return;
+        }
+
+        PresetItems.Add(new PresetItem
+        {
+            Name = name,
+            DefaultPrice = price
+        });
+
+        NewProductName = string.Empty;
+        NewProductPriceText = string.Empty;
+        IsAddProductPopupVisible = false;
+        StatusMessage = $"Product '{name}' added.";
+        _addNewProductCommand.RaiseCanExecuteChanged();
+    }
+
+    private void OpenAddProductPopup()
+    {
+        IsAddProductPopupVisible = true;
+    }
+
+    private void CloseAddProductPopup()
+    {
+        IsAddProductPopupVisible = false;
+    }
+
     private void ConnectPrinter()
     {
         try
         {
+            _printerSettingsRepository.Save(ConnectionOptions);
             _printerService.Open(ConnectionOptions);
             StatusMessage = "Printer connected.";
             RaisePropertyChanged(nameof(ConnectionStateText));
@@ -249,8 +380,21 @@ public sealed class MainViewModel : BindableBase
         }
 
         PricePadInputText = PricePadInputText == "0"
-            ? key
+            ? (key == "00" ? "0" : key)
             : PricePadInputText + key;
+    }
+
+    private void SetPricePadAmount(object? parameter)
+    {
+        if (SelectedCartLine is null || parameter is not string raw)
+        {
+            return;
+        }
+
+        if (decimal.TryParse(raw, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var value) && value >= 0m)
+        {
+            PricePadInputText = value.ToString("0.##", CultureInfo.InvariantCulture);
+        }
     }
 
     private void BackspacePricePadInput()
@@ -327,6 +471,7 @@ public sealed class MainViewModel : BindableBase
         PricePadInputCommand.RaiseCanExecuteChanged();
         PricePadBackspaceCommand.RaiseCanExecuteChanged();
         PricePadClearCommand.RaiseCanExecuteChanged();
+        SetPricePadAmountCommand.RaiseCanExecuteChanged();
         _applyFinalPriceCommand.RaiseCanExecuteChanged();
     }
 
@@ -339,30 +484,353 @@ public sealed class MainViewModel : BindableBase
 
     private void PrintReceipt()
     {
-        var lines = ReceiptComposer.Build("KLCMC POS", CartLines, Total, DateTime.Now);
-
-        try
-        {
-            _printerService.PrintReceipt(lines);
-            StatusMessage = "Receipt printed.";
-        }
-        catch (InvalidOperationException ex)
-        {
-            StatusMessage = $"Print failed: {ex.Message}";
-        }
-        catch (DllNotFoundException ex)
-        {
-            StatusMessage = $"POSDLL load failed: {ex.Message}";
-        }
-        catch (BadImageFormatException ex)
-        {
-            StatusMessage = $"POSDLL architecture mismatch: {ex.Message}";
-        }
+        // legacy direct print kept for reference; checkout flow is the primary path.
+        ConfirmCheckout();
     }
 
     private void RaiseTotalsChanged()
     {
         RaisePropertyChanged(nameof(Total));
         RaisePropertyChanged(nameof(TotalText));
+        RaisePropertyChanged(nameof(AmountDueText));
+        RaisePropertyChanged(nameof(OutstandingAmount));
+        RaisePropertyChanged(nameof(OutstandingText));
+        RaisePropertyChanged(nameof(PaidTotal));
+        RaisePropertyChanged(nameof(PaidTotalText));
+        _confirmCheckoutCommand.RaiseCanExecuteChanged();
+        _addPaymentCommand.RaiseCanExecuteChanged();
+    }
+
+    // ---- Checkout flow -----------------------------------------------------
+
+    public ObservableCollection<CheckoutPaymentLine> Payments { get; }
+
+    public Array PaymentMethods { get; }
+
+    public bool IsCheckoutPopupVisible
+    {
+        get => _isCheckoutPopupVisible;
+        private set => SetProperty(ref _isCheckoutPopupVisible, value);
+    }
+
+    public PaymentMethod SelectedNewPaymentMethod
+    {
+        get => _selectedNewPaymentMethod;
+        set
+        {
+            if (SetProperty(ref _selectedNewPaymentMethod, value))
+            {
+                RaisePropertyChanged(nameof(IsCashMethodSelected));
+                RaisePropertyChanged(nameof(MoneyPadLabelText));
+                RaisePropertyChanged(nameof(ChangePreviewText));
+                _addPaymentCommand.RaiseCanExecuteChanged();
+            }
+        }
+    }
+
+    public bool IsCashMethodSelected => SelectedNewPaymentMethod == PaymentMethod.Cash;
+
+    public string MoneyPadLabelText =>
+        IsCashMethodSelected ? "Money Received (HKD)" : "Charge Amount (HKD)";
+
+    public string MoneyPadInputText
+    {
+        get => _moneyPadInputText;
+        private set
+        {
+            if (SetProperty(ref _moneyPadInputText, value))
+            {
+                RaisePropertyChanged(nameof(ChangePreviewText));
+                _addPaymentCommand.RaiseCanExecuteChanged();
+            }
+        }
+    }
+
+    public string AmountDueText => $"Amount Due: HKD ${Total:F2}";
+
+    public decimal PaidTotal => Payments.Sum(p => p.Amount);
+
+    public string PaidTotalText => $"Paid: HKD ${PaidTotal:F2}";
+
+    public decimal OutstandingAmount
+    {
+        get
+        {
+            var outstanding = Total - PaidTotal;
+            return outstanding < 0m ? 0m : outstanding;
+        }
+    }
+
+    public string OutstandingText => $"Outstanding: HKD ${OutstandingAmount:F2}";
+
+    public string ChangePreviewText
+    {
+        get
+        {
+            if (!IsCashMethodSelected)
+            {
+                return string.Empty;
+            }
+
+            if (!decimal.TryParse(
+                    MoneyPadInputText,
+                    NumberStyles.AllowDecimalPoint,
+                    CultureInfo.InvariantCulture,
+                    out var tendered))
+            {
+                return string.Empty;
+            }
+
+            var change = tendered - OutstandingAmount;
+            return change > 0m ? $"Change preview: HKD ${change:F2}" : string.Empty;
+        }
+    }
+
+    public RelayCommand MoneyPadInputCommand { get; }
+
+    public RelayCommand MoneyPadBackspaceCommand { get; }
+
+    public RelayCommand MoneyPadClearCommand { get; }
+
+    public RelayCommand MoneyPadQuickAmountCommand { get; }
+
+    public RelayCommand AddPaymentCommand => _addPaymentCommand;
+
+    public RelayCommand RemovePaymentCommand { get; }
+
+    public RelayCommand ConfirmCheckoutCommand => _confirmCheckoutCommand;
+
+    public RelayCommand CancelCheckoutCommand { get; }
+
+    private void OpenCheckout()
+    {
+        if (CartLines.Count == 0)
+        {
+            return;
+        }
+
+        Payments.Clear();
+        SelectedNewPaymentMethod = PaymentMethod.Cash;
+        MoneyPadInputText = Total.ToString("0.##", CultureInfo.InvariantCulture);
+        IsCheckoutPopupVisible = true;
+        RaiseCheckoutTotalsChanged();
+        StatusMessage = "Checkout: enter payment(s).";
+    }
+
+    private void CancelCheckout()
+    {
+        IsCheckoutPopupVisible = false;
+        Payments.Clear();
+        MoneyPadInputText = "0";
+        RaiseCheckoutTotalsChanged();
+        StatusMessage = "Checkout cancelled.";
+    }
+
+    private void AppendMoneyPadInput(object? parameter)
+    {
+        if (parameter is not string key)
+        {
+            return;
+        }
+
+        if (key == ".")
+        {
+            if (MoneyPadInputText.Contains('.'))
+            {
+                return;
+            }
+
+            MoneyPadInputText += ".";
+            return;
+        }
+
+        if (!key.All(char.IsDigit))
+        {
+            return;
+        }
+
+        var decimalPointIndex = MoneyPadInputText.IndexOf('.');
+        if (decimalPointIndex >= 0 && MoneyPadInputText.Length - decimalPointIndex > 2)
+        {
+            return;
+        }
+
+        MoneyPadInputText = MoneyPadInputText == "0"
+            ? (key == "00" ? "0" : key)
+            : MoneyPadInputText + key;
+    }
+
+    private void BackspaceMoneyPadInput()
+    {
+        if (MoneyPadInputText.Length <= 1)
+        {
+            MoneyPadInputText = "0";
+            return;
+        }
+
+        MoneyPadInputText = MoneyPadInputText[..^1];
+        if (MoneyPadInputText.EndsWith('.'))
+        {
+            MoneyPadInputText = MoneyPadInputText[..^1];
+        }
+    }
+
+    private void ClearMoneyPadInput()
+    {
+        MoneyPadInputText = "0";
+    }
+
+    private void SetMoneyPadAmount(object? parameter)
+    {
+        if (parameter is not string raw)
+        {
+            return;
+        }
+
+        if (string.Equals(raw, "EXACT", StringComparison.OrdinalIgnoreCase))
+        {
+            MoneyPadInputText = OutstandingAmount.ToString("0.##", CultureInfo.InvariantCulture);
+            return;
+        }
+
+        if (decimal.TryParse(raw, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var value) && value >= 0m)
+        {
+            MoneyPadInputText = value.ToString("0.##", CultureInfo.InvariantCulture);
+        }
+    }
+
+    private bool CanAddPayment()
+    {
+        if (OutstandingAmount <= 0m)
+        {
+            return false;
+        }
+
+        if (!decimal.TryParse(
+                MoneyPadInputText,
+                NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture,
+                out var amount))
+        {
+            return false;
+        }
+
+        return amount > 0m;
+    }
+
+    private void AddPayment()
+    {
+        if (!CanAddPayment())
+        {
+            return;
+        }
+
+        var input = decimal.Parse(MoneyPadInputText, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+        var outstanding = OutstandingAmount;
+
+        CheckoutPaymentLine line;
+        if (SelectedNewPaymentMethod == PaymentMethod.Cash)
+        {
+            var applied = Math.Min(input, outstanding);
+            var change = input - applied;
+            line = new CheckoutPaymentLine
+            {
+                Method = PaymentMethod.Cash,
+                Amount = applied,
+                TenderedAmount = input,
+                ChangeAmount = change > 0m ? change : 0m
+            };
+        }
+        else
+        {
+            var applied = Math.Min(input, outstanding);
+            line = new CheckoutPaymentLine
+            {
+                Method = SelectedNewPaymentMethod,
+                Amount = applied
+            };
+        }
+
+        Payments.Add(line);
+        RaiseCheckoutTotalsChanged();
+        MoneyPadInputText = OutstandingAmount.ToString("0.##", CultureInfo.InvariantCulture);
+        StatusMessage = $"Added {line.DisplayText}.";
+    }
+
+    private void RemovePayment(object? parameter)
+    {
+        if (parameter is not CheckoutPaymentLine line)
+        {
+            return;
+        }
+
+        Payments.Remove(line);
+        RaiseCheckoutTotalsChanged();
+        MoneyPadInputText = OutstandingAmount.ToString("0.##", CultureInfo.InvariantCulture);
+    }
+
+    private bool CanConfirmCheckout()
+    {
+        return IsCheckoutPopupVisible && CartLines.Count > 0 && PaidTotal >= Total && Total > 0m;
+    }
+
+    private void ConfirmCheckout()
+    {
+        if (!CanConfirmCheckout())
+        {
+            StatusMessage = "Cannot confirm: outstanding balance remains.";
+            return;
+        }
+
+        var paymentEntries = Payments.Select(p => p.ToEntry()).ToList();
+
+        try
+        {
+            _saleRepository.Record(CartLines, Total, paymentEntries);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Failed to record sale: {ex.Message}";
+            return;
+        }
+
+        var lines = ReceiptComposer.Build("KLCMC POS", CartLines, Total, DateTime.Now, paymentEntries);
+
+        try
+        {
+            _printerService.PrintReceipt(lines);
+            StatusMessage = "Sale recorded and receipt printed.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            StatusMessage = $"Sale recorded; print failed: {ex.Message}";
+        }
+        catch (DllNotFoundException ex)
+        {
+            StatusMessage = $"Sale recorded; POSDLL load failed: {ex.Message}";
+        }
+        catch (BadImageFormatException ex)
+        {
+            StatusMessage = $"Sale recorded; POSDLL architecture mismatch: {ex.Message}";
+        }
+
+        IsCheckoutPopupVisible = false;
+        Payments.Clear();
+        MoneyPadInputText = "0";
+        CartLines.Clear();
+        SelectedCartLine = null;
+        RaiseCheckoutTotalsChanged();
+    }
+
+    private void RaiseCheckoutTotalsChanged()
+    {
+        RaisePropertyChanged(nameof(PaidTotal));
+        RaisePropertyChanged(nameof(PaidTotalText));
+        RaisePropertyChanged(nameof(OutstandingAmount));
+        RaisePropertyChanged(nameof(OutstandingText));
+        RaisePropertyChanged(nameof(AmountDueText));
+        RaisePropertyChanged(nameof(ChangePreviewText));
+        _confirmCheckoutCommand.RaiseCanExecuteChanged();
+        _addPaymentCommand.RaiseCanExecuteChanged();
     }
 }

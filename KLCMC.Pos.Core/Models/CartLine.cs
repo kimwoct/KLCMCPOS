@@ -7,8 +7,25 @@ public sealed class CartLine : INotifyPropertyChanged
 {
     private int _quantity;
     private decimal _unitPrice;
+    private string _remark = string.Empty;
 
     public required string Name { get; init; }
+
+    public string Remark
+    {
+        get => _remark;
+        set
+        {
+            var newValue = value ?? string.Empty;
+            if (_remark == newValue)
+            {
+                return;
+            }
+
+            _remark = newValue;
+            OnPropertyChanged();
+        }
+    }
 
     public int Quantity
     {

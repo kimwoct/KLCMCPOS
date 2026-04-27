@@ -12,7 +12,7 @@
             StrokeShape="RoundRectangle 14"
             BackgroundColor="#0F2131">
       <Grid Padding="14,10"
-            ColumnDefinitions="Auto,*,Auto"
+            ColumnDefinitions="Auto,*,Auto,Auto"
             ColumnSpacing="14">
         <VerticalStackLayout Spacing="0">
           <Label Text="KLCMC POS"
@@ -43,7 +43,16 @@
           </Grid>
         </Border>
 
-        <Border Grid.Column="2"
+        <Button Grid.Column="2"
+                x:Name="DailyAccountButton"
+                Text="📊 Daily Account"
+                BackgroundColor="#1F3D5C"
+                TextColor="#D2E4FB"
+                FontAttributes="Bold"
+                Padding="14,8"
+                Clicked="OnDailyAccountClicked" />
+
+        <Border Grid.Column="3"
                 Stroke="#364E00"
                 StrokeShape="RoundRectangle 999"
                 BackgroundColor="#1C2A0B"
@@ -84,73 +93,91 @@
               StrokeThickness="1"
               StrokeShape="RoundRectangle 14"
               BackgroundColor="#0F2131"
-              Padding="14">
-        <VerticalStackLayout Spacing="12">
-          <Label Text="Products"
-                 TextColor="#D2E4FB"
-                 FontSize="24"
-                 FontAttributes="Bold" />
-
-          <ScrollView Orientation="Horizontal">
-            <HorizontalStackLayout Spacing="8">
-              <Border BackgroundColor="#209DC0"
-                      StrokeShape="RoundRectangle 999"
-                      Padding="14,6">
-                <Label Text="All Products"
-                       TextColor="White"
-                       FontAttributes="Bold" />
-              </Border>
-              <Border BackgroundColor="#1A2B3C"
-                      Stroke="#2A3B4C"
-                      StrokeShape="RoundRectangle 999"
-                      Padding="14,6">
-                <Label Text="Beverages"
-                       TextColor="#C4D4E8" />
-              </Border>
-              <Border BackgroundColor="#1A2B3C"
-                      Stroke="#2A3B4C"
-                      StrokeShape="RoundRectangle 999"
-                      Padding="14,6">
-                <Label Text="Snacks"
-                       TextColor="#C4D4E8" />
-              </Border>
+              Padding="12">
+          <Grid RowDefinitions="Auto,*,Auto"
+                RowSpacing="14">
+            <HorizontalStackLayout Spacing="12"
+                                   VerticalOptions="Center">
+              <Label Text="Current Sale"
+                     FontSize="40"
+                     FontAttributes="Bold"
+                     TextColor="#D2E4FB" />
+              <Label Text="{Binding TotalText}"
+                     FontSize="32"
+                     FontAttributes="Bold"
+                     TextColor="#A6D64D"
+                     VerticalOptions="Center" />
             </HorizontalStackLayout>
-          </ScrollView>
 
-          <CollectionView ItemsSource="{Binding PresetItems}"
-                          SelectionMode="None">
-            <CollectionView.ItemTemplate>
-              <DataTemplate>
-                <Border Stroke="#253648"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 10"
-                        BackgroundColor="#1A2B3C"
-                        Padding="12,10"
-                        Margin="0,0,0,8">
-                  <Grid ColumnDefinitions="*,Auto"
-                        ColumnSpacing="10">
-                    <VerticalStackLayout Spacing="2">
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding CartLines}"
+                            SelectionMode="Single"
+                            SelectedItem="{Binding SelectedCartLine}">
+              <CollectionView.ItemTemplate>
+                <DataTemplate>
+                  <Border Stroke="#253648"
+                          StrokeThickness="1"
+                          StrokeShape="RoundRectangle 10"
+                          BackgroundColor="#1A2B3C"
+                          Padding="14"
+                          Margin="0,0,0,10">
+                    <Grid ColumnDefinitions="2*,Auto,Auto,Auto"
+                          ColumnSpacing="14">
                       <Label Text="{Binding Name}"
-                             FontSize="18"
+                             FontSize="28"
                              FontAttributes="Bold"
-                             TextColor="#D2E4FB" />
-                      <Label Text="{Binding DefaultPrice, StringFormat='HKD $ {0:F2}'}"
+                             TextColor="#D2E4FB"
+                             VerticalOptions="Center" />
+                      <Label Grid.Column="1"
+                             Text="{Binding Quantity, StringFormat='x{0}'}"
+                             FontSize="28"
+                             TextColor="#C4D4E8"
+                             VerticalOptions="Center" />
+                      <Label Grid.Column="2"
+                             Text="{Binding UnitPrice, StringFormat='HKD $ {0:F2}'}"
+                             FontSize="26"
                              TextColor="#69D4F8"
-                             FontAttributes="Bold" />
-                    </VerticalStackLayout>
-                    <Button Grid.Column="1"
-                            Text="Add"
-                            BackgroundColor="#A2D149"
-                            TextColor="#243600"
-                            FontAttributes="Bold"
-                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AddItemCommand}"
-                            CommandParameter="{Binding}" />
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </CollectionView.ItemTemplate>
-          </CollectionView>
-        </VerticalStackLayout>
+                             VerticalOptions="Center" />
+                      <Label Grid.Column="3"
+                             Text="{Binding LineTotal, StringFormat='HKD $ {0:F2}'}"
+                             FontSize="28"
+                             TextColor="#D2E4FB"
+                             FontAttributes="Bold"
+                             VerticalOptions="Center" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Grid Grid.Row="2"
+                  RowDefinitions="Auto,Auto"
+                  RowSpacing="10">
+              <Label Text="{Binding StatusMessage}"
+                     FontSize="22"
+                     TextColor="#C4D4E8"
+                     LineBreakMode="WordWrap" />
+              <HorizontalStackLayout Grid.Row="1"
+                                     Spacing="12">
+                <Button Text="Clear"
+                        FontSize="24"
+                        FontAttributes="Bold"
+                        HeightRequest="64"
+                        Padding="24,0"
+                        BackgroundColor="#253648"
+                        TextColor="#D2E4FB"
+                        Command="{Binding ClearCartCommand}" />
+                <Button Text="Checkout"
+                        FontSize="24"
+                        FontAttributes="Bold"
+                        HeightRequest="64"
+                        Padding="24,0"
+                        BackgroundColor="#A2D149"
+                        TextColor="#243600"
+                        Command="{Binding PrintReceiptCommand}" />
+              </HorizontalStackLayout>
+            </Grid>
+          </Grid>
       </Border>
 
       <Grid Grid.Column="0"
@@ -256,72 +283,65 @@
                 StrokeThickness="1"
                 StrokeShape="RoundRectangle 14"
                 BackgroundColor="#0F2131"
-                Padding="12">
-          <Grid RowDefinitions="Auto,*,Auto"
-                RowSpacing="10">
-            <HorizontalStackLayout Spacing="8"
-                                   VerticalOptions="Center">
-              <Label Text="Current Sale"
-                     FontSize="20"
-                     FontAttributes="Bold"
-                     TextColor="#D2E4FB" />
-              <Label Text="{Binding TotalText}"
-                     TextColor="#A6D64D"
-                     VerticalOptions="Center" />
-            </HorizontalStackLayout>
+                Padding="14">
+          <Grid RowDefinitions="Auto,*"
+                RowSpacing="12">
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="10">
+              <Label Text="Products"
+                     TextColor="#D2E4FB"
+                     FontSize="24"
+                     FontAttributes="Bold" />
+              <Button Grid.Column="1"
+                      Text="+ New Product"
+                      FontAttributes="Bold"
+                      BackgroundColor="#A2D149"
+                      TextColor="#243600"
+                      Command="{Binding OpenAddProductPopupCommand}" />
+            </Grid>
 
             <CollectionView Grid.Row="1"
-                            ItemsSource="{Binding CartLines}"
-                            SelectionMode="Single"
-                            SelectedItem="{Binding SelectedCartLine}">
+                            ItemsSource="{Binding PresetItems}"
+                            SelectionMode="None">
+              <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical"
+                                 Span="3"
+                                 HorizontalItemSpacing="10"
+                                 VerticalItemSpacing="10" />
+              </CollectionView.ItemsLayout>
               <CollectionView.ItemTemplate>
                 <DataTemplate>
                   <Border Stroke="#253648"
                           StrokeThickness="1"
                           StrokeShape="RoundRectangle 10"
                           BackgroundColor="#1A2B3C"
-                          Padding="10"
-                          Margin="0,0,0,8">
-                    <Grid ColumnDefinitions="2*,Auto,Auto,Auto"
-                          ColumnSpacing="8">
+                          Padding="12"
+                          MinimumHeightRequest="110">
+                    <Border.GestureRecognizers>
+                      <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AddItemCommand}"
+                                            CommandParameter="{Binding}" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="8"
+                                         VerticalOptions="Center"
+                                         HorizontalOptions="Center">
                       <Label Text="{Binding Name}"
+                             FontSize="18"
                              FontAttributes="Bold"
-                             TextColor="#D2E4FB" />
-                      <Label Grid.Column="1"
-                             Text="{Binding Quantity, StringFormat='x{0}'}"
-                             TextColor="#C4D4E8" />
-                      <Label Grid.Column="2"
-                             Text="{Binding UnitPrice, StringFormat='HKD $ {0:F2}'}"
-                             TextColor="#69D4F8" />
-                      <Label Grid.Column="3"
-                             Text="{Binding LineTotal, StringFormat='HKD $ {0:F2}'}"
                              TextColor="#D2E4FB"
-                             FontAttributes="Bold" />
-                    </Grid>
+                             HorizontalTextAlignment="Center" />
+                      <Label Text="{Binding DefaultPrice, StringFormat='HKD $ {0:F2}'}"
+                             TextColor="#69D4F8"
+                             FontAttributes="Bold"
+                             HorizontalTextAlignment="Center" />
+                      <Label Text="Tap to add"
+                             FontSize="12"
+                             TextColor="#8EA0B9"
+                             HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
                   </Border>
                 </DataTemplate>
               </CollectionView.ItemTemplate>
             </CollectionView>
-
-            <Grid Grid.Row="2"
-                  RowDefinitions="Auto,Auto"
-                  RowSpacing="8">
-              <Label Text="{Binding StatusMessage}"
-                     TextColor="#C4D4E8"
-                     LineBreakMode="WordWrap" />
-              <HorizontalStackLayout Grid.Row="1"
-                                     Spacing="8">
-                <Button Text="Clear"
-                        BackgroundColor="#253648"
-                        TextColor="#D2E4FB"
-                        Command="{Binding ClearCartCommand}" />
-                <Button Text="Print Receipt"
-                        BackgroundColor="#A2D149"
-                        TextColor="#243600"
-                        FontAttributes="Bold"
-                        Command="{Binding PrintReceiptCommand}" />
-              </HorizontalStackLayout>
-            </Grid>
           </Grid>
         </Border>
 
@@ -343,6 +363,13 @@
                    TextColor="#8EA0B9"
                    FontSize="12" />
 
+            <Entry Text="{Binding SelectedCartLine.Remark, Mode=TwoWay, FallbackValue=''}"
+                   Placeholder="Add remark for this item..."
+                   PlaceholderColor="#8EA0B9"
+                   TextColor="#D2E4FB"
+                   BackgroundColor="#1A2B3C"
+                   IsEnabled="{Binding HasSelectedCartLine}" />
+
             <Border Stroke="#253648"
                     StrokeShape="RoundRectangle 10"
                     BackgroundColor="#1A2B3C"
@@ -354,12 +381,14 @@
                      HorizontalTextAlignment="End" />
             </Border>
 
-            <Grid ColumnDefinitions="1*,1*"
+            <Grid RowDefinitions="*,*,*,*"
+                  ColumnDefinitions="1.1*,*,*,*,1.1*"
                   ColumnSpacing="8"
+                  RowSpacing="8"
                   IsEnabled="{Binding HasSelectedCartLine}">
               <Grid.Resources>
-                <Style TargetType="Button">
-                  <Setter Property="HeightRequest" Value="64" />
+                <Style x:Key="NumKey" TargetType="Button">
+                  <Setter Property="HeightRequest" Value="60" />
                   <Setter Property="FontSize" Value="22" />
                   <Setter Property="FontAttributes" Value="Bold" />
                   <Setter Property="BackgroundColor" Value="#1A2B3C" />
@@ -368,80 +397,108 @@
                   <Setter Property="BorderWidth" Value="1" />
                   <Setter Property="CornerRadius" Value="10" />
                 </Style>
+                <Style x:Key="SideKey" TargetType="Button" BasedOn="{StaticResource NumKey}">
+                  <Setter Property="BackgroundColor" Value="#209DC0" />
+                  <Setter Property="TextColor" Value="White" />
+                  <Setter Property="FontSize" Value="16" />
+                </Style>
+                <Style x:Key="QuickAmount" TargetType="Button" BasedOn="{StaticResource NumKey}">
+                  <Setter Property="BackgroundColor" Value="#E07A5F" />
+                  <Setter Property="TextColor" Value="White" />
+                  <Setter Property="FontSize" Value="18" />
+                </Style>
+                <Style x:Key="ActionKey" TargetType="Button" BasedOn="{StaticResource NumKey}">
+                  <Setter Property="BackgroundColor" Value="#A2D149" />
+                  <Setter Property="TextColor" Value="#243600" />
+                </Style>
               </Grid.Resources>
-              <Grid RowDefinitions="*,*,*,*"
-                    ColumnDefinitions="*,*,*"
-                    ColumnSpacing="8"
-                    RowSpacing="8">
-                <Button Grid.Row="0"
-                        Grid.Column="0"
-                        Text="1"
-                        Command="{Binding PricePadInputCommand}"
-                        CommandParameter="1" />
-                <Button Grid.Row="0"
-                        Grid.Column="1"
-                        Text="2"
-                        Command="{Binding PricePadInputCommand}"
-                        CommandParameter="2" />
-                <Button Grid.Row="0"
-                        Grid.Column="2"
-                        Text="3"
-                        Command="{Binding PricePadInputCommand}"
-                        CommandParameter="3" />
-                <Button Grid.Row="1"
-                        Grid.Column="0"
-                        Text="4"
-                        Command="{Binding PricePadInputCommand}"
-                        CommandParameter="4" />
-                <Button Grid.Row="1"
-                        Grid.Column="1"
-                        Text="5"
-                        Command="{Binding PricePadInputCommand}"
-                        CommandParameter="5" />
-                <Button Grid.Row="1"
-                        Grid.Column="2"
-                        Text="6"
-                        Command="{Binding PricePadInputCommand}"
-                        CommandParameter="6" />
-                <Button Grid.Row="2"
-                        Grid.Column="0"
-                        Text="7"
-                        Command="{Binding PricePadInputCommand}"
-                        CommandParameter="7" />
-                <Button Grid.Row="2"
-                        Grid.Column="1"
-                        Text="8"
-                        Command="{Binding PricePadInputCommand}"
-                        CommandParameter="8" />
-                <Button Grid.Row="2"
-                        Grid.Column="2"
-                        Text="9"
-                        Command="{Binding PricePadInputCommand}"
-                        CommandParameter="9" />
-                <Button Grid.Row="3"
-                        Grid.Column="0"
-                        Text="CLR"
-                        Command="{Binding PricePadClearCommand}" />
-                <Button Grid.Row="3"
-                        Grid.Column="1"
-                        Text="0"
-                        Command="{Binding PricePadInputCommand}"
-                        CommandParameter="0" />
-                <Button Grid.Row="3"
-                        Grid.Column="2"
-                        Text="."
-                        Command="{Binding PricePadInputCommand}"
-                        CommandParameter="." />
-              </Grid>
 
+              <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource SideKey}"
+                      Text="Cash"
+                      Command="{Binding SetPricePadAmountCommand}"
+                      CommandParameter="0" />
+              <Button Grid.Row="1" Grid.Column="0" Style="{StaticResource SideKey}"
+                      Text="Alipay"
+                      Command="{Binding SetPricePadAmountCommand}"
+                      CommandParameter="0" />
+              <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource SideKey}"
+                      Text="WeChat Pay"
+                      Command="{Binding SetPricePadAmountCommand}"
+                      CommandParameter="0" />
+              <Button Grid.Row="3" Grid.Column="0" Style="{StaticResource SideKey}"
+                      Text="Card"
+                      Command="{Binding SetPricePadAmountCommand}"
+                      CommandParameter="0" />
+
+              <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource NumKey}" Text="1"
+                      Command="{Binding PricePadInputCommand}" CommandParameter="1" />
+              <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource NumKey}" Text="2"
+                      Command="{Binding PricePadInputCommand}" CommandParameter="2" />
+              <Button Grid.Row="0" Grid.Column="3" Style="{StaticResource NumKey}" Text="3"
+                      Command="{Binding PricePadInputCommand}" CommandParameter="3" />
+              <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource NumKey}" Text="4"
+                      Command="{Binding PricePadInputCommand}" CommandParameter="4" />
+              <Button Grid.Row="1" Grid.Column="2" Style="{StaticResource NumKey}" Text="5"
+                      Command="{Binding PricePadInputCommand}" CommandParameter="5" />
+              <Button Grid.Row="1" Grid.Column="3" Style="{StaticResource NumKey}" Text="6"
+                      Command="{Binding PricePadInputCommand}" CommandParameter="6" />
+              <Button Grid.Row="2" Grid.Column="1" Style="{StaticResource NumKey}" Text="7"
+                      Command="{Binding PricePadInputCommand}" CommandParameter="7" />
+              <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource NumKey}" Text="8"
+                      Command="{Binding PricePadInputCommand}" CommandParameter="8" />
+              <Button Grid.Row="2" Grid.Column="3" Style="{StaticResource NumKey}" Text="9"
+                      Command="{Binding PricePadInputCommand}" CommandParameter="9" />
+              <Button Grid.Row="3" Grid.Column="1" Style="{StaticResource NumKey}" Text="0"
+                      Command="{Binding PricePadInputCommand}" CommandParameter="0" />
+              <Button Grid.Row="3" Grid.Column="2" Style="{StaticResource NumKey}" Text="00"
+                      Command="{Binding PricePadInputCommand}" CommandParameter="00" />
+              <Button Grid.Row="3" Grid.Column="3" Style="{StaticResource NumKey}" Text="."
+                      Command="{Binding PricePadInputCommand}" CommandParameter="." />
+
+              <Button Grid.Row="0" Grid.Column="4" Style="{StaticResource QuickAmount}" Text="$100"
+                      Command="{Binding SetPricePadAmountCommand}" CommandParameter="100" />
+              <Button Grid.Row="1" Grid.Column="4" Style="{StaticResource QuickAmount}" Text="$50"
+                      Command="{Binding SetPricePadAmountCommand}" CommandParameter="50" />
+              <Button Grid.Row="2" Grid.Column="4" Style="{StaticResource QuickAmount}" Text="$20"
+                      Command="{Binding SetPricePadAmountCommand}" CommandParameter="20" />
+              <Button Grid.Row="3" Grid.Column="4" Style="{StaticResource QuickAmount}" Text="$10"
+                      Command="{Binding SetPricePadAmountCommand}" CommandParameter="10" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*,2*"
+                  ColumnSpacing="8"
+                  IsEnabled="{Binding HasSelectedCartLine}">
+              <Button Grid.Column="0"
+                      Text="Delete"
+                      HeightRequest="56"
+                      FontSize="18"
+                      FontAttributes="Bold"
+                      BackgroundColor="#1A2B3C"
+                      TextColor="#D2E4FB"
+                      BorderColor="#2A3B4C"
+                      BorderWidth="1"
+                      CornerRadius="10"
+                      Command="{Binding PricePadBackspaceCommand}" />
               <Button Grid.Column="1"
+                      Text="Clear"
+                      HeightRequest="56"
+                      FontSize="18"
+                      FontAttributes="Bold"
+                      BackgroundColor="#1A2B3C"
+                      TextColor="#D2E4FB"
+                      BorderColor="#2A3B4C"
+                      BorderWidth="1"
+                      CornerRadius="10"
+                      Command="{Binding PricePadClearCommand}" />
+              <Button Grid.Column="2"
                       Text="Apply Price"
-                      Command="{Binding ApplyFinalPriceCommand}"
+                      HeightRequest="56"
+                      FontSize="20"
+                      FontAttributes="Bold"
                       BackgroundColor="#A2D149"
                       TextColor="#243600"
-                      FontSize="22"
-                      FontAttributes="Bold"
-                      CornerRadius="10" />
+                      CornerRadius="10"
+                      Command="{Binding ApplyFinalPriceCommand}" />
             </Grid>
           </VerticalStackLayout>
         </Border>
@@ -452,6 +509,215 @@
                TextColor="#8EA0B9"
                Opacity="0.9" />
       </Grid>
+    </Grid>
+    <Grid Grid.RowSpan="2"
+          IsVisible="{Binding IsAddProductPopupVisible}"
+          BackgroundColor="#80000000">
+      <Border Stroke="#2A3B4C"
+              StrokeThickness="1"
+              StrokeShape="RoundRectangle 14"
+              BackgroundColor="#0F2131"
+              Padding="16"
+              HorizontalOptions="Center"
+              VerticalOptions="Center"
+              MaximumWidthRequest="520">
+        <VerticalStackLayout Spacing="12">
+          <Label Text="Add New Product"
+                 FontSize="24"
+                 FontAttributes="Bold"
+                 TextColor="#D2E4FB" />
+
+          <Entry Placeholder="Product name"
+                 Text="{Binding NewProductName}" />
+          <Entry Placeholder="Price (e.g. 12.5)"
+                 Keyboard="Numeric"
+                 Text="{Binding NewProductPriceText}" />
+
+          <Grid ColumnDefinitions="*,*"
+                ColumnSpacing="10">
+            <Button Grid.Column="0"
+                    Text="Cancel"
+                    BackgroundColor="#253648"
+                    TextColor="#D2E4FB"
+                    FontAttributes="Bold"
+                    Command="{Binding CloseAddProductPopupCommand}" />
+            <Button Grid.Column="1"
+                    Text="Add Product"
+                    BackgroundColor="#A2D149"
+                    TextColor="#243600"
+                    FontAttributes="Bold"
+                    Command="{Binding AddNewProductCommand}" />
+          </Grid>
+        </VerticalStackLayout>
+      </Border>
+    </Grid>
+
+    <!-- Checkout popup -->
+    <Grid Grid.RowSpan="2"
+          IsVisible="{Binding IsCheckoutPopupVisible}"
+          BackgroundColor="#A0000000">
+      <Border Stroke="#2A3B4C"
+              StrokeThickness="1"
+              StrokeShape="RoundRectangle 14"
+              BackgroundColor="#0F2131"
+              Padding="20"
+              HorizontalOptions="Center"
+              VerticalOptions="Center"
+              MaximumWidthRequest="900"
+              MinimumWidthRequest="720">
+        <Grid RowDefinitions="Auto,Auto,*,Auto"
+              RowSpacing="14">
+
+          <VerticalStackLayout Grid.Row="0" Spacing="2">
+            <Label Text="Checkout"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="#D2E4FB" />
+            <Label Text="{Binding AmountDueText}"
+                   FontSize="22"
+                   TextColor="#BDEE62"
+                   FontAttributes="Bold" />
+            <Label Text="{Binding PaidTotalText}"
+                   FontSize="18"
+                   TextColor="#D2E4FB" />
+            <Label Text="{Binding OutstandingText}"
+                   FontSize="18"
+                   TextColor="#FFD479"
+                   FontAttributes="Bold" />
+          </VerticalStackLayout>
+
+          <!-- payments list -->
+          <Border Grid.Row="1"
+                  Stroke="#2A3B4C"
+                  StrokeShape="RoundRectangle 10"
+                  BackgroundColor="#1A2B3C"
+                  Padding="10"
+                  MinimumHeightRequest="80">
+            <CollectionView ItemsSource="{Binding Payments}"
+                            HeightRequest="120">
+              <CollectionView.EmptyView>
+                <Label Text="No payments added yet."
+                       TextColor="#8EA0B9"
+                       FontSize="14"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+              </CollectionView.EmptyView>
+              <CollectionView.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto"
+                        Padding="6,4"
+                        ColumnSpacing="8">
+                    <Label Text="{Binding DisplayText}"
+                           TextColor="#D2E4FB"
+                           FontSize="16"
+                           VerticalOptions="Center" />
+                    <Button Grid.Column="1"
+                            Text="Remove"
+                            FontSize="12"
+                            BackgroundColor="#3D1F1F"
+                            TextColor="#FFB4AB"
+                            Padding="10,4"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemovePaymentCommand}"
+                            CommandParameter="{Binding}" />
+                  </Grid>
+                </DataTemplate>
+              </CollectionView.ItemTemplate>
+            </CollectionView>
+          </Border>
+
+          <!-- method picker + numpad -->
+          <Grid Grid.Row="2"
+                ColumnDefinitions="1.1*,1.4*"
+                ColumnSpacing="14">
+            <VerticalStackLayout Grid.Column="0" Spacing="10">
+              <Label Text="Payment Method"
+                     TextColor="#8EA0B9"
+                     FontSize="14" />
+              <Picker ItemsSource="{Binding PaymentMethods}"
+                      SelectedItem="{Binding SelectedNewPaymentMethod}"
+                      TextColor="#D2E4FB"
+                      BackgroundColor="#1A2B3C"
+                      FontSize="18" />
+              <Label Text="{Binding MoneyPadLabelText}"
+                     TextColor="#8EA0B9"
+                     FontSize="14" />
+              <Border Stroke="#2A3B4C"
+                      StrokeShape="RoundRectangle 10"
+                      BackgroundColor="#1A2B3C"
+                      Padding="14,10">
+                <Label Text="{Binding MoneyPadInputText}"
+                       FontSize="32"
+                       FontAttributes="Bold"
+                       TextColor="#D2E4FB"
+                       HorizontalTextAlignment="End" />
+              </Border>
+              <Label Text="{Binding ChangePreviewText}"
+                     FontSize="16"
+                     TextColor="#BDEE62"
+                     FontAttributes="Bold" />
+              <Button Text="Add Payment"
+                      FontSize="20"
+                      FontAttributes="Bold"
+                      HeightRequest="56"
+                      BackgroundColor="#1F3D5C"
+                      TextColor="#D2E4FB"
+                      Command="{Binding AddPaymentCommand}" />
+            </VerticalStackLayout>
+
+            <Grid Grid.Column="1"
+                  RowDefinitions="*,*,*,*,*"
+                  ColumnDefinitions="*,*,*,*"
+                  RowSpacing="8"
+                  ColumnSpacing="8">
+              <Button Grid.Row="0" Grid.Column="0" Text="7" FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="7" />
+              <Button Grid.Row="0" Grid.Column="1" Text="8" FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="8" />
+              <Button Grid.Row="0" Grid.Column="2" Text="9" FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="9" />
+              <Button Grid.Row="0" Grid.Column="3" Text="20" FontSize="18" BackgroundColor="#253648" TextColor="#D2E4FB" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="20" />
+
+              <Button Grid.Row="1" Grid.Column="0" Text="4" FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="4" />
+              <Button Grid.Row="1" Grid.Column="1" Text="5" FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="5" />
+              <Button Grid.Row="1" Grid.Column="2" Text="6" FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="6" />
+              <Button Grid.Row="1" Grid.Column="3" Text="50" FontSize="18" BackgroundColor="#253648" TextColor="#D2E4FB" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="50" />
+
+              <Button Grid.Row="2" Grid.Column="0" Text="1" FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="1" />
+              <Button Grid.Row="2" Grid.Column="1" Text="2" FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="2" />
+              <Button Grid.Row="2" Grid.Column="2" Text="3" FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="3" />
+              <Button Grid.Row="2" Grid.Column="3" Text="100" FontSize="18" BackgroundColor="#253648" TextColor="#D2E4FB" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="100" />
+
+              <Button Grid.Row="3" Grid.Column="0" Text="0" FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="0" />
+              <Button Grid.Row="3" Grid.Column="1" Text="00" FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="00" />
+              <Button Grid.Row="3" Grid.Column="2" Text="." FontSize="22" Command="{Binding MoneyPadInputCommand}" CommandParameter="." />
+              <Button Grid.Row="3" Grid.Column="3" Text="500" FontSize="18" BackgroundColor="#253648" TextColor="#D2E4FB" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="500" />
+
+              <Button Grid.Row="4" Grid.Column="0" Text="C" FontSize="20" BackgroundColor="#3D1F1F" TextColor="#FFB4AB" Command="{Binding MoneyPadClearCommand}" />
+              <Button Grid.Row="4" Grid.Column="1" Text="⌫" FontSize="20" BackgroundColor="#3D1F1F" TextColor="#FFB4AB" Command="{Binding MoneyPadBackspaceCommand}" />
+              <Button Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" Text="Exact" FontSize="18" FontAttributes="Bold" BackgroundColor="#1C2A0B" TextColor="#BDEE62" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="EXACT" />
+            </Grid>
+          </Grid>
+
+          <!-- footer buttons -->
+          <Grid Grid.Row="3"
+                ColumnDefinitions="*,*"
+                ColumnSpacing="12">
+            <Button Grid.Column="0"
+                    Text="Cancel"
+                    FontSize="20"
+                    HeightRequest="58"
+                    BackgroundColor="#253648"
+                    TextColor="#D2E4FB"
+                    FontAttributes="Bold"
+                    Command="{Binding CancelCheckoutCommand}" />
+            <Button Grid.Column="1"
+                    Text="Confirm &amp; Print"
+                    FontSize="20"
+                    HeightRequest="58"
+                    BackgroundColor="#A2D149"
+                    TextColor="#243600"
+                    FontAttributes="Bold"
+                    Command="{Binding ConfirmCheckoutCommand}" />
+          </Grid>
+        </Grid>
+      </Border>
     </Grid>
   </Grid>
 </ContentPage>
