@@ -15,7 +15,7 @@ KLCMCPOS is being migrated to a cross-platform architecture for **Windows 10 + m
 - `KLCMC.Pos.Maui` (`net8.0-maccatalyst;net8.0-windows10.0.19041.0`)
   - Cross-platform UI shell (migration target)
 - `KLCMC.Pos.App` (`net8.0-windows`, WPF)
-  - Existing Windows UI retained temporarily as migration reference
+  - Windows 10 WPF host that reuses `KLCMC.Pos.Core` view models/services
 
 ## Platform behavior
 
@@ -70,7 +70,7 @@ make the C# Dev Kit re-evaluate projects.
 1. Build `KLCMC.Pos.Core` and `KLCMC.Pos.Printer.Mock`.
 2. Run UI on target platform:
    - MAUI (target architecture path)
-   - WPF (temporary Windows fallback/reference)
+   - WPF (Windows 10 desktop host)
 3. Verify cart operations and total calculation.
 4. On macOS, verify mock receipt file output.
 5. On Windows 10, verify `POSDLL` connect/print/feed/cut flow with hardware.

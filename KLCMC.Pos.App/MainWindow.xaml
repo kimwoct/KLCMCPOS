@@ -1,0 +1,426 @@
+<Window x:Class="KLCMC.Pos.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="clr-namespace:KLCMC.Pos.App.Converters"
+        Title="KLCMC POS (WPF)"
+        Width="1500"
+        Height="920"
+        MinWidth="1280"
+        MinHeight="760"
+        Background="#031425">
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    <conv:BoolToBrushConverter x:Key="BoolToTileBg" />
+    <conv:PaymentsToTextConverter x:Key="PaymentsToText" />
+    <Style TargetType="TextBlock">
+      <Setter Property="Foreground" Value="#D2E4FB" />
+    </Style>
+    <Style TargetType="Button">
+      <Setter Property="Margin" Value="4" />
+      <Setter Property="Padding" Value="10,6" />
+    </Style>
+    <Style TargetType="GroupBox">
+      <Setter Property="Margin" Value="6" />
+      <Setter Property="Padding" Value="8" />
+      <Setter Property="Foreground" Value="#D2E4FB" />
+      <Setter Property="BorderBrush" Value="#2A3B4C" />
+    </Style>
+  </Window.Resources>
+
+  <Grid Margin="12">
+    <TabControl Background="#0F2131"
+                BorderBrush="#2A3B4C">
+      <TabItem Header="Current Sale">
+        <Grid Margin="10">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.05*" />
+            <ColumnDefinition Width="1.9*" />
+            <ColumnDefinition Width="1.2*" />
+          </Grid.ColumnDefinitions>
+
+          <GroupBox Grid.Row="0" Grid.Column="0" Header="Preset Products">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <ItemsControl ItemsSource="{Binding MainViewModel.PresetItems}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Button Content="{Binding Name}"
+                            Command="{Binding DataContext.MainViewModel.AddItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            CommandParameter="{Binding}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </GroupBox>
+
+          <GroupBox Grid.Row="0" Grid.Column="1" Header="{Binding MainViewModel.TotalText}">
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+
+              <DataGrid Grid.Row="0"
+                        AutoGenerateColumns="False"
+                        HeadersVisibility="Column"
+                        CanUserAddRows="False"
+                        ItemsSource="{Binding MainViewModel.CartLines}"
+                        SelectedItem="{Binding MainViewModel.SelectedCartLine, Mode=TwoWay}">
+                <DataGrid.Columns>
+                  <DataGridTextColumn Header="Product" Binding="{Binding Name}" Width="2*" />
+                  <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}" Width="*" />
+                  <DataGridTextColumn Header="Unit" Binding="{Binding UnitPrice, StringFormat=F2}" Width="*" />
+                  <DataGridTextColumn Header="Total" Binding="{Binding LineTotal, StringFormat=F2}" Width="*" />
+                  <DataGridTemplateColumn Header="Edit" Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <Button Content="Edit"
+                                Command="{Binding DataContext.MainViewModel.EditCartLineCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <DataGridTemplateColumn Header="Remove" Width="90">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <Button Content="Remove"
+                                Command="{Binding DataContext.MainViewModel.RemoveCartLineCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                </DataGrid.Columns>
+              </DataGrid>
+
+              <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Clear Cart" Command="{Binding MainViewModel.ClearCartCommand}" />
+                <Button Content="Checkout" Command="{Binding MainViewModel.PrintReceiptCommand}" />
+              </StackPanel>
+            </Grid>
+          </GroupBox>
+
+          <GroupBox Grid.Row="0" Grid.Column="2" Header="Product / Printer Control">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <StackPanel>
+                <TextBlock Text="{Binding MainViewModel.SelectedCartLineName}" FontWeight="Bold" />
+                <TextBlock Text="{Binding MainViewModel.SelectedCartLineTotalText}" Margin="0,0,0,6" />
+
+                <Border Background="#1A2B3C"
+                        Padding="8"
+                        Visibility="{Binding MainViewModel.IsProductControlVisible, Converter={StaticResource BoolToVisibility}}">
+                  <StackPanel>
+                    <TextBlock Text="Final Price Pad" FontWeight="Bold" />
+                    <TextBox Text="{Binding MainViewModel.PricePadInputText}" IsReadOnly="True" Margin="0,6,0,6" />
+                    <UniformGrid Columns="3">
+                      <Button Content="7" Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="7" />
+                      <Button Content="8" Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="8" />
+                      <Button Content="9" Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="9" />
+                      <Button Content="4" Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="4" />
+                      <Button Content="5" Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="5" />
+                      <Button Content="6" Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="6" />
+                      <Button Content="1" Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="1" />
+                      <Button Content="2" Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="2" />
+                      <Button Content="3" Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="3" />
+                      <Button Content="0" Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="0" />
+                      <Button Content="00" Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="00" />
+                      <Button Content="." Command="{Binding MainViewModel.PricePadInputCommand}" CommandParameter="." />
+                    </UniformGrid>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                      <Button Content="⌫" Command="{Binding MainViewModel.PricePadBackspaceCommand}" />
+                      <Button Content="Clear" Command="{Binding MainViewModel.PricePadClearCommand}" />
+                      <Button Content="Apply" Command="{Binding MainViewModel.ApplyFinalPriceCommand}" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+
+                <Separator Margin="0,10,0,8" />
+
+                <Button Content="Add Product…" Command="{Binding MainViewModel.OpenAddProductPopupCommand}" HorizontalAlignment="Left" />
+                <Border BorderBrush="#2A3B4C"
+                        BorderThickness="1"
+                        Padding="8"
+                        Visibility="{Binding MainViewModel.IsAddProductPopupVisible, Converter={StaticResource BoolToVisibility}}">
+                  <StackPanel>
+                    <TextBlock Text="New Product Name" />
+                    <TextBox Text="{Binding MainViewModel.NewProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Default Price" Margin="0,6,0,0" />
+                    <TextBox Text="{Binding MainViewModel.NewProductPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                      <Button Content="Cancel" Command="{Binding MainViewModel.CloseAddProductPopupCommand}" />
+                      <Button Content="Add" Command="{Binding MainViewModel.AddNewProductCommand}" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+
+                <Separator Margin="0,10,0,8" />
+                <TextBlock Text="{Binding MainViewModel.ConnectionStateText}" FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal">
+                  <Button Content="Connect" Command="{Binding MainViewModel.ConnectPrinterCommand}" />
+                  <Button Content="Disconnect" Command="{Binding MainViewModel.DisconnectPrinterCommand}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                  <Button Content="Open Drawer" Command="{Binding MainViewModel.OpenDrawerCommand}" />
+                  <Button Content="Print Test" Command="{Binding MainViewModel.PrintPrinterTestCommand}" />
+                </StackPanel>
+              </StackPanel>
+            </ScrollViewer>
+          </GroupBox>
+
+          <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Header="Checkout"
+                    Visibility="{Binding MainViewModel.IsCheckoutPopupVisible, Converter={StaticResource BoolToVisibility}}">
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+              </Grid.RowDefinitions>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.2*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+              </Grid.ColumnDefinitions>
+
+              <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">
+                <TextBlock Text="{Binding MainViewModel.AmountDueText}" FontWeight="Bold" />
+                <TextBlock Text="{Binding MainViewModel.PaidTotalText}" />
+                <TextBlock Text="{Binding MainViewModel.OutstandingText}" />
+                <TextBlock Text="{Binding MainViewModel.ChangePreviewText}" />
+              </StackPanel>
+
+              <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Cash"
+                        Background="{Binding MainViewModel.IsCashMethodSelected, Converter={StaticResource BoolToTileBg}}"
+                        Foreground="#D2E4FB"
+                        Command="{Binding MainViewModel.SelectPaymentMethodCommand}"
+                        CommandParameter="Cash" />
+                <Button Content="Card"
+                        Background="{Binding MainViewModel.IsCardMethodSelected, Converter={StaticResource BoolToTileBg}}"
+                        Foreground="#D2E4FB"
+                        Command="{Binding MainViewModel.SelectPaymentMethodCommand}"
+                        CommandParameter="Card" />
+                <Button Content="Octopus"
+                        Background="{Binding MainViewModel.IsOctopusMethodSelected, Converter={StaticResource BoolToTileBg}}"
+                        Foreground="#D2E4FB"
+                        Command="{Binding MainViewModel.SelectPaymentMethodCommand}"
+                        CommandParameter="Octopus" />
+                <Button Content="FPS"
+                        Background="{Binding MainViewModel.IsFpsMethodSelected, Converter={StaticResource BoolToTileBg}}"
+                        Foreground="#D2E4FB"
+                        Command="{Binding MainViewModel.SelectPaymentMethodCommand}"
+                        CommandParameter="FPS" />
+                <Button Content="Other"
+                        Background="{Binding MainViewModel.IsOtherMethodSelected, Converter={StaticResource BoolToTileBg}}"
+                        Foreground="#D2E4FB"
+                        Command="{Binding MainViewModel.SelectPaymentMethodCommand}"
+                        CommandParameter="Other" />
+              </StackPanel>
+
+              <GroupBox Grid.Row="1" Grid.Column="0" Header="{Binding MainViewModel.MoneyPadLabelText}">
+                <StackPanel>
+                  <TextBox Text="{Binding MainViewModel.MoneyPadInputText}" IsReadOnly="True" />
+                  <UniformGrid Columns="4">
+                    <Button Content="7" Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="7" />
+                    <Button Content="8" Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="8" />
+                    <Button Content="9" Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="9" />
+                    <Button Content="100" Command="{Binding MainViewModel.MoneyPadQuickAmountCommand}" CommandParameter="100" />
+                    <Button Content="4" Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="4" />
+                    <Button Content="5" Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="5" />
+                    <Button Content="6" Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="6" />
+                    <Button Content="500" Command="{Binding MainViewModel.MoneyPadQuickAmountCommand}" CommandParameter="500" />
+                    <Button Content="1" Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="1" />
+                    <Button Content="2" Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="2" />
+                    <Button Content="3" Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="3" />
+                    <Button Content="EXACT" Command="{Binding MainViewModel.MoneyPadQuickAmountCommand}" CommandParameter="EXACT" />
+                    <Button Content="0" Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="0" />
+                    <Button Content="00" Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="00" />
+                    <Button Content="." Command="{Binding MainViewModel.MoneyPadInputCommand}" CommandParameter="." />
+                    <Button Content="50" Command="{Binding MainViewModel.MoneyPadQuickAmountCommand}" CommandParameter="50" />
+                  </UniformGrid>
+                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="⌫" Command="{Binding MainViewModel.MoneyPadBackspaceCommand}" />
+                    <Button Content="Clear" Command="{Binding MainViewModel.MoneyPadClearCommand}" />
+                    <Button Content="Add Payment" Command="{Binding MainViewModel.AddPaymentCommand}" />
+                  </StackPanel>
+                </StackPanel>
+              </GroupBox>
+
+              <GroupBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Header="Payments">
+                <DataGrid AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          ItemsSource="{Binding MainViewModel.Payments}">
+                  <DataGrid.Columns>
+                    <DataGridTextColumn Header="Method" Binding="{Binding Method}" Width="*" />
+                    <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat=F2}" Width="*" />
+                    <DataGridTextColumn Header="Tendered" Binding="{Binding TenderedAmount, StringFormat=F2}" Width="*" />
+                    <DataGridTextColumn Header="Change" Binding="{Binding ChangeAmount, StringFormat=F2}" Width="*" />
+                    <DataGridTemplateColumn Header="Action" Width="90">
+                      <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                          <Button Content="Remove"
+                                  Command="{Binding DataContext.MainViewModel.RemovePaymentCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                  CommandParameter="{Binding}" />
+                        </DataTemplate>
+                      </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                  </DataGrid.Columns>
+                </DataGrid>
+              </GroupBox>
+
+              <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Cancel Checkout" Command="{Binding MainViewModel.CancelCheckoutCommand}" />
+                <Button Content="Confirm &amp; Print" Command="{Binding MainViewModel.ConfirmCheckoutCommand}" />
+              </StackPanel>
+            </Grid>
+          </GroupBox>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Daily Account" GotFocus="DailyAccountTab_GotFocus">
+        <Grid Margin="10">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <DockPanel Grid.Row="0" Margin="0,0,0,8">
+            <TextBlock Text="{Binding DailyAccountViewModel.HeaderText}" FontSize="20" FontWeight="Bold" DockPanel.Dock="Left" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+              <Button Content="◀ Prev" Command="{Binding DailyAccountViewModel.PrevDayCommand}" />
+              <Button Content="Today" Command="{Binding DailyAccountViewModel.TodayCommand}" />
+              <Button Content="Next ▶" Command="{Binding DailyAccountViewModel.NextDayCommand}" />
+              <DatePicker SelectedDate="{Binding DailyAccountViewModel.SelectedDate, Mode=TwoWay}" />
+            </StackPanel>
+          </DockPanel>
+
+          <Grid Grid.Row="1" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <GroupBox Grid.Column="0" Header="Transactions">
+              <TextBlock Text="{Binding DailyAccountViewModel.TransactionCountText}" FontSize="18" FontWeight="Bold" />
+            </GroupBox>
+            <GroupBox Grid.Column="1" Header="Gross">
+              <TextBlock Text="{Binding DailyAccountViewModel.GrossTotalText}" FontSize="18" FontWeight="Bold" />
+            </GroupBox>
+            <Button Grid.Column="2" Content="Print Daily Report" Command="{Binding DailyAccountViewModel.PrintDailyReportCommand}" />
+          </Grid>
+
+          <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="1.2*" />
+              <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Grid.Column="0" Header="By Payment Method">
+              <DataGrid AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        ItemsSource="{Binding DailyAccountViewModel.ByMethod}">
+                <DataGrid.Columns>
+                  <DataGridTextColumn Header="Method" Binding="{Binding Method}" Width="*" />
+                  <DataGridTextColumn Header="Count" Binding="{Binding Count}" Width="*" />
+                  <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat=F2}" Width="*" />
+                </DataGrid.Columns>
+              </DataGrid>
+            </GroupBox>
+
+            <GroupBox Grid.Column="1" Header="Transactions">
+              <DataGrid AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        ItemsSource="{Binding DailyAccountViewModel.Transactions}">
+                <DataGrid.Columns>
+                  <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="Auto" />
+                  <DataGridTextColumn Header="Time" Binding="{Binding CreatedAtLocal, StringFormat=HH:mm:ss}" Width="*" />
+                  <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat=F2}" Width="*" />
+                  <DataGridTextColumn Header="Payments" Binding="{Binding Payments, Converter={StaticResource PaymentsToText}}" Width="2*" />
+                </DataGrid.Columns>
+              </DataGrid>
+            </GroupBox>
+          </Grid>
+
+          <TextBlock Grid.Row="3" Text="{Binding DailyAccountViewModel.StatusMessage}" Margin="4" />
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Configure">
+        <Grid Margin="10">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.2*" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+
+          <GroupBox Grid.Column="0" Header="Printer Settings">
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="130" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+
+              <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Mode" />
+              <ComboBox Grid.Row="0" Grid.Column="1"
+                        ItemsSource="{Binding MainViewModel.ConnectionModes}"
+                        SelectedItem="{Binding MainViewModel.ConnectionOptions.Mode, Mode=TwoWay}" />
+
+              <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="Endpoint" />
+              <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.Endpoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+              <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="BaudRate" />
+              <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.BaudRate, Mode=TwoWay}" />
+
+              <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Text="DataBits" />
+              <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.DataBits, Mode=TwoWay}" />
+
+              <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="StopBits" />
+              <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.StopBits, Mode=TwoWay}" />
+
+              <TextBlock Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Text="Parity" />
+              <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.Parity, Mode=TwoWay}" />
+
+              <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Text="FlowControl" />
+              <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.FlowControl, Mode=TwoWay}" />
+
+              <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Content="Connect" Command="{Binding MainViewModel.ConnectPrinterCommand}" />
+                <Button Content="Disconnect" Command="{Binding MainViewModel.DisconnectPrinterCommand}" />
+                <Button Content="Open Drawer" Command="{Binding MainViewModel.OpenDrawerCommand}" />
+                <Button Content="Print Test" Command="{Binding MainViewModel.PrintPrinterTestCommand}" />
+              </StackPanel>
+            </Grid>
+          </GroupBox>
+
+          <GroupBox Grid.Column="1" Header="Status / Printer Console">
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+              </Grid.RowDefinitions>
+              <TextBlock Grid.Row="0" Text="{Binding MainViewModel.StatusMessage}" Margin="0,0,0,8" />
+              <TextBox Grid.Row="1"
+                       Text="{Binding MainViewModel.PrinterConsoleText}"
+                       IsReadOnly="True"
+                       TextWrapping="Wrap"
+                       VerticalScrollBarVisibility="Auto"
+                       AcceptsReturn="True" />
+            </Grid>
+          </GroupBox>
+        </Grid>
+      </TabItem>
+    </TabControl>
+  </Grid>
+</Window>
