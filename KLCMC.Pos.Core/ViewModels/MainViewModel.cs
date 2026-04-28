@@ -8,6 +8,7 @@ namespace KLCMC.Pos.Core.ViewModels;
 
 public sealed class MainViewModel : BindableBase
 {
+    public event Action? SaleConfirmed;
     private readonly IPrinterService _printerService;
     private readonly IProductRepository _productRepository;
     private readonly ISaleRepository _saleRepository;
@@ -20,9 +21,12 @@ public sealed class MainViewModel : BindableBase
     private readonly RelayCommand _printCutCalibrationCommand;
     private readonly RelayCommand _printDrawerPulseCalibrationCommand;
     private readonly RelayCommand _addNewProductCommand;
+    private readonly RelayCommand _saveProductCommand;
+    private readonly RelayCommand _deleteProductCommand;
     private readonly RelayCommand _clearCartCommand;
     private readonly RelayCommand _editCartLineCommand;
     private readonly RelayCommand _removeCartLineCommand;
+    private readonly RelayCommand _dismissProductControlCommand;
     private readonly RelayCommand _printReceiptCommand;
     private readonly RelayCommand _applyFinalPriceCommand;
     private readonly RelayCommand _addPaymentCommand;
@@ -62,6 +66,8 @@ public sealed class MainViewModel : BindableBase
                 DefaultPrice = p.DefaultPrice
             }));
 
+        ReloadProductEditorRows();
+
         ConnectionModes = Enum.GetValues<PrinterConnectionMode>();
         ConnectionOptions = _printerSettingsRepository.Load();
         PaperWidths = [58, 80];
@@ -73,6 +79,8 @@ public sealed class MainViewModel : BindableBase
 
         AddItemCommand = new RelayCommand(AddPresetItem);
         _addNewProductCommand = new RelayCommand(_ => AddNewProduct(), _ => CanAddNewProduct());
+        _saveProductCommand = new RelayCommand(SaveProduct);
+        _deleteProductCommand = new RelayCommand(DeleteProduct);
         OpenAddProductPopupCommand = new RelayCommand(_ => OpenAddProductPopup());
         CloseAddProductPopupCommand = new RelayCommand(_ => CloseAddProductPopup());
         TogglePrinterPanelCommand = new RelayCommand(_ => TogglePrinterPanel());
@@ -90,6 +98,7 @@ public sealed class MainViewModel : BindableBase
         _clearCartCommand = new RelayCommand(_ => ClearCart(), _ => CartLines.Count > 0);
         _editCartLineCommand = new RelayCommand(EditCartLine);
         _removeCartLineCommand = new RelayCommand(RemoveCartLine);
+        _dismissProductControlCommand = new RelayCommand(_ => DismissProductControl());
         _printReceiptCommand = new RelayCommand(_ => OpenCheckout(), _ => CartLines.Count > 0);
         PricePadInputCommand = new RelayCommand(AppendPricePadInput, _ => HasSelectedCartLine);
         PricePadBackspaceCommand = new RelayCommand(_ => BackspacePricePadInput(), _ => HasSelectedCartLine);
@@ -127,6 +136,8 @@ public sealed class MainViewModel : BindableBase
     }
 
     public ObservableCollection<PresetItem> PresetItems { get; }
+
+    public ObservableCollection<ProductEditorRow> ProductEditorRows { get; } = [];
 
     public Array ConnectionModes { get; }
 
@@ -259,6 +270,10 @@ public sealed class MainViewModel : BindableBase
 
     public RelayCommand AddNewProductCommand => _addNewProductCommand;
 
+    public RelayCommand SaveProductCommand => _saveProductCommand;
+
+    public RelayCommand DeleteProductCommand => _deleteProductCommand;
+
     public RelayCommand OpenAddProductPopupCommand { get; }
 
     public RelayCommand CloseAddProductPopupCommand { get; }
@@ -302,6 +317,8 @@ public sealed class MainViewModel : BindableBase
     public RelayCommand EditCartLineCommand => _editCartLineCommand;
 
     public RelayCommand RemoveCartLineCommand => _removeCartLineCommand;
+
+    public RelayCommand DismissProductControlCommand => _dismissProductControlCommand;
 
     public RelayCommand PrintReceiptCommand => _printReceiptCommand;
 
@@ -379,11 +396,79 @@ public sealed class MainViewModel : BindableBase
             DefaultPrice = price
         });
 
+        ProductEditorRows.Add(new ProductEditorRow
+        {
+            Id = _productRepository.GetAll().LastOrDefault(p => p.Name == name)?.Id ?? 0,
+            Name = name,
+            PriceText = price.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
+        });
+
         NewProductName = string.Empty;
         NewProductPriceText = string.Empty;
         IsAddProductPopupVisible = false;
         StatusMessage = $"Product '{name}' added.";
         _addNewProductCommand.RaiseCanExecuteChanged();
+    }
+
+    private void ReloadProductEditorRows()
+    {
+        ProductEditorRows.Clear();
+        foreach (var p in _productRepository.GetAll())
+        {
+            ProductEditorRows.Add(new ProductEditorRow
+            {
+                Id = p.Id,
+                Name = p.Name,
+                PriceText = p.DefaultPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
+            });
+        }
+    }
+
+    private void SaveProduct(object? parameter)
+    {
+        if (parameter is not ProductEditorRow row)
+            return;
+
+        var name = row.Name.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            StatusMessage = "Product name cannot be empty.";
+            return;
+        }
+
+        if (!_productRepository.Update(row.Id, name, row.Price))
+        {
+            StatusMessage = $"Product #{row.Id} not found.";
+            return;
+        }
+
+        // sync PresetItems
+        var preset = PresetItems.FirstOrDefault(p => p.Name == row.Name || PresetItems.IndexOf(p) == ProductEditorRows.IndexOf(row));
+        ReloadProductEditorRows();
+        // rebuild preset items to reflect name/price change
+        PresetItems.Clear();
+        foreach (var p in _productRepository.GetAll())
+            PresetItems.Add(new PresetItem { Name = p.Name, DefaultPrice = p.DefaultPrice });
+
+        StatusMessage = $"Product '{name}' saved.";
+    }
+
+    private void DeleteProduct(object? parameter)
+    {
+        if (parameter is not ProductEditorRow row)
+            return;
+
+        if (!_productRepository.Delete(row.Id))
+        {
+            StatusMessage = $"Product #{row.Id} not found.";
+            return;
+        }
+
+        ProductEditorRows.Remove(row);
+        var preset = PresetItems.FirstOrDefault(p => p.Name == row.Name);
+        if (preset is not null) PresetItems.Remove(preset);
+
+        StatusMessage = $"Product '{row.Name}' deleted.";
     }
 
     private void OpenAddProductPopup()
@@ -830,6 +915,12 @@ public sealed class MainViewModel : BindableBase
         StatusMessage = $"Editing {line.Name}.";
     }
 
+    private void DismissProductControl()
+    {
+        SelectedCartLine = null;
+        IsProductControlVisible = false;
+    }
+
     private void RemoveCartLine(object? parameter)
     {
         if (parameter is not CartLine line)
@@ -1198,25 +1289,16 @@ public sealed class MainViewModel : BindableBase
             return;
         }
 
-        var lines = ReceiptComposer.Build("KLCMC POS", CartLines, Total, DateTime.Now, paymentEntries, ConnectionOptions);
-
         try
         {
+            var lines = ReceiptComposer.Build("KLCMC POS", CartLines, Total, DateTime.Now, paymentEntries, ConnectionOptions);
             EnsurePrinterReady();
             _printerService.PrintReceipt(lines);
             StatusMessage = "Sale recorded and receipt printed.";
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex)
         {
             StatusMessage = $"Sale recorded; print failed: {ex.Message}";
-        }
-        catch (DllNotFoundException ex)
-        {
-            StatusMessage = $"Sale recorded; printer runtime load failed: {ex.Message}";
-        }
-        catch (BadImageFormatException ex)
-        {
-            StatusMessage = $"Sale recorded; printer runtime architecture mismatch: {ex.Message}";
         }
 
         IsCheckoutPopupVisible = false;
@@ -1225,6 +1307,7 @@ public sealed class MainViewModel : BindableBase
         CartLines.Clear();
         SelectedCartLine = null;
         RaiseCheckoutTotalsChanged();
+        SaleConfirmed?.Invoke();
     }
 
     private void RaiseCheckoutTotalsChanged()

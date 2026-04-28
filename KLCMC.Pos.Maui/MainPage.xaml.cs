@@ -18,6 +18,8 @@ public partial class MainPage : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
         DailyAccountViewModel = services.GetRequiredService<DailyAccountViewModel>();
+        DailyAccountTabContent.BindingContext = DailyAccountViewModel;
+        viewModel.SaleConfirmed += DailyAccountViewModel.Load;
         SetActiveTab(MainTab.CurrentSale);
     }
 

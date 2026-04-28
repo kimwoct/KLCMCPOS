@@ -32,4 +32,25 @@ public sealed class ProductRepository : IProductRepository
         using var db = _dbFactory.CreateDbContext();
         return db.Products.Any(p => EF.Functions.Like(p.Name, name));
     }
+
+    public bool Update(int id, string name, decimal defaultPrice)
+    {
+        using var db = _dbFactory.CreateDbContext();
+        var entity = db.Products.FirstOrDefault(p => p.Id == id);
+        if (entity is null) return false;
+        entity.Name = name;
+        entity.DefaultPrice = defaultPrice;
+        db.SaveChanges();
+        return true;
+    }
+
+    public bool Delete(int id)
+    {
+        using var db = _dbFactory.CreateDbContext();
+        var entity = db.Products.FirstOrDefault(p => p.Id == id);
+        if (entity is null) return false;
+        entity.IsActive = false;
+        db.SaveChanges();
+        return true;
+    }
 }

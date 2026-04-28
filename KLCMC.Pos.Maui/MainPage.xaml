@@ -2,6 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:conv="clr-namespace:KLCMC.Pos.Maui.Converters"
+             xmlns:models="clr-namespace:KLCMC.Pos.Core.Models;assembly=KLCMC.Pos.Core"
+             xmlns:vm="clr-namespace:KLCMC.Pos.Core.ViewModels;assembly=KLCMC.Pos.Core"
              x:Class="KLCMC.Pos.Maui.MainPage"
              x:Name="RootPage"
              Title="KLCMC POS"
@@ -51,7 +53,7 @@
 
             <Grid Grid.Row="1">
             <Grid x:Name="CurrentSaleTabContent"
-                  RowDefinitions="Auto,*,Auto,Auto"
+                  RowDefinitions="Auto,*,Auto"
                   RowSpacing="14">
             <HorizontalStackLayout Spacing="12"
                                     VerticalOptions="Center">
@@ -138,17 +140,44 @@
               </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <!-- Inline checkout panel (under cart list) -->
-            <Border Grid.Row="2"
-                    Grid.RowSpan="2"
-                    IsVisible="{Binding IsCheckoutPopupVisible}"
-                    ZIndex="10"
-                    Stroke="#2A3B4C"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 12"
-                    BackgroundColor="#27435F"
-                    Padding="14"
-                    VerticalOptions="FillAndExpand">
+            <Grid Grid.Row="2"
+                  ColumnDefinitions="*,Auto"
+                  ColumnSpacing="12">
+              <Label Text="{Binding StatusMessage}"
+                     FontSize="16"
+                     TextColor="#C4D4E8"
+                     LineBreakMode="TailTruncation"
+                     VerticalOptions="Center"
+                     HorizontalTextAlignment="End" />
+              <Button Grid.Column="1"
+                      Text="Checkout"
+                      FontSize="20"
+                      FontAttributes="Bold"
+                      HeightRequest="52"
+                      Padding="18,0"
+                      BackgroundColor="#A2D149"
+                      TextColor="#243600"
+                      Command="{Binding PrintReceiptCommand}" />
+            </Grid>
+            </Grid>
+
+            <!-- Checkout modal backdrop -->
+            <BoxView IsVisible="{Binding IsCheckoutPopupVisible}"
+                     BackgroundColor="#000000"
+                     Opacity="0.55"
+                     ZIndex="9" />
+
+            <!-- Checkout modal overlay -->
+            <ScrollView IsVisible="{Binding IsCheckoutPopupVisible}"
+                        ZIndex="10"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Fill"
+                        Margin="20">
+              <Border Stroke="#2A3B4C"
+                      StrokeThickness="1"
+                      StrokeShape="RoundRectangle 16"
+                      BackgroundColor="#27435F"
+                      Padding="14">
               <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
                     RowSpacing="10">
                 <!-- Row 0: totals + close X -->
@@ -294,22 +323,22 @@
                     <Button Grid.Row="1" Grid.Column="0" Text="1" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="1" />
                     <Button Grid.Row="1" Grid.Column="1" Text="2" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="2" />
                     <Button Grid.Row="1" Grid.Column="2" Text="3" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="3" />
-                    <Button Grid.Row="1" Grid.Column="3" Text="$100" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="100" />
+                    <Button Grid.Row="1" Grid.Column="3" Text="$100" FontSize="18" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="100" />
 
                     <Button Grid.Row="2" Grid.Column="0" Text="4" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="4" />
                     <Button Grid.Row="2" Grid.Column="1" Text="5" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="5" />
                     <Button Grid.Row="2" Grid.Column="2" Text="6" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="6" />
-                    <Button Grid.Row="2" Grid.Column="3" Text="$50" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="50" />
+                    <Button Grid.Row="2" Grid.Column="3" Text="$50" FontSize="18" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="50" />
 
                     <Button Grid.Row="3" Grid.Column="0" Text="7" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="7" />
                     <Button Grid.Row="3" Grid.Column="1" Text="8" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="8" />
                     <Button Grid.Row="3" Grid.Column="2" Text="9" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="9" />
-                    <Button Grid.Row="3" Grid.Column="3" Text="$20" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="20" />
+                    <Button Grid.Row="3" Grid.Column="3" Text="$20" FontSize="18" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="20" />
 
                     <Button Grid.Row="4" Grid.Column="0" Text="0" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="0" />
                     <Button Grid.Row="4" Grid.Column="1" Text="00" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="00" />
                     <Button Grid.Row="4" Grid.Column="2" Text="." FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="." />
-                    <Button Grid.Row="4" Grid.Column="3" Text="$10" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="10" />
+                    <Button Grid.Row="4" Grid.Column="3" Text="$10" FontSize="18" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="10" />
 
                     <Button Grid.Row="5" Grid.Column="0"
                             Text="C"
@@ -367,280 +396,385 @@
                           BackgroundColor="#A2D149"
                           TextColor="#243600"
                           FontAttributes="Bold"
-                          Command="{Binding ConfirmCheckoutCommand}" />
+                          Command="{Binding ConfirmCheckoutCommand}">
+                    <VisualStateManager.VisualStateGroups>
+                      <VisualStateGroup Name="CommonStates">
+                        <VisualState Name="Normal">
+                          <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="#A2D149" />
+                            <Setter Property="TextColor" Value="#243600" />
+                          </VisualState.Setters>
+                        </VisualState>
+                        <VisualState Name="Disabled">
+                          <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="#253648" />
+                            <Setter Property="TextColor" Value="#4A6070" />
+                          </VisualState.Setters>
+                        </VisualState>
+                      </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+                  </Button>
                 </Grid>
               </Grid>
-            </Border>
-
-            <Grid Grid.Row="3"
-                  ColumnDefinitions="*,Auto"
-                  ColumnSpacing="12">
-              <Label Text="{Binding StatusMessage}"
-                     FontSize="16"
-                     TextColor="#C4D4E8"
-                     LineBreakMode="TailTruncation"
-                     VerticalOptions="Center"
-                     HorizontalTextAlignment="End" />
-              <Button Grid.Column="1"
-                      Text="Checkout"
-                      FontSize="20"
-                      FontAttributes="Bold"
-                      HeightRequest="52"
-                      Padding="18,0"
-                      BackgroundColor="#A2D149"
-                      TextColor="#243600"
-                      Command="{Binding PrintReceiptCommand}" />
-            </Grid>
-            </Grid>
+              </Border>
+            </ScrollView>
             <Grid x:Name="DailyAccountTabContent"
                   IsVisible="False"
-                  BindingContext="{Binding Source={x:Reference RootPage}, Path=DailyAccountViewModel}"
-                  RowDefinitions="Auto,Auto,Auto,*,Auto"
-                  RowSpacing="14">
-              <Border Stroke="#2A3B4C"
-                      StrokeThickness="1"
-                      StrokeShape="RoundRectangle 14"
-                      BackgroundColor="#0F2131"
-                      Padding="14,10">
-                <Grid ColumnDefinitions="*,Auto"
-                      ColumnSpacing="10">
-                  <Label Text="{Binding HeaderText}"
-                         FontSize="22"
-                         FontAttributes="Bold"
-                         TextColor="#D2E4FB"
-                         VerticalOptions="Center" />
-                  <HorizontalStackLayout Grid.Column="1"
-                                         Spacing="8">
-                    <Button Text="◀ Prev"
-                            BackgroundColor="#253648"
-                            TextColor="#D2E4FB"
-                            Padding="12,6"
-                            Command="{Binding PrevDayCommand}" />
-                    <Button Text="Today"
-                            BackgroundColor="#1F3D5C"
-                            TextColor="#D2E4FB"
-                            FontAttributes="Bold"
-                            Padding="12,6"
-                            Command="{Binding TodayCommand}" />
-                    <Button Text="Next ▶"
-                            BackgroundColor="#253648"
-                            TextColor="#D2E4FB"
-                            Padding="12,6"
-                            Command="{Binding NextDayCommand}" />
-                    <DatePicker Date="{Binding SelectedDate}"
-                                TextColor="#D2E4FB"
-                                BackgroundColor="#1A2B3C"
-                                FontSize="14" />
-                  </HorizontalStackLayout>
-                </Grid>
-              </Border>
-
-              <Grid Grid.Row="1"
-                    ColumnDefinitions="*,*,Auto"
-                    ColumnSpacing="14">
-                <Border Grid.Column="0"
-                        Stroke="#2A3B4C"
-                        StrokeShape="RoundRectangle 14"
-                        BackgroundColor="#0F2131"
-                        Padding="16">
-                  <VerticalStackLayout Spacing="4">
-                    <Label Text="Transactions"
-                           TextColor="#8EA0B9"
-                           FontSize="14" />
-                    <Label Text="{Binding TransactionCountText}"
-                           TextColor="#D2E4FB"
-                           FontSize="22"
-                           FontAttributes="Bold" />
-                  </VerticalStackLayout>
-                </Border>
-                <Border Grid.Column="1"
-                        Stroke="#2A3B4C"
-                        StrokeShape="RoundRectangle 14"
-                        BackgroundColor="#0F2131"
-                        Padding="16">
-                  <VerticalStackLayout Spacing="4">
-                    <Label Text="Gross Total"
-                           TextColor="#8EA0B9"
-                           FontSize="14" />
-                    <Label Text="{Binding GrossTotalText}"
-                           TextColor="#BDEE62"
-                           FontSize="22"
-                           FontAttributes="Bold" />
-                  </VerticalStackLayout>
-                </Border>
-                <Button Grid.Column="2"
-                        Text="🖨 Print Daily Report"
-                        BackgroundColor="#A2D149"
-                        TextColor="#243600"
-                        FontAttributes="Bold"
-                        Padding="16,12"
-                        Command="{Binding PrintDailyReportCommand}" />
+                  RowDefinitions="Auto,*,Auto,Auto"
+                  RowSpacing="0">
+              <!-- ── Header: date nav + print ── -->
+              <Grid Grid.Row="0"
+                    ColumnDefinitions="*,Auto"
+                    Padding="2,0,2,10">
+                <Label Grid.Column="0"
+                       Text="{Binding HeaderText}"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="#D2E4FB"
+                       VerticalOptions="Center" />
+                <HorizontalStackLayout Grid.Column="1"
+                                       Spacing="8">
+                  <Button Text="◀ Prev"
+                          BackgroundColor="#253648"
+                          TextColor="#D2E4FB"
+                          Padding="12,6"
+                          Command="{Binding PrevDayCommand}" />
+                  <Button Text="Today"
+                          BackgroundColor="#1F3D5C"
+                          TextColor="#D2E4FB"
+                          FontAttributes="Bold"
+                          Padding="12,6"
+                          Command="{Binding TodayCommand}" />
+                  <Button Text="Next ▶"
+                          BackgroundColor="#253648"
+                          TextColor="#D2E4FB"
+                          Padding="12,6"
+                          Command="{Binding NextDayCommand}" />
+                  <DatePicker Date="{Binding SelectedDate}"
+                              TextColor="#D2E4FB"
+                              BackgroundColor="#1A2B3C"
+                              FontSize="14" />
+                  <Button Text="🖨 Print Daily Report"
+                          BackgroundColor="#A2D149"
+                          TextColor="#243600"
+                          FontAttributes="Bold"
+                          Padding="12,6"
+                          Command="{Binding PrintDailyReportCommand}" />
+                </HorizontalStackLayout>
               </Grid>
 
-              <Border Grid.Row="2"
+              <!-- ── Transaction table ── -->
+              <Border Grid.Row="1"
                       Stroke="#2A3B4C"
-                      StrokeShape="RoundRectangle 14"
-                      BackgroundColor="#0F2131"
-                      Padding="14">
-                <VerticalStackLayout Spacing="8">
-                  <Label Text="By Payment Method"
-                         FontSize="16"
-                         FontAttributes="Bold"
-                         TextColor="#D2E4FB" />
-                  <CollectionView ItemsSource="{Binding ByMethod}">
-                    <CollectionView.EmptyView>
-                      <Label Text="No data."
-                             TextColor="#8EA0B9"
-                             FontSize="13" />
-                    </CollectionView.EmptyView>
-                    <CollectionView.ItemsLayout>
-                      <LinearItemsLayout Orientation="Horizontal"
-                                         ItemSpacing="10" />
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                      <DataTemplate>
-                        <Border Stroke="#2A3B4C"
-                                StrokeShape="RoundRectangle 10"
-                                BackgroundColor="#1A2B3C"
-                                Padding="14,10"
-                                MinimumWidthRequest="160">
-                          <VerticalStackLayout Spacing="2">
-                            <Label Text="{Binding Method}"
-                                   TextColor="#8EA0B9"
-                                   FontSize="13" />
-                            <Label TextColor="#D2E4FB"
-                                   FontSize="18"
-                                   FontAttributes="Bold">
-                              <Label.FormattedText>
-                                <FormattedString>
-                                  <Span Text="HKD $" />
-                                  <Span Text="{Binding Amount, StringFormat='{0:F2}'}" />
-                                </FormattedString>
-                              </Label.FormattedText>
-                            </Label>
-                            <Label TextColor="#8EA0B9"
-                                   FontSize="12">
-                              <Label.FormattedText>
-                                <FormattedString>
-                                  <Span Text="{Binding Count}" />
-                                  <Span Text=" txn(s)" />
-                                </FormattedString>
-                              </Label.FormattedText>
-                            </Label>
+                      StrokeThickness="1"
+                      StrokeShape="RoundRectangle 12"
+                      BackgroundColor="#0F2131">
+                <CollectionView ItemsSource="{Binding Transactions}">
+                  <CollectionView.Header>
+                    <Grid ColumnDefinitions="60,2*,90,1.5*,88"
+                          Padding="14,10"
+                          BackgroundColor="#0A1823">
+                      <Label Grid.Column="0" Text="ID" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
+                      <Label Grid.Column="1" Text="PRODUCTS" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
+                      <Label Grid.Column="2" Text="TIME" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
+                      <Label Grid.Column="3" Text="PAYMENT" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
+                      <Label Grid.Column="4" Text="AMOUNT" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="End" />
+                    </Grid>
+                  </CollectionView.Header>
+                  <CollectionView.EmptyView>
+                    <Label Text="No transactions for the selected date."
+                           TextColor="#8EA0B9"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Margin="0,40" />
+                  </CollectionView.EmptyView>
+                  <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                      <VerticalStackLayout>
+                        <Grid ColumnDefinitions="60,2*,90,1.5*,88"
+                              Padding="14,11"
+                              HorizontalOptions="Fill">
+                          <!-- ID -->
+                          <Label Grid.Column="0"
+                                 TextColor="#7BABDE"
+                                 FontSize="14"
+                                 FontAttributes="Bold"
+                                 VerticalOptions="Start">
+                            <Label.FormattedText>
+                              <FormattedString>
+                                <Span Text="#" TextColor="#5E7A96" />
+                                <Span Text="{Binding Id}" />
+                              </FormattedString>
+                            </Label.FormattedText>
+                          </Label>
+
+                          <!-- Products (BindableLayout on VerticalStackLayout) -->
+                          <VerticalStackLayout Grid.Column="1"
+                                               Spacing="3"
+                                               VerticalOptions="Start">
+                            <BindableLayout.ItemsSource>
+                              <Binding Path="Lines" />
+                            </BindableLayout.ItemsSource>
+                            <BindableLayout.ItemTemplate>
+                              <DataTemplate>
+                                <Label FontSize="13">
+                                  <Label.FormattedText>
+                                    <FormattedString>
+                                      <Span Text="{Binding Quantity}" TextColor="#8EA0B9" />
+                                      <Span Text="× " TextColor="#8EA0B9" />
+                                      <Span Text="{Binding Name}" TextColor="#D2E4FB" />
+                                      <Span Text="  " />
+                                      <Span Text="{Binding LineTotal, StringFormat='${0:F2}'}" TextColor="#BDEE62" />
+                                    </FormattedString>
+                                  </Label.FormattedText>
+                                </Label>
+                              </DataTemplate>
+                            </BindableLayout.ItemTemplate>
                           </VerticalStackLayout>
-                        </Border>
-                      </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                  </CollectionView>
-                </VerticalStackLayout>
+
+                          <!-- Timestamp -->
+                          <VerticalStackLayout Grid.Column="2"
+                                               Spacing="2"
+                                               VerticalOptions="Start">
+                            <Label Text="{Binding CreatedAtLocal, StringFormat='{0:yyyy-MM-dd}'}"
+                                   TextColor="#D2E4FB"
+                                   FontSize="12"
+                                   FontAttributes="Bold" />
+                            <Label Text="{Binding CreatedAtLocal, StringFormat='{0:HH:mm:ss}'}"
+                                   TextColor="#8EA0B9"
+                                   FontSize="11" />
+                          </VerticalStackLayout>
+
+                          <!-- Payment methods (BindableLayout) -->
+                          <VerticalStackLayout Grid.Column="3"
+                                               Spacing="3"
+                                               VerticalOptions="Start">
+                            <BindableLayout.ItemsSource>
+                              <Binding Path="Payments" />
+                            </BindableLayout.ItemsSource>
+                            <BindableLayout.ItemTemplate>
+                              <DataTemplate>
+                                <Label FontSize="12">
+                                  <Label.FormattedText>
+                                    <FormattedString>
+                                      <Span Text="{Binding Method}" TextColor="#8EA0B9" FontAttributes="Bold" />
+                                      <Span Text="  $" TextColor="#5E7A96" />
+                                      <Span Text="{Binding Amount, StringFormat='{0:F2}'}" TextColor="#D2E4FB" />
+                                    </FormattedString>
+                                  </Label.FormattedText>
+                                </Label>
+                              </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                          </VerticalStackLayout>
+
+                          <!-- Amount -->
+                          <Label Grid.Column="4"
+                                 TextColor="#BDEE62"
+                                 FontSize="16"
+                                 FontAttributes="Bold"
+                                 HorizontalOptions="End"
+                                 VerticalOptions="Start">
+                            <Label.FormattedText>
+                              <FormattedString>
+                                <Span Text="$" TextColor="#8EA0B9" FontSize="12" />
+                                <Span Text="{Binding Total, StringFormat='{0:F2}'}" />
+                              </FormattedString>
+                            </Label.FormattedText>
+                          </Label>
+                        </Grid>
+                        <!-- Row separator -->
+                        <BoxView HeightRequest="1" BackgroundColor="#162436" HorizontalOptions="Fill" />
+                      </VerticalStackLayout>
+                    </DataTemplate>
+                  </CollectionView.ItemTemplate>
+                </CollectionView>
               </Border>
 
-              <Border Grid.Row="3"
+              <!-- ── Footer summary bar ── -->
+              <Border Grid.Row="2"
+                      BackgroundColor="#0A1823"
                       Stroke="#2A3B4C"
-                      StrokeShape="RoundRectangle 14"
-                      BackgroundColor="#0F2131"
-                      Padding="14">
-                <Grid RowDefinitions="Auto,*"
-                      RowSpacing="8">
-                  <Label Text="Transactions"
-                         FontSize="16"
-                         FontAttributes="Bold"
-                         TextColor="#D2E4FB" />
-                  <CollectionView Grid.Row="1"
-                                  ItemsSource="{Binding Transactions}">
-                    <CollectionView.EmptyView>
-                      <Label Text="No transactions for the selected date."
-                             TextColor="#8EA0B9"
-                             FontSize="14"
-                             HorizontalOptions="Center"
-                             VerticalOptions="Center" />
-                    </CollectionView.EmptyView>
-                    <CollectionView.ItemTemplate>
+                      StrokeThickness="1"
+                      StrokeShape="RoundRectangle 10"
+                      Padding="16,12"
+                      Margin="0,8,0,0">
+                <Grid ColumnDefinitions="*,Auto"
+                      ColumnSpacing="16">
+                  <!-- Per-method totals -->
+                  <FlexLayout BindableLayout.ItemsSource="{Binding ByMethod}"
+                              Direction="Row"
+                              Wrap="Wrap"
+                              AlignItems="Center">
+                    <BindableLayout.EmptyView>
+                      <Label Text="No data." TextColor="#5E7A96" FontSize="12" />
+                    </BindableLayout.EmptyView>
+                    <BindableLayout.ItemTemplate>
                       <DataTemplate>
-                        <Border Stroke="#2A3B4C"
-                                StrokeShape="RoundRectangle 10"
-                                BackgroundColor="#1A2B3C"
-                                Padding="14,10"
-                                Margin="0,0,0,8">
-                          <Grid ColumnDefinitions="Auto,*,Auto"
-                                ColumnSpacing="12">
-                            <VerticalStackLayout Grid.Column="0"
-                                                 Spacing="2">
-                              <Label TextColor="#D2E4FB"
-                                     FontSize="14"
-                                     FontAttributes="Bold">
-                                <Label.FormattedText>
-                                  <FormattedString>
-                                    <Span Text="#" />
-                                    <Span Text="{Binding Id}" />
-                                  </FormattedString>
-                                </Label.FormattedText>
-                              </Label>
-                              <Label Text="{Binding CreatedAtLocal, StringFormat='{0:HH:mm:ss}'}"
-                                     TextColor="#8EA0B9"
-                                     FontSize="12" />
-                            </VerticalStackLayout>
-                            <CollectionView Grid.Column="1"
-                                            ItemsSource="{Binding Payments}">
-                              <CollectionView.ItemsLayout>
-                                <LinearItemsLayout Orientation="Horizontal"
-                                                   ItemSpacing="6" />
-                              </CollectionView.ItemsLayout>
-                              <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                  <Border Stroke="#1F3D5C"
-                                          StrokeShape="RoundRectangle 999"
-                                          BackgroundColor="#0F2131"
-                                          Padding="8,3">
-                                    <Label TextColor="#D2E4FB"
-                                           FontSize="12">
-                                      <Label.FormattedText>
-                                        <FormattedString>
-                                          <Span Text="{Binding Method}" />
-                                          <Span Text=" $" />
-                                          <Span Text="{Binding Amount, StringFormat='{0:F2}'}" />
-                                        </FormattedString>
-                                      </Label.FormattedText>
-                                    </Label>
-                                  </Border>
-                                </DataTemplate>
-                              </CollectionView.ItemTemplate>
-                            </CollectionView>
-                            <Label Grid.Column="2"
-                                   TextColor="#BDEE62"
-                                   FontSize="18"
-                                   FontAttributes="Bold"
-                                   VerticalOptions="Center">
-                              <Label.FormattedText>
-                                <FormattedString>
-                                  <Span Text="$" />
-                                  <Span Text="{Binding Total, StringFormat='{0:F2}'}" />
-                                </FormattedString>
-                              </Label.FormattedText>
-                            </Label>
-                          </Grid>
-                        </Border>
+                        <VerticalStackLayout Spacing="2"
+                                             Margin="0,0,28,0">
+                          <Label Text="{Binding Method}"
+                                 TextColor="#5E7A96"
+                                 FontSize="10"
+                                 FontAttributes="Bold"
+                                 CharacterSpacing="1.5" />
+                          <Label TextColor="#D2E4FB"
+                                 FontSize="20"
+                                 FontAttributes="Bold">
+                            <Label.FormattedText>
+                              <FormattedString>
+                                <Span Text="$" TextColor="#8EA0B9" FontSize="13" />
+                                <Span Text="{Binding Amount, StringFormat='{0:F2}'}" />
+                              </FormattedString>
+                            </Label.FormattedText>
+                          </Label>
+                          <Label TextColor="#5E7A96" FontSize="11">
+                            <Label.FormattedText>
+                              <FormattedString>
+                                <Span Text="{Binding Count}" />
+                                <Span Text=" txn(s)" />
+                              </FormattedString>
+                            </Label.FormattedText>
+                          </Label>
+                        </VerticalStackLayout>
                       </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                  </CollectionView>
+                    </BindableLayout.ItemTemplate>
+                  </FlexLayout>
+
+                  <!-- Grand total panel -->
+                  <Border Grid.Column="1"
+                          BackgroundColor="#162A3E"
+                          Stroke="#2A3B4C"
+                          StrokeThickness="1"
+                          StrokeShape="RoundRectangle 8"
+                          Padding="18,10">
+                    <HorizontalStackLayout Spacing="0">
+                      <VerticalStackLayout Spacing="3">
+                        <Label Text="TOTAL REVENUE"
+                               TextColor="#5E7A96"
+                               FontSize="9"
+                               FontAttributes="Bold"
+                               CharacterSpacing="1.5" />
+                        <Label Text="{Binding GrossTotalText}"
+                               TextColor="#BDEE62"
+                               FontSize="22"
+                               FontAttributes="Bold" />
+                      </VerticalStackLayout>
+                      <BoxView WidthRequest="1"
+                               BackgroundColor="#2A3B4C"
+                               Margin="16,0"
+                               VerticalOptions="Fill" />
+                      <VerticalStackLayout Spacing="3">
+                        <Label Text="TRANSACTIONS"
+                               TextColor="#5E7A96"
+                               FontSize="9"
+                               FontAttributes="Bold"
+                               CharacterSpacing="1.5" />
+                        <Label Text="{Binding TransactionCountText}"
+                               TextColor="#D2E4FB"
+                               FontSize="22"
+                               FontAttributes="Bold" />
+                      </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                  </Border>
                 </Grid>
               </Border>
 
-              <Label Grid.Row="4"
+              <!-- Status message -->
+              <Label Grid.Row="3"
                      Text="{Binding StatusMessage}"
                      TextColor="#8EA0B9"
-                     FontSize="13" />
+                     FontSize="12"
+                     Padding="2,4,2,0" />
             </Grid>
             <Grid x:Name="ConfigureTabContent"
                   IsVisible="False"
-                  RowDefinitions="Auto,Auto,*,Auto"
+                  RowDefinitions="Auto,Auto,Auto,*,Auto"
                   RowSpacing="14">
-              <Label Text="Printer Configure"
+              <!-- ── Product Editor ── -->
+              <Label Text="Product Editor"
                      FontSize="32"
                      FontAttributes="Bold"
                      TextColor="#D2E4FB" />
 
               <Border Grid.Row="1"
+                      Stroke="#2A3B4C"
+                      StrokeShape="RoundRectangle 14"
+                      BackgroundColor="#162A3E"
+                      Padding="14">
+                <Grid RowDefinitions="Auto,*"
+                      RowSpacing="10">
+                  <!-- Column header -->
+                  <Grid ColumnDefinitions="*,120,80,80"
+                        ColumnSpacing="10">
+                    <Label Grid.Column="0" Text="NAME" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="DEFAULT PRICE" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="SAVE" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Column="3" Text="DELETE" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
+                  </Grid>
+                  <!-- Product rows -->
+                  <CollectionView Grid.Row="1"
+                                  ItemsSource="{Binding ProductEditorRows}"
+                                  HeightRequest="220">
+                    <CollectionView.EmptyView>
+                      <Label Text="No products yet. Add a product from the Product Panel."
+                             TextColor="#8EA0B9"
+                             FontSize="13"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Margin="0,20" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                      <DataTemplate x:DataType="vm:ProductEditorRow">
+                        <Grid ColumnDefinitions="*,120,80,80"
+                              ColumnSpacing="10"
+                              Padding="0,5">
+                          <Entry Grid.Column="0"
+                                 Text="{Binding Name}"
+                                 TextColor="#D2E4FB"
+                                 BackgroundColor="#0F2131"
+                                 FontSize="14" />
+                          <Entry Grid.Column="1"
+                                 Text="{Binding PriceText}"
+                                 TextColor="#BDEE62"
+                                 BackgroundColor="#0F2131"
+                                 FontSize="14"
+                                 Keyboard="Numeric" />
+                          <Button Grid.Column="2"
+                                  Text="💾"
+                                  FontSize="18"
+                                  BackgroundColor="#A2D149"
+                                  TextColor="#243600"
+                                  HeightRequest="40"
+                                  WidthRequest="64"
+                                  CornerRadius="8"
+                                  Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.SaveProductCommand}"
+                                  CommandParameter="{Binding .}" />
+                          <Button Grid.Column="3"
+                                  Text="🗑"
+                                  FontSize="18"
+                                  BackgroundColor="#4A1A1A"
+                                  TextColor="#FF6B6B"
+                                  HeightRequest="40"
+                                  WidthRequest="64"
+                                  CornerRadius="8"
+                                  Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.DeleteProductCommand}"
+                                  CommandParameter="{Binding .}" />
+                        </Grid>
+                      </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                  </CollectionView>
+                </Grid>
+              </Border>
+
+              <!-- ── Printer Configure ── -->
+              <Label Grid.Row="2"
+                     Text="Printer Configure"
+                     FontSize="24"
+                     FontAttributes="Bold"
+                     TextColor="#D2E4FB" />
+
+              <Border Grid.Row="3"
                       Stroke="#2A3B4C"
                       StrokeShape="RoundRectangle 14"
                       BackgroundColor="#162A3E"
@@ -709,7 +843,7 @@
                 </Grid>
               </Border>
 
-              <Border Grid.Row="2"
+              <Border Grid.Row="4"
                       Stroke="#2A3B4C"
                       StrokeShape="RoundRectangle 14"
                       BackgroundColor="#0F2131"
@@ -731,7 +865,7 @@
                 </Grid>
               </Border>
 
-              <Label Grid.Row="3"
+              <Label Grid.Row="4"
                      Text="{Binding StatusMessage}"
                      TextColor="#8EA0B9"
                      FontSize="13"
@@ -796,31 +930,6 @@
                      Grid.Column="1"
                 Placeholder="Installed printer name"
                      Text="{Binding ConnectionOptions.Endpoint}" />
-              <Entry Grid.Row="1"
-                     Grid.Column="0"
-                     Placeholder="Baud Rate"
-                     Keyboard="Numeric"
-                     Text="{Binding ConnectionOptions.BaudRate}" />
-              <Entry Grid.Row="1"
-                     Grid.Column="1"
-                     Placeholder="Data Bits"
-                     Keyboard="Numeric"
-                     Text="{Binding ConnectionOptions.DataBits}" />
-              <Entry Grid.Row="2"
-                     Grid.Column="0"
-                     Placeholder="Stop Bits"
-                     Keyboard="Numeric"
-                     Text="{Binding ConnectionOptions.StopBits}" />
-              <Entry Grid.Row="2"
-                     Grid.Column="1"
-                     Placeholder="Parity"
-                     Keyboard="Numeric"
-                     Text="{Binding ConnectionOptions.Parity}" />
-              <Entry Grid.Row="3"
-                     Grid.Column="0"
-                     Placeholder="Flow Control"
-                     Keyboard="Numeric"
-                     Text="{Binding ConnectionOptions.FlowControl}" />
               <HorizontalStackLayout Grid.Row="4"
                                      Grid.ColumnSpan="2"
                                      Spacing="8">
@@ -916,10 +1025,25 @@
                   BackgroundColor="#0F2131"
                   Padding="12">
             <VerticalStackLayout Spacing="10">
-              <Label Text="Product Control"
-                     FontSize="18"
-                     FontAttributes="Bold"
-                     TextColor="#D2E4FB" />
+              <Grid ColumnDefinitions="*,Auto">
+                <Label Text="Product Control"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="#D2E4FB"
+                       VerticalOptions="Center" />
+                <Button Grid.Column="1"
+                        Text="✕"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        WidthRequest="36"
+                        HeightRequest="36"
+                        Padding="0"
+                        CornerRadius="18"
+                        BackgroundColor="#3D1F1F"
+                        TextColor="#FFB4AB"
+                        VerticalOptions="Start"
+                        Command="{Binding DismissProductControlCommand}" />
+              </Grid>
               <Label Text="{Binding SelectedCartLineName}"
                      TextColor="#C4D4E8"
                      FontAttributes="Bold" />
@@ -1009,27 +1133,27 @@
                     ColumnSpacing="8"
                     IsEnabled="{Binding HasSelectedCartLine}">
                 <Button Grid.Column="0"
-                        Text="Delete"
+                        Text="C"
                         HeightRequest="56"
                         FontSize="18"
                         FontAttributes="Bold"
-                        BackgroundColor="#1A2B3C"
-                        TextColor="#D2E4FB"
-                        BorderColor="#2A3B4C"
-                        BorderWidth="1"
-                        CornerRadius="10"
-                        Command="{Binding PricePadBackspaceCommand}" />
-                <Button Grid.Column="1"
-                        Text="Clear"
-                        HeightRequest="56"
-                        FontSize="18"
-                        FontAttributes="Bold"
-                        BackgroundColor="#1A2B3C"
-                        TextColor="#D2E4FB"
+                        BackgroundColor="#3D1F1F"
+                        TextColor="#FFB4AB"
                         BorderColor="#2A3B4C"
                         BorderWidth="1"
                         CornerRadius="10"
                         Command="{Binding PricePadClearCommand}" />
+                <Button Grid.Column="1"
+                        Text="⌫"
+                        HeightRequest="56"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        BackgroundColor="#3D1F1F"
+                        TextColor="#FFB4AB"
+                        BorderColor="#2A3B4C"
+                        BorderWidth="1"
+                        CornerRadius="10"
+                        Command="{Binding PricePadBackspaceCommand}" />
                 <Button Grid.Column="2"
                         Text="Apply Price"
                         HeightRequest="56"

@@ -59,7 +59,8 @@ public sealed class SaleRepository : ISaleRepository
                 s.Id,
                 s.CreatedAt,
                 s.Total,
-                Payments = s.Payments.Select(p => new { p.Method, p.Amount, p.TenderedAmount, p.ChangeAmount }).ToList()
+                Payments = s.Payments.Select(p => new { p.Method, p.Amount, p.TenderedAmount, p.ChangeAmount }).ToList(),
+                Lines = s.Lines.Select(l => new { l.Name, l.Quantity, l.LineTotal }).ToList()
             })
             .ToList();
 
@@ -74,6 +75,12 @@ public sealed class SaleRepository : ISaleRepository
                 Amount = p.Amount,
                 TenderedAmount = p.TenderedAmount,
                 ChangeAmount = p.ChangeAmount
+            }).ToList(),
+            Lines = s.Lines.Select(l => new SaleLineSummary
+            {
+                Name = l.Name,
+                Quantity = l.Quantity,
+                LineTotal = l.LineTotal
             }).ToList()
         }).ToList();
     }
