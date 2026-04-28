@@ -11,4 +11,7 @@ public interface IPrinterService
     void Close();
     void OpenDrawer();
     void PrintReceipt(IReadOnlyList<ReceiptLine> lines);
+    IReadOnlyList<string> GetInstalledPrinters();
+    void OpenPrinterProperties(string printerName);
+    PrinterCapabilities ProbePrinter(string printerName);
 }

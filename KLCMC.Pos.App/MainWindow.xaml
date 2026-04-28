@@ -356,62 +356,123 @@
           </Grid.ColumnDefinitions>
 
           <GroupBox Grid.Column="0" Header="Printer Settings">
-            <Grid>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-              </Grid.RowDefinitions>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="130" />
-                <ColumnDefinition Width="*" />
-              </Grid.ColumnDefinitions>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <Grid>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="140" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-              <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Mode" />
-              <ComboBox Grid.Row="0" Grid.Column="1"
-                        ItemsSource="{Binding MainViewModel.ConnectionModes}"
-                        SelectedItem="{Binding MainViewModel.ConnectionOptions.Mode, Mode=TwoWay}" />
+                <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Mode" />
+                <ComboBox Grid.Row="0" Grid.Column="1"
+                          ItemsSource="{Binding MainViewModel.ConnectionModes}"
+                          SelectedItem="{Binding MainViewModel.ConnectionOptions.Mode, Mode=TwoWay}" />
 
-              <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="Endpoint" />
-              <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.Endpoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="Endpoint" />
+                <ComboBox Grid.Row="1" Grid.Column="1"
+                          ItemsSource="{Binding MainViewModel.InstalledPrinters}"
+                          IsEditable="True"
+                          IsTextSearchEnabled="True"
+                          Text="{Binding MainViewModel.ConnectionOptions.Endpoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-              <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="BaudRate" />
-              <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.BaudRate, Mode=TwoWay}" />
+                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left">
+                  <Button Content="Refresh Printers" Command="{Binding MainViewModel.RefreshInstalledPrintersCommand}" />
+                  <Button Content="Printer Properties" Command="{Binding MainViewModel.OpenPrinterPropertiesCommand}" />
+                  <Button Content="Probe Capabilities" Command="{Binding MainViewModel.ProbePrinterCapabilitiesCommand}" />
+                </StackPanel>
 
-              <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Text="DataBits" />
-              <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.DataBits, Mode=TwoWay}" />
+                <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Text="BaudRate" />
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.BaudRate, Mode=TwoWay}" />
 
-              <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="StopBits" />
-              <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.StopBits, Mode=TwoWay}" />
+                <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="DataBits" />
+                <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.DataBits, Mode=TwoWay}" />
 
-              <TextBlock Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Text="Parity" />
-              <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.Parity, Mode=TwoWay}" />
+                <TextBlock Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Text="StopBits" />
+                <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.StopBits, Mode=TwoWay}" />
 
-              <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Text="FlowControl" />
-              <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.FlowControl, Mode=TwoWay}" />
+                <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Text="Parity" />
+                <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.Parity, Mode=TwoWay}" />
 
-              <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left">
-                <Button Content="Connect" Command="{Binding MainViewModel.ConnectPrinterCommand}" />
-                <Button Content="Disconnect" Command="{Binding MainViewModel.DisconnectPrinterCommand}" />
-                <Button Content="Open Drawer" Command="{Binding MainViewModel.OpenDrawerCommand}" />
-                <Button Content="Print Test" Command="{Binding MainViewModel.PrintPrinterTestCommand}" />
-              </StackPanel>
-            </Grid>
+                <TextBlock Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" Text="FlowControl" />
+                <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding MainViewModel.ConnectionOptions.FlowControl, Mode=TwoWay}" />
+
+                <Separator Grid.Row="8" Grid.ColumnSpan="2" Margin="0,10,0,10" />
+
+                <TextBlock Grid.Row="9" Grid.Column="0" VerticalAlignment="Center" Text="Paper Width" />
+                <ComboBox Grid.Row="9" Grid.Column="1"
+                          ItemsSource="{Binding MainViewModel.PaperWidths}"
+                          SelectedItem="{Binding MainViewModel.ConnectionOptions.PaperWidthMm, Mode=TwoWay}" />
+
+                <TextBlock Grid.Row="10" Grid.Column="0" VerticalAlignment="Center" Text="Code Page" />
+                <ComboBox Grid.Row="10" Grid.Column="1"
+                          ItemsSource="{Binding MainViewModel.CodePages}"
+                          SelectedItem="{Binding MainViewModel.ConnectionOptions.CodePage, Mode=TwoWay}" />
+
+                <TextBlock Grid.Row="11" Grid.Column="0" VerticalAlignment="Center" Text="Cut Mode" />
+                <ComboBox Grid.Row="11" Grid.Column="1"
+                          ItemsSource="{Binding MainViewModel.CutModes}"
+                          SelectedItem="{Binding MainViewModel.ConnectionOptions.CutMode, Mode=TwoWay}" />
+              </Grid>
+            </ScrollViewer>
           </GroupBox>
 
           <GroupBox Grid.Column="1" Header="Status / Printer Console">
             <Grid>
               <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
               </Grid.RowDefinitions>
               <TextBlock Grid.Row="0" Text="{Binding MainViewModel.StatusMessage}" Margin="0,0,0,8" />
-              <TextBox Grid.Row="1"
+              <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Content="Connect" Command="{Binding MainViewModel.ConnectPrinterCommand}" />
+                <Button Content="Disconnect" Command="{Binding MainViewModel.DisconnectPrinterCommand}" />
+                <Button Content="Open Drawer" Command="{Binding MainViewModel.OpenDrawerCommand}" />
+                <Button Content="Print Test" Command="{Binding MainViewModel.PrintPrinterTestCommand}" />
+              </StackPanel>
+              <Grid Grid.Row="2" Margin="0,8,0,8">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Drawer Pulse On/Off (ms)" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left">
+                  <TextBox Width="70" Text="{Binding MainViewModel.ConnectionOptions.DrawerPulseOnMs, Mode=TwoWay}" />
+                  <TextBox Width="70" Text="{Binding MainViewModel.ConnectionOptions.DrawerPulseOffMs, Mode=TwoWay}" />
+                </StackPanel>
+              </Grid>
+              <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Content="Print Alignment" Command="{Binding MainViewModel.PrintAlignmentCalibrationCommand}" />
+                <Button Content="Print Codepage Sample" Command="{Binding MainViewModel.PrintCodePageSampleCommand}" />
+                <Button Content="Cut Test" Command="{Binding MainViewModel.PrintCutCalibrationCommand}" />
+                <Button Content="Drawer Pulse Test" Command="{Binding MainViewModel.PrintDrawerPulseCalibrationCommand}" />
+              </StackPanel>
+              <TextBox Grid.Row="4"
+                       Text="{Binding MainViewModel.PrinterCapabilitiesText}"
+                       IsReadOnly="True"
+                       TextWrapping="Wrap"
+                       VerticalScrollBarVisibility="Auto"
+                       AcceptsReturn="True"
+                       Margin="0,8,0,8"
+                       Height="150" />
+              <TextBox Grid.Row="5"
                        Text="{Binding MainViewModel.PrinterConsoleText}"
                        IsReadOnly="True"
                        TextWrapping="Wrap"

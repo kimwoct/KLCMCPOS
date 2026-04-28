@@ -12,6 +12,13 @@ public sealed class MainViewModel : BindableBase
     private readonly IProductRepository _productRepository;
     private readonly ISaleRepository _saleRepository;
     private readonly IPrinterSettingsRepository _printerSettingsRepository;
+    private readonly RelayCommand _refreshInstalledPrintersCommand;
+    private readonly RelayCommand _openPrinterPropertiesCommand;
+    private readonly RelayCommand _probePrinterCapabilitiesCommand;
+    private readonly RelayCommand _printAlignmentCalibrationCommand;
+    private readonly RelayCommand _printCodePageSampleCommand;
+    private readonly RelayCommand _printCutCalibrationCommand;
+    private readonly RelayCommand _printDrawerPulseCalibrationCommand;
     private readonly RelayCommand _addNewProductCommand;
     private readonly RelayCommand _clearCartCommand;
     private readonly RelayCommand _editCartLineCommand;
@@ -31,9 +38,11 @@ public sealed class MainViewModel : BindableBase
     private string _newProductPriceText = string.Empty;
     private string _pricePadInputText = "0";
     private string _moneyPadInputText = "0";
+    private string _printerCapabilitiesText = "No capability probe yet.";
     private PaymentMethod _selectedNewPaymentMethod = PaymentMethod.Cash;
     private string _statusMessage = "Ready.";
     private readonly ObservableCollection<string> _printerConsoleEntries = [];
+    private readonly ObservableCollection<string> _installedPrinters = [];
 
     public MainViewModel(
         IPrinterService printerService,
@@ -55,6 +64,9 @@ public sealed class MainViewModel : BindableBase
 
         ConnectionModes = Enum.GetValues<PrinterConnectionMode>();
         ConnectionOptions = _printerSettingsRepository.Load();
+        PaperWidths = [58, 80];
+        CodePages = ["UTF-8", "ASCII", "Big5", "GB18030", "Shift_JIS", "Windows-1252"];
+        CutModes = Enum.GetValues<PrinterCutMode>();
         CartLines = new ObservableCollection<CartLine>();
         Payments = new ObservableCollection<CheckoutPaymentLine>();
         PaymentMethods = Enum.GetValues<PaymentMethod>();
@@ -66,8 +78,15 @@ public sealed class MainViewModel : BindableBase
         TogglePrinterPanelCommand = new RelayCommand(_ => TogglePrinterPanel());
         ConnectPrinterCommand = new RelayCommand(_ => ConnectPrinter());
         DisconnectPrinterCommand = new RelayCommand(_ => DisconnectPrinter());
+        _refreshInstalledPrintersCommand = new RelayCommand(_ => RefreshInstalledPrinters());
+        _openPrinterPropertiesCommand = new RelayCommand(_ => OpenPrinterProperties());
+        _probePrinterCapabilitiesCommand = new RelayCommand(_ => ProbePrinterCapabilities());
         _openDrawerCommand = new RelayCommand(_ => OpenDrawer());
         _printPrinterTestCommand = new RelayCommand(_ => PrintPrinterTest());
+        _printAlignmentCalibrationCommand = new RelayCommand(_ => PrintAlignmentCalibration());
+        _printCodePageSampleCommand = new RelayCommand(_ => PrintCodePageSample());
+        _printCutCalibrationCommand = new RelayCommand(_ => PrintCutCalibration());
+        _printDrawerPulseCalibrationCommand = new RelayCommand(_ => PrintDrawerPulseCalibration());
         _clearCartCommand = new RelayCommand(_ => ClearCart(), _ => CartLines.Count > 0);
         _editCartLineCommand = new RelayCommand(EditCartLine);
         _removeCartLineCommand = new RelayCommand(RemoveCartLine);
@@ -88,6 +107,8 @@ public sealed class MainViewModel : BindableBase
         _confirmCheckoutCommand = new RelayCommand(_ => ConfirmCheckout(), _ => CanConfirmCheckout());
         CancelCheckoutCommand = new RelayCommand(_ => CancelCheckout());
         AppendPrinterConsole("Printer console ready.");
+        RefreshInstalledPrinters();
+        ProbePrinterCapabilities();
 
         CartLines.CollectionChanged += (_, _) =>
         {
@@ -110,6 +131,20 @@ public sealed class MainViewModel : BindableBase
     public Array ConnectionModes { get; }
 
     public PrinterConnectionOptions ConnectionOptions { get; }
+
+    public IReadOnlyList<int> PaperWidths { get; }
+
+    public IReadOnlyList<string> CodePages { get; }
+
+    public Array CutModes { get; }
+
+    public ObservableCollection<string> InstalledPrinters => _installedPrinters;
+
+    public string PrinterCapabilitiesText
+    {
+        get => _printerCapabilitiesText;
+        private set => SetProperty(ref _printerCapabilitiesText, value);
+    }
 
     public ObservableCollection<CartLine> CartLines { get; }
 
@@ -234,9 +269,23 @@ public sealed class MainViewModel : BindableBase
 
     public RelayCommand DisconnectPrinterCommand { get; }
 
+    public RelayCommand RefreshInstalledPrintersCommand => _refreshInstalledPrintersCommand;
+
+    public RelayCommand OpenPrinterPropertiesCommand => _openPrinterPropertiesCommand;
+
+    public RelayCommand ProbePrinterCapabilitiesCommand => _probePrinterCapabilitiesCommand;
+
     public RelayCommand OpenDrawerCommand => _openDrawerCommand;
 
     public RelayCommand PrintPrinterTestCommand => _printPrinterTestCommand;
+
+    public RelayCommand PrintAlignmentCalibrationCommand => _printAlignmentCalibrationCommand;
+
+    public RelayCommand PrintCodePageSampleCommand => _printCodePageSampleCommand;
+
+    public RelayCommand PrintCutCalibrationCommand => _printCutCalibrationCommand;
+
+    public RelayCommand PrintDrawerPulseCalibrationCommand => _printDrawerPulseCalibrationCommand;
 
     public RelayCommand PricePadInputCommand { get; }
 
@@ -385,6 +434,65 @@ public sealed class MainViewModel : BindableBase
         RaisePropertyChanged(nameof(ConnectionStateText));
     }
 
+    private void RefreshInstalledPrinters()
+    {
+        try
+        {
+            var printers = _printerService.GetInstalledPrinters();
+            _installedPrinters.Clear();
+            foreach (var printer in printers)
+            {
+                _installedPrinters.Add(printer);
+            }
+
+            if (_installedPrinters.Count > 0 &&
+                !_installedPrinters.Any(x => string.Equals(x, ConnectionOptions.Endpoint, StringComparison.OrdinalIgnoreCase)))
+            {
+                ConnectionOptions.Endpoint = _installedPrinters[0];
+            }
+
+            StatusMessage = $"Loaded {_installedPrinters.Count} installed printer(s).";
+            AppendPrinterConsole(StatusMessage);
+        }
+        catch (InvalidOperationException ex)
+        {
+            StatusMessage = $"Failed to load printers: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
+        }
+    }
+
+    private void OpenPrinterProperties()
+    {
+        try
+        {
+            _printerService.OpenPrinterProperties(ConnectionOptions.Endpoint);
+            StatusMessage = "Opened Windows printer properties.";
+            AppendPrinterConsole(StatusMessage);
+        }
+        catch (InvalidOperationException ex)
+        {
+            StatusMessage = $"Open properties failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
+        }
+    }
+
+    private void ProbePrinterCapabilities()
+    {
+        try
+        {
+            var capabilities = _printerService.ProbePrinter(ConnectionOptions.Endpoint);
+            PrinterCapabilitiesText = FormatCapabilities(capabilities);
+            StatusMessage = "Printer capabilities updated.";
+            AppendPrinterConsole(StatusMessage);
+        }
+        catch (InvalidOperationException ex)
+        {
+            PrinterCapabilitiesText = "Capability probe failed.";
+            StatusMessage = $"Capability probe failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
+        }
+    }
+
     private void TogglePrinterPanel()
     {
         IsPrinterPanelExpanded = !IsPrinterPanelExpanded;
@@ -395,7 +503,7 @@ public sealed class MainViewModel : BindableBase
     {
         try
         {
-            _printerSettingsRepository.Save(ConnectionOptions);
+            EnsurePrinterReady();
             _printerService.OpenDrawer();
             StatusMessage = "Cash drawer opened.";
             AppendPrinterConsole(StatusMessage);
@@ -421,12 +529,13 @@ public sealed class MainViewModel : BindableBase
     {
         try
         {
-            _printerSettingsRepository.Save(ConnectionOptions);
+            EnsurePrinterReady();
             _printerService.PrintReceipt(
             [
                 new ReceiptLine { Text = "KLCMC POS" },
                 new ReceiptLine { Text = "Printer Test" },
                 new ReceiptLine { Text = $"Connection: {ConnectionOptions.Mode} {ConnectionOptions.Endpoint}" },
+                new ReceiptLine { Text = $"Profile: {ConnectionOptions.PaperWidthMm}mm / {ConnectionOptions.CodePage} / {ConnectionOptions.CutMode}" },
                 new ReceiptLine { Text = $"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}" }
             ]);
             StatusMessage = "Printer test sent.";
@@ -447,6 +556,116 @@ public sealed class MainViewModel : BindableBase
             StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
+    }
+
+    private void PrintAlignmentCalibration()
+    {
+        ExecuteCalibrationPrint("Alignment calibration sent.",
+        [
+            new ReceiptLine { Text = "ALIGNMENT CALIBRATION" },
+            new ReceiptLine { Text = "0123456789012345678901234567890123456789" },
+            new ReceiptLine { Text = "|....|....|....|....|....|....|....|....|" },
+            new ReceiptLine { Text = "----------------------------------------" },
+            new ReceiptLine { Text = "Check left margin and line alignment." }
+        ]);
+    }
+
+    private void PrintCodePageSample()
+    {
+        ExecuteCalibrationPrint("Codepage sample sent.",
+        [
+            new ReceiptLine { Text = "CODEPAGE SAMPLE" },
+            new ReceiptLine { Text = $"Current: {ConnectionOptions.CodePage}" },
+            new ReceiptLine { Text = "ASCII: ABCDEFG abcdefg 1234567890" },
+            new ReceiptLine { Text = "Symbols: !@#$%^&*()[]{}<>/\\|`~" },
+            new ReceiptLine { Text = "CJK: 中文測試 日本語 테스트" }
+        ]);
+    }
+
+    private void PrintCutCalibration()
+    {
+        ExecuteCalibrationPrint("Cut calibration sent.",
+        [
+            new ReceiptLine { Text = "CUT CALIBRATION" },
+            new ReceiptLine { Text = $"Cut mode: {ConnectionOptions.CutMode}" },
+            new ReceiptLine { Text = "A cut command should trigger after this print." }
+        ]);
+    }
+
+    private void PrintDrawerPulseCalibration()
+    {
+        try
+        {
+            EnsurePrinterReady();
+            _printerService.OpenDrawer();
+            StatusMessage = "Drawer pulse calibration sent.";
+            AppendPrinterConsole(StatusMessage);
+        }
+        catch (InvalidOperationException ex)
+        {
+            StatusMessage = $"Drawer pulse calibration failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
+        }
+        catch (DllNotFoundException ex)
+        {
+            StatusMessage = $"Printer runtime load failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
+        }
+        catch (BadImageFormatException ex)
+        {
+            StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
+        }
+    }
+
+    private void ExecuteCalibrationPrint(string successMessage, IReadOnlyList<ReceiptLine> lines)
+    {
+        try
+        {
+            EnsurePrinterReady();
+            _printerService.PrintReceipt(lines);
+            StatusMessage = successMessage;
+            AppendPrinterConsole(StatusMessage);
+        }
+        catch (InvalidOperationException ex)
+        {
+            StatusMessage = $"Calibration print failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
+        }
+        catch (DllNotFoundException ex)
+        {
+            StatusMessage = $"Printer runtime load failed: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
+        }
+        catch (BadImageFormatException ex)
+        {
+            StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
+            AppendPrinterConsole(StatusMessage);
+        }
+    }
+
+    private void EnsurePrinterReady()
+    {
+        _printerSettingsRepository.Save(ConnectionOptions);
+        _printerService.Open(ConnectionOptions);
+        RaisePropertyChanged(nameof(ConnectionStateText));
+    }
+
+    private static string FormatCapabilities(PrinterCapabilities capabilities)
+    {
+        var paperSizes = capabilities.PaperSizes.Count == 0
+            ? "(none reported)"
+            : string.Join(", ", capabilities.PaperSizes);
+        return string.Join(Environment.NewLine,
+        [
+            $"Name        : {capabilities.PrinterName}",
+            $"Driver      : {capabilities.DriverName}",
+            $"Port        : {capabilities.PortName}",
+            $"Default     : {(capabilities.IsDefault ? "Yes" : "No")}",
+            $"Status      : {capabilities.StatusText}",
+            $"Paper       : {capabilities.DefaultPaper}",
+            $"Paper Sizes : {paperSizes}"
+        ]);
     }
 
     private void AppendPrinterConsole(string message)
@@ -976,10 +1195,11 @@ public sealed class MainViewModel : BindableBase
             return;
         }
 
-        var lines = ReceiptComposer.Build("KLCMC POS", CartLines, Total, DateTime.Now, paymentEntries);
+        var lines = ReceiptComposer.Build("KLCMC POS", CartLines, Total, DateTime.Now, paymentEntries, ConnectionOptions);
 
         try
         {
+            EnsurePrinterReady();
             _printerService.PrintReceipt(lines);
             StatusMessage = "Sale recorded and receipt printed.";
         }

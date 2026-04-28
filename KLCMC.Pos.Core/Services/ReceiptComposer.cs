@@ -9,13 +9,16 @@ public static class ReceiptComposer
         IEnumerable<CartLine> lines,
         decimal total,
         DateTime timestamp,
-        IEnumerable<PaymentEntry>? payments = null)
+        IEnumerable<PaymentEntry>? payments = null,
+        PrinterConnectionOptions? printerOptions = null)
     {
+        var width = printerOptions?.PaperWidthMm == 58 ? 32 : 48;
+        var separator = new string('-', width);
         var receiptLines = new List<ReceiptLine>
         {
             new() { Text = title },
             new() { Text = timestamp.ToString("yyyy-MM-dd HH:mm:ss") },
-            new() { Text = "-------------------------------" }
+            new() { Text = separator }
         };
 
         foreach (var line in lines)
@@ -26,7 +29,7 @@ public static class ReceiptComposer
             });
         }
 
-        receiptLines.Add(new ReceiptLine { Text = "-------------------------------" });
+        receiptLines.Add(new ReceiptLine { Text = separator });
         receiptLines.Add(new ReceiptLine { Text = $"TOTAL: HKD ${total:F2}" });
 
         if (payments is not null)

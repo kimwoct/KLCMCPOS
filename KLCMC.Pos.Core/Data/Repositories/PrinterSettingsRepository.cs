@@ -28,7 +28,12 @@ public sealed class PrinterSettingsRepository : IPrinterSettingsRepository
                 DataBits = 8,
                 StopBits = 0,
                 Parity = 0,
-                FlowControl = 1
+                FlowControl = 1,
+                PaperWidthMm = 80,
+                CodePage = "UTF-8",
+                CutMode = PrinterCutMode.Partial,
+                DrawerPulseOnMs = 120,
+                DrawerPulseOffMs = 240
             };
             db.PrinterSettings.Add(entity);
             db.SaveChanges();
@@ -48,7 +53,12 @@ public sealed class PrinterSettingsRepository : IPrinterSettingsRepository
             DataBits = entity.DataBits,
             StopBits = entity.StopBits,
             Parity = entity.Parity,
-            FlowControl = entity.FlowControl
+            FlowControl = entity.FlowControl,
+            PaperWidthMm = entity.PaperWidthMm <= 0 ? 80 : entity.PaperWidthMm,
+            CodePage = string.IsNullOrWhiteSpace(entity.CodePage) ? "UTF-8" : entity.CodePage,
+            CutMode = entity.CutMode,
+            DrawerPulseOnMs = entity.DrawerPulseOnMs <= 0 ? 120 : entity.DrawerPulseOnMs,
+            DrawerPulseOffMs = entity.DrawerPulseOffMs <= 0 ? 240 : entity.DrawerPulseOffMs
         };
     }
 
@@ -69,6 +79,11 @@ public sealed class PrinterSettingsRepository : IPrinterSettingsRepository
         entity.StopBits = options.StopBits;
         entity.Parity = options.Parity;
         entity.FlowControl = options.FlowControl;
+        entity.PaperWidthMm = options.PaperWidthMm;
+        entity.CodePage = options.CodePage;
+        entity.CutMode = options.CutMode;
+        entity.DrawerPulseOnMs = options.DrawerPulseOnMs;
+        entity.DrawerPulseOffMs = options.DrawerPulseOffMs;
         db.SaveChanges();
     }
 }

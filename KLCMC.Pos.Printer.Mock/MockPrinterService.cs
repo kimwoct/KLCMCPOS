@@ -70,4 +70,36 @@ public sealed class MockPrinterService : IPrinterService
         File.WriteAllText(outputPath, content, Encoding.UTF8);
         _lastError = null;
     }
+
+    public IReadOnlyList<string> GetInstalledPrinters()
+    {
+        return ["Mock Printer"];
+    }
+
+    public void OpenPrinterProperties(string printerName)
+    {
+        if (string.IsNullOrWhiteSpace(printerName))
+        {
+            throw new InvalidOperationException("Printer endpoint is required.");
+        }
+    }
+
+    public PrinterCapabilities ProbePrinter(string printerName)
+    {
+        if (string.IsNullOrWhiteSpace(printerName))
+        {
+            throw new InvalidOperationException("Printer endpoint is required.");
+        }
+
+        return new PrinterCapabilities
+        {
+            PrinterName = printerName.Trim(),
+            DriverName = "Mock Driver",
+            PortName = "MOCK",
+            IsDefault = true,
+            StatusText = "Ready",
+            DefaultPaper = "80mm",
+            PaperSizes = ["58mm", "80mm"]
+        };
+    }
 }

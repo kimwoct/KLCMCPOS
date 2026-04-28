@@ -9,4 +9,9 @@ public sealed class PrinterConnectionOptions
     public int StopBits { get; set; } = 0;
     public int Parity { get; set; } = 0;
     public int FlowControl { get; set; } = 1;
+    public int PaperWidthMm { get; set; } = 80;
+    public string CodePage { get; set; } = "UTF-8";
+    public PrinterCutMode CutMode { get; set; } = PrinterCutMode.Partial;
+    public int DrawerPulseOnMs { get; set; } = 120;
+    public int DrawerPulseOffMs { get; set; } = 240;
 }

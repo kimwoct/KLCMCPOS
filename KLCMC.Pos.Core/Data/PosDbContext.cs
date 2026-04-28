@@ -60,6 +60,7 @@ public sealed class PosDbContext : DbContext
         modelBuilder.Entity<PrinterSettingEntity>(b =>
         {
             b.Property(p => p.Endpoint).HasMaxLength(120);
+            b.Property(p => p.CodePage).HasMaxLength(40);
         });
     }
 }
