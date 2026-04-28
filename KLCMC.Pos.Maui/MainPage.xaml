@@ -431,12 +431,12 @@
                               TextColor="#D2E4FB"
                               BackgroundColor="#1A2B3C"
                               FontSize="14" />
-                  <Button Text="🖨 列印每日報告"
+                  <Button Text="📊 匯出 Excel"
                           BackgroundColor="#A2D149"
                           TextColor="#243600"
                           FontAttributes="Bold"
                           Padding="12,6"
-                          Command="{Binding PrintDailyReportCommand}" />
+                          Command="{Binding ExportDailyReportCommand}" />
                 </HorizontalStackLayout>
               </Grid>
 

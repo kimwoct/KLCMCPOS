@@ -2,13 +2,13 @@ using System.Collections.ObjectModel;
 using KLCMC.Pos.Core.Data.Repositories;
 using KLCMC.Pos.Core.Models;
 using KLCMC.Pos.Core.Services;
+using System.Diagnostics;
 
 namespace KLCMC.Pos.Core.ViewModels;
 
 public sealed class DailyAccountViewModel : BindableBase
 {
     private readonly ISaleRepository _saleRepository;
-    private readonly IPrinterService _printerService;
     private DateTime _selectedDate = DateTime.Today;
     private DailySummary _summary;
     private string _statusMessage = string.Empty;
@@ -16,7 +16,6 @@ public sealed class DailyAccountViewModel : BindableBase
     public DailyAccountViewModel(ISaleRepository saleRepository, IPrinterService printerService)
     {
         _saleRepository = saleRepository;
-        _printerService = printerService;
         _summary = DailySummary.Empty(DateOnly.FromDateTime(DateTime.Today));
 
         ByMethod = new ObservableCollection<MethodTotal>();
@@ -29,7 +28,7 @@ public sealed class DailyAccountViewModel : BindableBase
         });
         PrevDayCommand = new RelayCommand(_ => SelectedDate = SelectedDate.AddDays(-1));
         NextDayCommand = new RelayCommand(_ => SelectedDate = SelectedDate.AddDays(1));
-        PrintDailyReportCommand = new RelayCommand(_ => PrintDailyReport(), _ => Summary.TransactionCount > 0);
+        ExportDailyReportCommand = new RelayCommand(_ => ExportDailyReport(), _ => Summary.TransactionCount > 0);
 
         Load();
     }
@@ -57,7 +56,7 @@ public sealed class DailyAccountViewModel : BindableBase
                 RaisePropertyChanged(nameof(TransactionCountText));
                 RaisePropertyChanged(nameof(GrossTotalText));
                 RaisePropertyChanged(nameof(HeaderText));
-                ((RelayCommand)PrintDailyReportCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)ExportDailyReportCommand).RaiseCanExecuteChanged();
             }
         }
     }
@@ -66,11 +65,11 @@ public sealed class DailyAccountViewModel : BindableBase
 
     public ObservableCollection<SaleSummary> Transactions { get; }
 
-    public string HeaderText => $"Daily Account — {SelectedDate:yyyy-MM-dd}";
+    public string HeaderText => $"每日帳目 — {SelectedDate:yyyy-MM-dd}";
 
-    public string TransactionCountText => $"Transactions: {Summary.TransactionCount}";
+    public string TransactionCountText => $"交易次數：{Summary.TransactionCount}";
 
-    public string GrossTotalText => $"Gross: HKD ${Summary.GrossTotal:F2}";
+    public string GrossTotalText => $"總收入：HKD ${Summary.GrossTotal:F2}";
 
     public string StatusMessage
     {
@@ -82,7 +81,7 @@ public sealed class DailyAccountViewModel : BindableBase
     public RelayCommand TodayCommand { get; }
     public RelayCommand PrevDayCommand { get; }
     public RelayCommand NextDayCommand { get; }
-    public RelayCommand PrintDailyReportCommand { get; }
+    public RelayCommand ExportDailyReportCommand { get; }
 
     public void Load()
     {
@@ -105,26 +104,29 @@ public sealed class DailyAccountViewModel : BindableBase
             }
 
             StatusMessage = summary.TransactionCount == 0
-                ? "No transactions for selected date."
-                : $"Loaded {summary.TransactionCount} transaction(s).";
+                ? "所選日期沒有交易記錄。"
+                : $"已載入 {summary.TransactionCount} 筆交易。";
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Failed to load: {ex.Message}";
+            StatusMessage = $"載入失敗：{ex.Message}";
         }
     }
 
-    private void PrintDailyReport()
+    private void ExportDailyReport()
     {
-        var lines = ReceiptComposer.BuildDailyReport("KLCMC POS", Summary);
         try
         {
-            _printerService.PrintReceipt(lines);
-            StatusMessage = "Daily report printed.";
+            var folder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var filePath = ExcelExportService.ExportDailyReport(Summary, folder);
+            StatusMessage = $"已匯出：{Path.GetFileName(filePath)}";
+
+            // Open the file with the default application
+            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Print failed: {ex.Message}";
+            StatusMessage = $"匯出失敗：{ex.Message}";
         }
     }
 }
