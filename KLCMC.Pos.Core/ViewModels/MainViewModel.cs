@@ -247,7 +247,7 @@ public sealed class MainViewModel : BindableBase
 
     public string PrinterPanelToggleText => IsPrinterPanelExpanded ? "Hide details" : "Show details";
 
-    public string ConnectionStateText => _printerService.IsOpen ? "Connected" : "Disconnected";
+    public string ConnectionStateText => _printerService.IsOpen ? "Connected" : "Not Connected";
 
     public string PrinterConsoleText => string.Join(Environment.NewLine, _printerConsoleEntries);
 
@@ -408,18 +408,21 @@ public sealed class MainViewModel : BindableBase
         }
         catch (InvalidOperationException ex)
         {
+            _printerService.Close();
             StatusMessage = $"Connection failed: {ex.Message}";
             AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));
         }
         catch (DllNotFoundException ex)
         {
+            _printerService.Close();
             StatusMessage = $"Printer runtime load failed: {ex.Message}";
             AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));
         }
         catch (BadImageFormatException ex)
         {
+            _printerService.Close();
             StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
             AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));

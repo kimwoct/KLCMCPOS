@@ -767,7 +767,7 @@
                     </DataTrigger>
                     <DataTrigger TargetType="Label"
                                  Binding="{Binding ConnectionStateText}"
-                                 Value="Disconnected">
+                                 Value="Not Connected">
                       <Setter Property="TextColor"
                               Value="#FFB4AB" />
                     </DataTrigger>

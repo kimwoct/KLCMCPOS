@@ -44,6 +44,35 @@ dotnet build KLCMCPOS.sln --nologo -p:KLCMCMauiTarget=macos
 dotnet build KLCMCPOS.sln --nologo -p:KLCMCMauiTarget=windows10
 ```
 
+### MAUI publish commands (standalone)
+
+- Windows 10 (self-contained, no MSIX packaging):
+
+```powershell
+dotnet publish .\KLCMC.Pos.Maui\KLCMC.Pos.Maui.csproj `
+   -c Release `
+   -f net8.0-windows10.0.19041.0 `
+   -r win-x64 `
+   -p:KLCMCMauiTarget=windows10 `
+   -p:WindowsPackageType=None `
+   -p:SelfContained=true `
+   -o .\artifacts\publish\KLCMC.Pos.Maui-win-x64
+```
+
+- macOS (self-contained):
+
+```sh
+dotnet publish KLCMC.Pos.Maui/KLCMC.Pos.Maui.csproj \
+   -c Release \
+   -f net8.0-maccatalyst \
+   -r maccatalyst-x64 \
+   -p:KLCMCMauiTarget=macos \
+   -p:SelfContained=true \
+   -o ./artifacts/publish/KLCMC.Pos.Maui-maccatalyst-x64
+```
+
+> **Note:** Windows App Runtime 1.5 (`WindowsAppRuntimeInstall-1.5.x.exe`) must be installed on the target machine before running the Windows build. It is not bundled by `SelfContained=true`.
+
 ### MAUI run commands
 
 - macOS (Mac Catalyst):
