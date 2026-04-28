@@ -30,6 +30,34 @@ KLCMCPOS is being migrated to a cross-platform architecture for **Windows 10 + m
 1. `KLCMC.Pos.Core`, `KLCMC.Pos.Printer.Mock`, and `KLCMC.Pos.Printer.Windows` build with .NET 8 SDK.
 2. `KLCMC.Pos.Maui` requires MAUI workloads/tooling support in your local .NET installation.
 
+### Solution build commands
+
+- macOS (MAUI Mac Catalyst target):
+
+```sh
+dotnet build KLCMCPOS.sln --nologo -p:KLCMCMauiTarget=macos
+```
+
+- Windows 10 (MAUI Windows target):
+
+```powershell
+dotnet build KLCMCPOS.sln --nologo -p:KLCMCMauiTarget=windows10
+```
+
+### MAUI run commands
+
+- macOS (Mac Catalyst):
+
+```sh
+dotnet run --project KLCMC.Pos.Maui/KLCMC.Pos.Maui.csproj -f net8.0-maccatalyst -c Debug
+```
+
+- Windows 10:
+
+```powershell
+dotnet run --project .\KLCMC.Pos.Maui\KLCMC.Pos.Maui.csproj -f net8.0-windows10.0.19041.0 -c Debug -p:KLCMCMauiTarget=windows10
+```
+
 ### VS Code / C# Dev Kit on macOS
 
 If `ms-dotnettools.csdevkit.Projects.log` shows errors like:
