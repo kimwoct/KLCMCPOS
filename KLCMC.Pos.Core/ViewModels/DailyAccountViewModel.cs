@@ -130,27 +130,38 @@ public sealed class DailyAccountViewModel : BindableBase
 
     private async void ExportDailyReport()
     {
+        string filePath;
         try
         {
             var folder = Path.GetTempPath();
-            var filePath = ExcelExportService.ExportDailyReport(Summary, folder);
-            _lastExportPath = filePath;
-            RaisePropertyChanged(nameof(LastExportFileName));
-            RaisePropertyChanged(nameof(HasLastExport));
-            ((RelayCommand)OpenLastExportCommand).RaiseCanExecuteChanged();
-            StatusMessage = "已匯出：";
-            await _fileLauncher.OpenFileAsync(filePath);
+            filePath = ExcelExportService.ExportDailyReport(Summary, folder);
         }
         catch (Exception ex)
         {
             StatusMessage = $"匯出失敗：{ex.Message}";
+            return;
+        }
+
+        _lastExportPath = filePath;
+        RaisePropertyChanged(nameof(LastExportFileName));
+        RaisePropertyChanged(nameof(HasLastExport));
+        ((RelayCommand)OpenLastExportCommand).RaiseCanExecuteChanged();
+        StatusMessage = "已匯出：";
+
+        try
+        {
+            await _fileLauncher.OpenFileAsync(filePath);
+        }
+        catch
+        {
+            // Share sheet dismissed or unavailable — file is still saved, link remains clickable
         }
     }
 
     private async void OpenLastExport()
     {
-        if (_lastExportPath != null)
-            await _fileLauncher.OpenFileAsync(_lastExportPath);
+        if (_lastExportPath == null) return;
+        try { await _fileLauncher.OpenFileAsync(_lastExportPath); } catch { }
     }
 
     private async void DeleteDayData()
