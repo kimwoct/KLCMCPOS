@@ -7,12 +7,12 @@ public static class DatabaseInitializer
 {
     private static readonly (string Name, decimal Price)[] DefaultProducts =
     {
-        ("Americano", 6.50m),
-        ("Latte", 8.90m),
-        ("Cappuccino", 8.90m),
-        ("Sandwich", 12.00m),
-        ("Muffin", 5.00m),
-        ("Mineral Water", 2.00m)
+        ("中醫治療 診症", 80.00m),
+        ("中醫診治 針灸", 250.00m),
+        ("醫療券", 100.00m),
+        ("中醫藥", 100.00m),
+        ("藥品", 500.00m),
+        ("雜項", 1.00m)
     };
 
     public static void EnsureReady(PosDbContext db)

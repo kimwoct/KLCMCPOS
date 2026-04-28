@@ -34,7 +34,7 @@ public sealed class MainViewModel : BindableBase
     private readonly RelayCommand _openDrawerCommand;
     private readonly RelayCommand _printPrinterTestCommand;
     private CartLine? _selectedCartLine;
-    private bool _isPrinterPanelExpanded = true;
+    private bool _isPrinterPanelExpanded = false;
     private bool _isAddProductPopupVisible;
     private bool _isCheckoutPopupVisible;
     private bool _isProductControlVisible;
@@ -256,9 +256,11 @@ public sealed class MainViewModel : BindableBase
             ? "Select a product in cart to edit final price."
             : $"Current line total: HKD ${SelectedCartLine.LineTotal:F2}";
 
-    public string PrinterPanelToggleText => IsPrinterPanelExpanded ? "Hide details" : "Show details";
+    public string PrinterPanelToggleText => IsPrinterPanelExpanded ? "▲" : "▼";
 
-    public string ConnectionStateText => _printerService.IsOpen ? "Connected" : "Not Connected";
+    public string ConnectionStateText => _printerService.IsOpen ? "● Connected" : "● Not Connected";
+
+    public bool IsPrinterConnected => _printerService.IsOpen;
 
     public string PrinterConsoleText => string.Join(Environment.NewLine, _printerConsoleEntries);
 
@@ -489,7 +491,9 @@ public sealed class MainViewModel : BindableBase
             _printerService.Open(ConnectionOptions);
             StatusMessage = "Printer connected.";
             AppendPrinterConsole(StatusMessage);
+            IsPrinterPanelExpanded = false;
             RaisePropertyChanged(nameof(ConnectionStateText));
+            RaisePropertyChanged(nameof(IsPrinterConnected));
         }
         catch (InvalidOperationException ex)
         {
@@ -520,6 +524,7 @@ public sealed class MainViewModel : BindableBase
         StatusMessage = "Printer disconnected.";
         AppendPrinterConsole(StatusMessage);
         RaisePropertyChanged(nameof(ConnectionStateText));
+        RaisePropertyChanged(nameof(IsPrinterConnected));
     }
 
     private void RefreshInstalledPrinters()
