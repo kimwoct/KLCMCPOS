@@ -365,13 +365,13 @@ public sealed class MainViewModel : BindableBase
         }
         catch (DllNotFoundException ex)
         {
-            StatusMessage = $"POSDLL load failed: {ex.Message}";
+            StatusMessage = $"Printer runtime load failed: {ex.Message}";
             AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));
         }
         catch (BadImageFormatException ex)
         {
-            StatusMessage = $"POSDLL architecture mismatch: {ex.Message}";
+            StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
             AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));
         }
@@ -407,12 +407,12 @@ public sealed class MainViewModel : BindableBase
         }
         catch (DllNotFoundException ex)
         {
-            StatusMessage = $"POSDLL load failed: {ex.Message}";
+            StatusMessage = $"Printer runtime load failed: {ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
         catch (BadImageFormatException ex)
         {
-            StatusMessage = $"POSDLL architecture mismatch: {ex.Message}";
+            StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
     }
@@ -439,12 +439,12 @@ public sealed class MainViewModel : BindableBase
         }
         catch (DllNotFoundException ex)
         {
-            StatusMessage = $"POSDLL load failed: {ex.Message}";
+            StatusMessage = $"Printer runtime load failed: {ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
         catch (BadImageFormatException ex)
         {
-            StatusMessage = $"POSDLL architecture mismatch: {ex.Message}";
+            StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
     }
@@ -989,11 +989,11 @@ public sealed class MainViewModel : BindableBase
         }
         catch (DllNotFoundException ex)
         {
-            StatusMessage = $"Sale recorded; POSDLL load failed: {ex.Message}";
+            StatusMessage = $"Sale recorded; printer runtime load failed: {ex.Message}";
         }
         catch (BadImageFormatException ex)
         {
-            StatusMessage = $"Sale recorded; POSDLL architecture mismatch: {ex.Message}";
+            StatusMessage = $"Sale recorded; printer runtime architecture mismatch: {ex.Message}";
         }
 
         IsCheckoutPopupVisible = false;

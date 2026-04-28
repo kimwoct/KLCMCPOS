@@ -9,7 +9,7 @@ KLCMCPOS is being migrated to a cross-platform architecture for **Windows 10 + m
   - Cart and receipt composition logic
   - Shared `IPrinterService` and `MainViewModel`
 - `KLCMC.Pos.Printer.Windows` (`net8.0-windows`)
-  - Real printer integration through `POSDLL.dll`
+  - Real printer integration through Windows RAW spooler and bundled POS driver package
 - `KLCMC.Pos.Printer.Mock` (`net8.0`)
   - Mock/file printer for macOS and non-hardware testing
 - `KLCMC.Pos.Maui` (`net8.0-maccatalyst;net8.0-windows10.0.19041.0`)
@@ -19,13 +19,13 @@ KLCMCPOS is being migrated to a cross-platform architecture for **Windows 10 + m
 
 ## Platform behavior
 
-- **Windows 10**: real `POSDLL.dll` hardware printing path is supported.
-- **macOS**: app flow uses mock printer output; real POSDLL hardware printing is not available on macOS.
+- **Windows 10**: real hardware printing path is supported via installed printer queue + RAW spooler output.
+- **macOS**: app flow uses mock printer output; Windows printer driver flow is not available on macOS.
 
 ## Printer API usage (Windows)
 
-- Open/close/status: `POS_Open`, `POS_IsOpen`, `POS_Close`
-- Print flow: `POS_SetMode(0x00)`, `POS_S_TextOut`, `POS_FeedLine`, `POS_CutPaper`
+- Open/close/status: validate and use installed printer queue name (for example `POS-80 11.3.0.1`)
+- Print flow: send RAW ESC/POS bytes through WinSpool (`StartDocPrinter`, `WritePrinter`, `EndDocPrinter`)
 
 ## Build notes
 
@@ -73,7 +73,7 @@ make the C# Dev Kit re-evaluate projects.
    - WPF (Windows 10 desktop host)
 3. Verify cart operations and total calculation.
 4. On macOS, verify mock receipt file output.
-5. On Windows 10, verify `POSDLL` connect/print/feed/cut flow with hardware.
+5. On Windows 10, install driver from `POS Printer Driver V11.3.0.3` then verify connect/print/feed/cut flow with hardware.
 
 ## Local database (SQLite)
 

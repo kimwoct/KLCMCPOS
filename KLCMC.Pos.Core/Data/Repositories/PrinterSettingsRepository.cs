@@ -23,7 +23,7 @@ public sealed class PrinterSettingsRepository : IPrinterSettingsRepository
             {
                 Id = 1,
                 Mode = PrinterConnectionMode.Usb,
-                Endpoint = "USB001",
+                Endpoint = "POS-80 11.3.0.1",
                 BaudRate = 9600,
                 DataBits = 8,
                 StopBits = 0,
@@ -33,17 +33,10 @@ public sealed class PrinterSettingsRepository : IPrinterSettingsRepository
             db.PrinterSettings.Add(entity);
             db.SaveChanges();
         }
-        else if (entity.Mode == PrinterConnectionMode.Serial &&
-                 string.Equals(entity.Endpoint, "COM1", StringComparison.OrdinalIgnoreCase) &&
-                 entity.BaudRate == 115200 &&
-                 entity.DataBits == 8 &&
-                 entity.StopBits == 0 &&
-                 entity.Parity == 0 &&
-                 entity.FlowControl == 1)
+        else if (entity.Mode == PrinterConnectionMode.Usb &&
+                 string.Equals(entity.Endpoint, "USB001", StringComparison.OrdinalIgnoreCase))
         {
-            entity.Mode = PrinterConnectionMode.Usb;
-            entity.Endpoint = "USB001";
-            entity.BaudRate = 9600;
+            entity.Endpoint = "POS-80 11.3.0.1";
             db.SaveChanges();
         }
 
