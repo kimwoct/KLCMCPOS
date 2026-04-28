@@ -133,8 +133,10 @@ public sealed class DailyAccountViewModel : BindableBase
         string filePath;
         try
         {
-            var folder = Path.GetTempPath();
-            filePath = ExcelExportService.ExportDailyReport(Summary, folder);
+            var downloads = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            if (!Directory.Exists(downloads))
+                downloads = Path.GetTempPath();
+            filePath = ExcelExportService.ExportDailyReport(Summary, downloads);
         }
         catch (Exception ex)
         {
@@ -154,7 +156,7 @@ public sealed class DailyAccountViewModel : BindableBase
         }
         catch
         {
-            // Share sheet dismissed or unavailable — file is still saved, link remains clickable
+            // Open failed — file is saved, link is still clickable
         }
     }
 

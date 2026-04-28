@@ -2,15 +2,15 @@ using KLCMC.Pos.Core.Services;
 
 namespace KLCMC.Pos.Maui;
 
-/// <summary>Shares/exports a local file using the platform share sheet (macOS Catalyst + Windows).</summary>
+/// <summary>Saves exported files to ~/Downloads and opens them with the default app.</summary>
 public sealed class MauiFileLauncher : IFileLauncher
 {
     public async Task OpenFileAsync(string filePath)
     {
-        await Share.RequestAsync(new ShareFileRequest
+        // Open with the default application via MAUI Launcher
+        await Launcher.OpenAsync(new OpenFileRequest
         {
-            Title = System.IO.Path.GetFileName(filePath),
-            File = new ShareFile(filePath)
+            File = new ReadOnlyFile(filePath)
         });
     }
 }
