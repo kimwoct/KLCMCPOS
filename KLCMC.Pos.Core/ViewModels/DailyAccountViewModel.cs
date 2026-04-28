@@ -12,6 +12,7 @@ public sealed class DailyAccountViewModel : BindableBase
     private DateTime _selectedDate = DateTime.Today;
     private DailySummary _summary;
     private string _statusMessage = string.Empty;
+    private string? _lastExportPath;
 
     public DailyAccountViewModel(ISaleRepository saleRepository, IPrinterService printerService, IFileLauncher fileLauncher)
     {
@@ -30,6 +31,7 @@ public sealed class DailyAccountViewModel : BindableBase
         PrevDayCommand = new RelayCommand(_ => SelectedDate = SelectedDate.AddDays(-1));
         NextDayCommand = new RelayCommand(_ => SelectedDate = SelectedDate.AddDays(1));
         ExportDailyReportCommand = new RelayCommand(_ => ExportDailyReport(), _ => Summary.TransactionCount > 0);
+        OpenLastExportCommand = new RelayCommand(_ => OpenLastExport(), _ => _lastExportPath != null);
 
         Load();
     }
@@ -78,11 +80,16 @@ public sealed class DailyAccountViewModel : BindableBase
         private set => SetProperty(ref _statusMessage, value);
     }
 
+    public string? LastExportFileName => _lastExportPath == null ? null : Path.GetFileName(_lastExportPath);
+
+    public bool HasLastExport => _lastExportPath != null;
+
     public RelayCommand LoadCommand { get; }
     public RelayCommand TodayCommand { get; }
     public RelayCommand PrevDayCommand { get; }
     public RelayCommand NextDayCommand { get; }
     public RelayCommand ExportDailyReportCommand { get; }
+    public RelayCommand OpenLastExportCommand { get; }
 
     public void Load()
     {
@@ -120,12 +127,22 @@ public sealed class DailyAccountViewModel : BindableBase
         {
             var folder = Path.GetTempPath();
             var filePath = ExcelExportService.ExportDailyReport(Summary, folder);
-            StatusMessage = $"已匯出：{Path.GetFileName(filePath)}";
+            _lastExportPath = filePath;
+            RaisePropertyChanged(nameof(LastExportFileName));
+            RaisePropertyChanged(nameof(HasLastExport));
+            ((RelayCommand)OpenLastExportCommand).RaiseCanExecuteChanged();
+            StatusMessage = "已匯出：";
             await _fileLauncher.OpenFileAsync(filePath);
         }
         catch (Exception ex)
         {
             StatusMessage = $"匯出失敗：{ex.Message}";
         }
+    }
+
+    private async void OpenLastExport()
+    {
+        if (_lastExportPath != null)
+            await _fileLauncher.OpenFileAsync(_lastExportPath);
     }
 }

@@ -187,6 +187,49 @@ day-end view:
 
 Inspect with:
 
-```
+```sh
 sqlite3 "<path-to>/klcmcpos.db" ".tables"
+```
+
+### Useful SQLite commands
+
+Open an interactive shell:
+
+```sh
+# macOS (MAUI)
+sqlite3 ~/Library/Containers/com.klcmc.pos/Data/Library/Application\ Support/klcmcpos.db
+
+# Shortcut if running outside the sandbox (Debug builds)
+sqlite3 /Users/<you>/Library/klcmcpos.db
+```
+
+**Delete all test transaction data** (keeps products, payment methods, printer settings):
+
+```sql
+DELETE FROM SalePayments;
+DELETE FROM SaleLines;
+DELETE FROM Sales;
+```
+
+**Delete transactions for a specific date only:**
+
+```sql
+DELETE FROM SalePayments WHERE SaleId IN (SELECT Id FROM Sales WHERE date(CreatedAtUtc) = '2026-04-28');
+DELETE FROM SaleLines    WHERE SaleId IN (SELECT Id FROM Sales WHERE date(CreatedAtUtc) = '2026-04-28');
+DELETE FROM Sales        WHERE date(CreatedAtUtc) = '2026-04-28';
+```
+
+**Count rows per table:**
+
+```sql
+SELECT 'Sales'       , COUNT(*) FROM Sales
+UNION ALL SELECT 'SaleLines'   , COUNT(*) FROM SaleLines
+UNION ALL SELECT 'SalePayments', COUNT(*) FROM SalePayments
+UNION ALL SELECT 'Products'    , COUNT(*) FROM Products;
+```
+
+**Wipe everything and start fresh** (nuclear option — app will re-seed on next launch):
+
+```sh
+rm "<path-to>/klcmcpos.db"
 ```

@@ -339,18 +339,8 @@
                             BorderWidth="1"
                             CornerRadius="10"
                             Command="{Binding MoneyPadBackspaceCommand}" />
-                    <Button Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2"
-                            Text="剛好"
-                            FontSize="16"
-                            FontAttributes="Bold"
-                            HeightRequest="48"
-                            BackgroundColor="#1C2A0B"
-                            TextColor="#BDEE62"
-                            BorderColor="#2A3B4C"
-                            BorderWidth="1"
-                            CornerRadius="10"
-                            Command="{Binding MoneyPadQuickAmountCommand}"
-                            CommandParameter="EXACT" />
+                    <Button Grid.Row="5" Grid.Column="2" Text="$500" FontSize="18" FontAttributes="Bold" HeightRequest="48" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="500" />
+                    <Button Grid.Row="5" Grid.Column="3" Text="$1000" FontSize="18" FontAttributes="Bold" HeightRequest="48" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="1000" />
                   </Grid>
                 </Grid>
 
@@ -658,11 +648,22 @@
               </Border>
 
               <!-- Status message -->
-              <Label Grid.Row="3"
-                     Text="{Binding StatusMessage}"
-                     TextColor="#8EA0B9"
-                     FontSize="12"
-                     Padding="2,4,2,0" />
+              <HorizontalStackLayout Grid.Row="3" Spacing="0" Padding="2,4,2,0">
+                <Label Text="{Binding StatusMessage}"
+                       TextColor="#8EA0B9"
+                       FontSize="12"
+                       VerticalOptions="Center" />
+                <Label Text="{Binding LastExportFileName}"
+                       IsVisible="{Binding HasLastExport}"
+                       TextColor="#4DA3FF"
+                       FontSize="12"
+                       TextDecorations="Underline"
+                       VerticalOptions="Center">
+                  <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenLastExportCommand}" />
+                  </Label.GestureRecognizers>
+                </Label>
+              </HorizontalStackLayout>
             </Grid>
             <Grid x:Name="ConfigureTabContent"
                   IsVisible="False"

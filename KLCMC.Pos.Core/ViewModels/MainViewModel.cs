@@ -1247,12 +1247,6 @@ public sealed class MainViewModel : BindableBase
             return;
         }
 
-        if (string.Equals(raw, "EXACT", StringComparison.OrdinalIgnoreCase))
-        {
-            MoneyPadInputText = RemainingAmount.ToString("0.##", CultureInfo.InvariantCulture);
-            return;
-        }
-
         if (decimal.TryParse(raw, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var value) && value >= 0m)
         {
             MoneyPadInputText = value.ToString("0.##", CultureInfo.InvariantCulture);
