@@ -39,6 +39,7 @@ public static class MauiProgram
 #endif
         builder.Services.AddSingleton<MainViewModel>();
         builder.Services.AddSingleton<MainPage>();
+        builder.Services.AddSingleton<IFileLauncher, MauiFileLauncher>();
         builder.Services.AddTransient<DailyAccountViewModel>();
         builder.Services.AddTransient<DailyAccountPage>();
 

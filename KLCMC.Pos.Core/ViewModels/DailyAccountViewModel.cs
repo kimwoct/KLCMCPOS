@@ -2,20 +2,21 @@ using System.Collections.ObjectModel;
 using KLCMC.Pos.Core.Data.Repositories;
 using KLCMC.Pos.Core.Models;
 using KLCMC.Pos.Core.Services;
-using System.Diagnostics;
 
 namespace KLCMC.Pos.Core.ViewModels;
 
 public sealed class DailyAccountViewModel : BindableBase
 {
     private readonly ISaleRepository _saleRepository;
+    private readonly IFileLauncher _fileLauncher;
     private DateTime _selectedDate = DateTime.Today;
     private DailySummary _summary;
     private string _statusMessage = string.Empty;
 
-    public DailyAccountViewModel(ISaleRepository saleRepository, IPrinterService printerService)
+    public DailyAccountViewModel(ISaleRepository saleRepository, IPrinterService printerService, IFileLauncher fileLauncher)
     {
         _saleRepository = saleRepository;
+        _fileLauncher = fileLauncher;
         _summary = DailySummary.Empty(DateOnly.FromDateTime(DateTime.Today));
 
         ByMethod = new ObservableCollection<MethodTotal>();
@@ -113,16 +114,14 @@ public sealed class DailyAccountViewModel : BindableBase
         }
     }
 
-    private void ExportDailyReport()
+    private async void ExportDailyReport()
     {
         try
         {
-            var folder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var folder = Path.GetTempPath();
             var filePath = ExcelExportService.ExportDailyReport(Summary, folder);
             StatusMessage = $"已匯出：{Path.GetFileName(filePath)}";
-
-            // Open the file with the default application
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            await _fileLauncher.OpenFileAsync(filePath);
         }
         catch (Exception ex)
         {
