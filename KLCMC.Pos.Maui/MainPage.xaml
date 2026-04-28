@@ -30,7 +30,7 @@
             <Grid ColumnDefinitions="*,*,*"
                   ColumnSpacing="10">
               <Button x:Name="CurrentSaleTabButton"
-                      Text="Current Sale"
+                      Text="當前銷售"
                       FontAttributes="Bold"
                       HeightRequest="44"
                       BackgroundColor="#1F3D5C"
@@ -38,7 +38,7 @@
                       Clicked="OnCurrentSaleTabClicked" />
                 <Button Grid.Column="1"
                         x:Name="DailyAccountTabButton"
-                        Text="📊 Daily Account"
+                        Text="📊 每日帳目"
                         FontAttributes="Bold"
                         HeightRequest="44"
                         BackgroundColor="#253648"
@@ -46,7 +46,7 @@
                         Clicked="OnDailyAccountTabClicked" />
               <Button Grid.Column="2"
                       x:Name="ConfigureTabButton"
-                      Text="⚙ Configuration"
+                      Text="⚙ 設置"
                       FontAttributes="Bold"
                       HeightRequest="44"
                       BackgroundColor="#253648"
@@ -60,7 +60,7 @@
                   RowSpacing="14">
             <HorizontalStackLayout Spacing="12"
                                     VerticalOptions="Center">
-              <Label Text="Current Sale"
+              <Label Text="當前銷售"
                      FontSize="32"
                       FontAttributes="Bold"
                       TextColor="#D2E4FB" />
@@ -153,7 +153,7 @@
                      VerticalOptions="Center"
                      HorizontalTextAlignment="End" />
               <Button Grid.Column="1"
-                      Text="Checkout"
+                      Text="結帳"
                       FontSize="20"
                       FontAttributes="Bold"
                       HeightRequest="52"
@@ -188,15 +188,15 @@
                       ColumnDefinitions="*,*,*,Auto"
                       ColumnSpacing="10">
                   <VerticalStackLayout Grid.Column="0" Spacing="0">
-                    <Label Text="Amount Due" FontSize="13" TextColor="#8EA0B9" />
+                    <Label Text="應付金額" FontSize="13" TextColor="#8EA0B9" />
                     <Label Text="{Binding AmountDueText}" FontSize="18" FontAttributes="Bold" TextColor="#BDEE62" />
                   </VerticalStackLayout>
                   <VerticalStackLayout Grid.Column="1" Spacing="0">
-                    <Label Text="Paid" FontSize="13" TextColor="#8EA0B9" />
+                    <Label Text="已付" FontSize="13" TextColor="#8EA0B9" />
                     <Label Text="{Binding PaidTotalText}" FontSize="18" FontAttributes="Bold" TextColor="#D2E4FB" />
                   </VerticalStackLayout>
                   <VerticalStackLayout Grid.Column="2" Spacing="0">
-                    <Label Text="Outstanding" FontSize="13" TextColor="#8EA0B9" />
+                    <Label Text="餘額" FontSize="13" TextColor="#8EA0B9" />
                     <Label Text="{Binding OutstandingText}" FontSize="18" FontAttributes="Bold" TextColor="#FFD479" />
                   </VerticalStackLayout>
                   <Button Grid.Column="3"
@@ -248,7 +248,7 @@
                   <CollectionView ItemsSource="{Binding Payments}"
                                   HeightRequest="80">
                     <CollectionView.EmptyView>
-                      <Label Text="No payments added yet."
+                      <Label Text="尚未新增付款。"
                              TextColor="#8EA0B9"
                              FontSize="14"
                              HorizontalOptions="Center"
@@ -264,7 +264,7 @@
                                  FontSize="16"
                                  VerticalOptions="Center" />
                           <Button Grid.Column="1"
-                                  Text="Remove"
+                                  Text="刪除"
                                   FontSize="12"
                                   BackgroundColor="#3D1F1F"
                                   TextColor="#FFB4AB"
@@ -340,7 +340,7 @@
                             CornerRadius="10"
                             Command="{Binding MoneyPadBackspaceCommand}" />
                     <Button Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2"
-                            Text="Exact"
+                            Text="剛好"
                             FontSize="16"
                             FontAttributes="Bold"
                             HeightRequest="48"
@@ -359,17 +359,17 @@
                       ColumnDefinitions="*,*"
                       ColumnSpacing="10">
                   <Button Grid.Column="0"
-                           Text="Add Payment"
-                           FontSize="14"
-                           HeightRequest="42"
-                          BackgroundColor="#1F3D5C"
-                          TextColor="#D2E4FB"
+                          Text="新增付款"
+                          FontSize="14"
+                          HeightRequest="42"
+                          BackgroundColor="#A2D149"
+                          TextColor="#243600"
                           FontAttributes="Bold"
                           Command="{Binding AddPaymentCommand}" />
                   <Button Grid.Column="1"
-                           Text="Confirm &amp; Print"
-                           FontSize="14"
-                           HeightRequest="42"
+                          Text="確認並列印"
+                          FontSize="14"
+                          HeightRequest="42"
                           BackgroundColor="#A2D149"
                           TextColor="#243600"
                           FontAttributes="Bold"
@@ -411,18 +411,18 @@
                        VerticalOptions="Center" />
                 <HorizontalStackLayout Grid.Column="1"
                                        Spacing="8">
-                  <Button Text="◀ Prev"
+                  <Button Text="◀ 上一日"
                           BackgroundColor="#253648"
                           TextColor="#D2E4FB"
                           Padding="12,6"
                           Command="{Binding PrevDayCommand}" />
-                  <Button Text="Today"
+                  <Button Text="今日"
                           BackgroundColor="#1F3D5C"
                           TextColor="#D2E4FB"
                           FontAttributes="Bold"
                           Padding="12,6"
                           Command="{Binding TodayCommand}" />
-                  <Button Text="Next ▶"
+                  <Button Text="下一日 ▶"
                           BackgroundColor="#253648"
                           TextColor="#D2E4FB"
                           Padding="12,6"
@@ -431,7 +431,7 @@
                               TextColor="#D2E4FB"
                               BackgroundColor="#1A2B3C"
                               FontSize="14" />
-                  <Button Text="🖨 Print Daily Report"
+                  <Button Text="🖨 列印每日報告"
                           BackgroundColor="#A2D149"
                           TextColor="#243600"
                           FontAttributes="Bold"
@@ -451,15 +451,15 @@
                     <Grid ColumnDefinitions="60,2*,90,1.5*,88"
                           Padding="14,10"
                           BackgroundColor="#0A1823">
-                      <Label Grid.Column="0" Text="ID" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
-                      <Label Grid.Column="1" Text="PRODUCTS" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
-                      <Label Grid.Column="2" Text="TIME" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
-                      <Label Grid.Column="3" Text="PAYMENT" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
-                      <Label Grid.Column="4" Text="AMOUNT" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="End" />
+                      <Label Grid.Column="0" Text="編號" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
+                      <Label Grid.Column="1" Text="產品" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
+                      <Label Grid.Column="2" Text="時間" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
+                      <Label Grid.Column="3" Text="付款方式" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
+                      <Label Grid.Column="4" Text="金額" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="End" />
                     </Grid>
                   </CollectionView.Header>
                   <CollectionView.EmptyView>
-                    <Label Text="No transactions for the selected date."
+                    <Label Text="所選日期沒有交易記錄。"
                            TextColor="#8EA0B9"
                            FontSize="14"
                            HorizontalOptions="Center"
@@ -584,7 +584,7 @@
                               Wrap="Wrap"
                               AlignItems="Center">
                     <BindableLayout.EmptyView>
-                      <Label Text="No data." TextColor="#5E7A96" FontSize="12" />
+                      <Label Text="暫無數據。" TextColor="#5E7A96" FontSize="12" />
                     </BindableLayout.EmptyView>
                     <BindableLayout.ItemTemplate>
                       <DataTemplate>
@@ -627,7 +627,7 @@
                           Padding="18,10">
                     <HorizontalStackLayout Spacing="0">
                       <VerticalStackLayout Spacing="3">
-                        <Label Text="TOTAL REVENUE"
+                        <Label Text="總收入"
                                TextColor="#5E7A96"
                                FontSize="9"
                                FontAttributes="Bold"
@@ -642,7 +642,7 @@
                                Margin="16,0"
                                VerticalOptions="Fill" />
                       <VerticalStackLayout Spacing="3">
-                        <Label Text="TRANSACTIONS"
+                        <Label Text="交易次數"
                                TextColor="#5E7A96"
                                FontSize="9"
                                FontAttributes="Bold"
@@ -679,17 +679,17 @@
                   <!-- Section header + column labels -->
                   <Grid ColumnDefinitions="Auto,*,120,80,80"
                         ColumnSpacing="10">
-                    <Label Grid.Column="0" Text="PRODUCTS" TextColor="#D2E4FB" FontSize="13" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
-                    <Label Grid.Column="2" Text="DEFAULT PRICE" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
-                    <Label Grid.Column="3" Text="SAVE" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
-                    <Label Grid.Column="4" Text="DELETE" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Column="0" Text="產品" TextColor="#D2E4FB" FontSize="13" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="預設價格" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
+                    <Label Grid.Column="3" Text="儲存" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Column="4" Text="刪除" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
                   </Grid>
                   <!-- Product rows -->
                   <CollectionView Grid.Row="1"
                                   ItemsSource="{Binding ProductEditorRows}"
                                   HeightRequest="220">
                     <CollectionView.EmptyView>
-                      <Label Text="No products yet. Add a product from the Product Panel."
+                      <Label Text="暫無產品。請在產品面板新增產品。"
                              TextColor="#8EA0B9"
                              FontSize="13"
                              HorizontalOptions="Center"
@@ -761,16 +761,16 @@
                   <!-- Section header -->
                   <Grid ColumnDefinitions="Auto,*,80,80"
                         ColumnSpacing="10">
-                    <Label Grid.Column="0" Text="PAYMENT METHODS" TextColor="#D2E4FB" FontSize="13" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
-                    <Label Grid.Column="2" Text="SAVE" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
-                    <Label Grid.Column="3" Text="DELETE" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Column="0" Text="付款方式" TextColor="#D2E4FB" FontSize="13" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="儲存" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Column="3" Text="刪除" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
                   </Grid>
                   <!-- Existing method rows -->
                   <CollectionView Grid.Row="1"
                                   ItemsSource="{Binding PaymentMethodEditorRows}"
                                   HeightRequest="160">
                     <CollectionView.EmptyView>
-                      <Label Text="No payment methods configured."
+                      <Label Text="尚未設定付款方式。"
                              TextColor="#8EA0B9"
                              FontSize="13"
                              HorizontalOptions="Center"
@@ -817,13 +817,13 @@
                         ColumnSpacing="10">
                     <Entry Grid.Column="0"
                            Text="{Binding NewPaymentMethodName}"
-                           Placeholder="New method name (e.g. WeChat Pay)"
+                           Placeholder="新付款方式名稱（如：微信支付）"
                            PlaceholderColor="#5E7A96"
                            TextColor="#D2E4FB"
                            BackgroundColor="#0F2131"
                            FontSize="14" />
                     <Button Grid.Column="1"
-                            Text="+ Add"
+                            Text="+ 新增"
                             FontSize="14"
                             FontAttributes="Bold"
                             BackgroundColor="#2563A8"
@@ -851,7 +851,7 @@
                       <TapGestureRecognizer Command="{Binding TogglePrinterPanelCommand}" />
                     </Grid.GestureRecognizers>
                     <Label Grid.Column="0"
-                           Text="🖨 Printer Configure"
+                           Text="🖨 印表機設置"
                            FontSize="18"
                            FontAttributes="Bold"
                            TextColor="#D2E4FB"
@@ -889,27 +889,27 @@
                     <!-- Mode + Port -->
                     <Grid ColumnDefinitions="Auto,*,Auto,*"
                           ColumnSpacing="10">
-                      <Label Grid.Column="0" Text="Mode" TextColor="#8EA0B9" VerticalOptions="Center" />
+                      <Label Grid.Column="0" Text="模式" TextColor="#8EA0B9" VerticalOptions="Center" />
                       <Picker Grid.Column="1"
-                              Title="USB or COM"
+                              Title="USB 或 COM"
                               ItemsSource="{Binding ConnectionModes}"
                               SelectedItem="{Binding ConnectionOptions.Mode}" />
-                      <Label Grid.Column="2" Text="Port" TextColor="#8EA0B9" VerticalOptions="Center" />
+                      <Label Grid.Column="2" Text="連接埠" TextColor="#8EA0B9" VerticalOptions="Center" />
                       <Entry Grid.Column="3"
-                             Placeholder="Installed printer name (e.g. POS-80)"
+                             Placeholder="已安裝印表機名稱（如：POS-80）"
                              Text="{Binding ConnectionOptions.Endpoint}" />
                     </Grid>
                     <!-- Connect / Disconnect -->
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                       <Button Grid.Column="0"
-                              Text="Connect Printer"
+                              Text="連接印表機"
                               HeightRequest="48"
                               FontAttributes="Bold"
                               BackgroundColor="#209DC0"
                               TextColor="White"
                               Command="{Binding ConnectPrinterCommand}" />
                       <Button Grid.Column="1"
-                              Text="Disconnect"
+                              Text="中斷連接"
                               HeightRequest="48"
                               FontAttributes="Bold"
                               BackgroundColor="#253648"
@@ -919,14 +919,14 @@
                     <!-- Open Drawer / Print Test -->
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                       <Button Grid.Column="0"
-                              Text="Open Drawer"
+                              Text="開錢箱"
                               HeightRequest="48"
                               FontAttributes="Bold"
                               BackgroundColor="#D18467"
                               TextColor="White"
                               Command="{Binding OpenDrawerCommand}" />
                       <Button Grid.Column="1"
-                              Text="Print Test"
+                              Text="列印測試"
                               HeightRequest="48"
                               FontAttributes="Bold"
                               BackgroundColor="#1F3D5C"
@@ -940,7 +940,7 @@
                   <Grid RowDefinitions="Auto,*"
                         RowSpacing="6"
                         Padding="16,12">
-                    <Label Text="Printer Console"
+                    <Label Text="印表機控制台"
                            FontSize="14"
                            FontAttributes="Bold"
                            TextColor="#D2E4FB" />
@@ -978,7 +978,7 @@
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="10">
               <VerticalStackLayout Spacing="2">
-                <Label Text="Printer Connection"
+                <Label Text="印表機連接"
                        FontSize="18"
                        FontAttributes="Bold"
                        TextColor="#D2E4FB" />
@@ -1014,22 +1014,22 @@
                   RowSpacing="8">
               <Picker Grid.Row="0"
                       Grid.Column="0"
-                      Title="Mode"
+                      Title="模式"
                       ItemsSource="{Binding ConnectionModes}"
                       SelectedItem="{Binding ConnectionOptions.Mode}" />
               <Entry Grid.Row="0"
                      Grid.Column="1"
-                Placeholder="Installed printer name"
+                Placeholder="已安裝印表機名稱"
                      Text="{Binding ConnectionOptions.Endpoint}" />
               <HorizontalStackLayout Grid.Row="4"
                                      Grid.ColumnSpan="2"
                                      Spacing="8">
-                <Button Text="Connect"
+                <Button Text="連接"
                         BackgroundColor="#209DC0"
                         TextColor="White"
                         FontAttributes="Bold"
                         Command="{Binding ConnectPrinterCommand}" />
-                <Button Text="Disconnect"
+                <Button Text="中斷連接"
                         BackgroundColor="#253648"
                         TextColor="#D2E4FB"
                         FontAttributes="Bold"
@@ -1051,12 +1051,12 @@
                   RowSpacing="12">
               <Grid ColumnDefinitions="*,Auto"
                     ColumnSpacing="10">
-                <Label Text="Products"
+                <Label Text="產品"
                        TextColor="#D2E4FB"
                        FontSize="24"
                        FontAttributes="Bold" />
                 <Button Grid.Column="1"
-                        Text="+ New Product"
+                        Text="+ 新增產品"
                         FontAttributes="Bold"
                         BackgroundColor="#A2D149"
                         TextColor="#243600"
@@ -1096,7 +1096,7 @@
                                TextColor="#69D4F8"
                                FontAttributes="Bold"
                                HorizontalTextAlignment="Center" />
-                        <Label Text="Tap to add"
+                        <Label Text="點擊新增"
                                FontSize="12"
                                TextColor="#8EA0B9"
                                HorizontalTextAlignment="Center" />
@@ -1117,7 +1117,7 @@
                   Padding="12">
             <VerticalStackLayout Spacing="10">
               <Grid ColumnDefinitions="*,Auto">
-                <Label Text="Product Control"
+                <Label Text="產品控制"
                        FontSize="18"
                        FontAttributes="Bold"
                        TextColor="#D2E4FB"
@@ -1143,7 +1143,7 @@
                      FontSize="12" />
 
               <Entry Text="{Binding SelectedCartLine.Remark, Mode=TwoWay, FallbackValue=''}"
-                     Placeholder="Add remark for this item..."
+                     Placeholder="新增備註..."
                      PlaceholderColor="#8EA0B9"
                      TextColor="#D2E4FB"
                      BackgroundColor="#1A2B3C"
@@ -1246,7 +1246,7 @@
                         CornerRadius="10"
                         Command="{Binding PricePadBackspaceCommand}" />
                 <Button Grid.Column="2"
-                        Text="Apply Price"
+                        Text="套用價格"
                         HeightRequest="56"
                         FontSize="20"
                         FontAttributes="Bold"
@@ -1260,7 +1260,7 @@
         </Grid>
 
         <Label Grid.Row="2"
-               Text="On macOS, current default printer implementation is mock/file output."
+               Text="在 macOS 上，目前預設印表機為模擬/檔案輸出。"
                FontSize="12"
                TextColor="#8EA0B9"
                Opacity="0.9" />
@@ -1278,27 +1278,27 @@
               VerticalOptions="Center"
               MaximumWidthRequest="520">
         <VerticalStackLayout Spacing="12">
-          <Label Text="Add New Product"
+          <Label Text="新增產品"
                  FontSize="24"
                  FontAttributes="Bold"
                  TextColor="#D2E4FB" />
 
-          <Entry Placeholder="Product name"
+          <Entry Placeholder="產品名稱"
                  Text="{Binding NewProductName}" />
-          <Entry Placeholder="Price (e.g. 12.5)"
+          <Entry Placeholder="價格（如：12.5）"
                  Keyboard="Numeric"
                  Text="{Binding NewProductPriceText}" />
 
           <Grid ColumnDefinitions="*,*"
                 ColumnSpacing="10">
             <Button Grid.Column="0"
-                    Text="Cancel"
+                    Text="取消"
                     BackgroundColor="#253648"
                     TextColor="#D2E4FB"
                     FontAttributes="Bold"
                     Command="{Binding CloseAddProductPopupCommand}" />
             <Button Grid.Column="1"
-                    Text="Add Product"
+                    Text="新增"
                     BackgroundColor="#A2D149"
                     TextColor="#243600"
                     FontAttributes="Bold"

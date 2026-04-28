@@ -30,7 +30,7 @@ public static class ReceiptComposer
         }
 
         receiptLines.Add(new ReceiptLine { Text = separator });
-        receiptLines.Add(new ReceiptLine { Text = $"TOTAL: HKD ${total:F2}" });
+        receiptLines.Add(new ReceiptLine { Text = $"總計: HKD ${total:F2}" });
 
         if (payments is not null)
         {

@@ -17,8 +17,8 @@ public sealed class CheckoutPaymentLine
             {
                 var change = ChangeAmount ?? 0m;
                 return change > 0m
-                    ? $"Cash {Amount:F2} (tendered {TenderedAmount:F2}, change {change:F2})"
-                    : $"Cash {Amount:F2} (tendered {TenderedAmount:F2})";
+                    ? $"現金 {Amount:F2}（實收 {TenderedAmount:F2}，找贖 {change:F2}）"
+                    : $"現金 {Amount:F2}（實收 {TenderedAmount:F2}）";
             }
 
             return $"{Method} {Amount:F2}";

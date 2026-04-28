@@ -278,7 +278,7 @@ public sealed class MainViewModel : BindableBase
 
     public decimal Total => CartLines.Sum(line => line.LineTotal);
 
-    public string TotalText => $"Total: HKD ${Total:F2}";
+    public string TotalText => $"總計: HKD ${Total:F2}";
 
     public RelayCommand AddItemCommand { get; }
 
@@ -382,14 +382,14 @@ public sealed class MainViewModel : BindableBase
     {
         if (!CanAddNewProduct())
         {
-            StatusMessage = "Enter a valid product name and price.";
+            StatusMessage = "請輸入有效的產品名稱和價格。";
             return;
         }
 
         var name = NewProductName.Trim();
         if (PresetItems.Any(item => string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase)))
         {
-            StatusMessage = $"Product '{name}' already exists.";
+            StatusMessage = $"產品「{name}」已存在。";
             return;
         }
 
@@ -400,7 +400,7 @@ public sealed class MainViewModel : BindableBase
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Failed to save product: {ex.Message}";
+            StatusMessage = $"儲存產品失敗：{ex.Message}";
             return;
         }
 
@@ -420,7 +420,7 @@ public sealed class MainViewModel : BindableBase
         NewProductName = string.Empty;
         NewProductPriceText = string.Empty;
         IsAddProductPopupVisible = false;
-        StatusMessage = $"Product '{name}' added.";
+        StatusMessage = $"產品「{name}」已新增。";
         _addNewProductCommand.RaiseCanExecuteChanged();
     }
 
@@ -472,25 +472,25 @@ public sealed class MainViewModel : BindableBase
         _paymentMethodRepository.Add(name);
         NewPaymentMethodName = string.Empty;
         ReloadPaymentMethodOptions();
-        StatusMessage = $"Payment method '{name}' added.";
+        StatusMessage = $"付款方式「{name}」已新增。";
     }
 
     private void SavePaymentMethod(object? parameter)
     {
         if (parameter is not PaymentMethodEditorRow row) return;
         var name = row.Name.Trim();
-        if (string.IsNullOrWhiteSpace(name)) { StatusMessage = "Method name cannot be empty."; return; }
-        if (!_paymentMethodRepository.Update(row.Id, name)) { StatusMessage = $"Method #{row.Id} not found."; return; }
+        if (string.IsNullOrWhiteSpace(name)) { StatusMessage = "付款方式名稱不能為空。"; return; }
+        if (!_paymentMethodRepository.Update(row.Id, name)) { StatusMessage = $"找不到付款方式 #{row.Id}。"; return; }
         ReloadPaymentMethodOptions();
-        StatusMessage = $"Payment method '{name}' saved.";
+        StatusMessage = $"付款方式「{name}」已儲存。";
     }
 
     private void DeletePaymentMethod(object? parameter)
     {
         if (parameter is not PaymentMethodEditorRow row) return;
-        if (!_paymentMethodRepository.Delete(row.Id)) { StatusMessage = $"Method #{row.Id} not found."; return; }
+        if (!_paymentMethodRepository.Delete(row.Id)) { StatusMessage = $"找不到付款方式 #{row.Id}。"; return; }
         ReloadPaymentMethodOptions();
-        StatusMessage = $"Payment method '{row.Name}' deleted.";
+        StatusMessage = $"付款方式「{row.Name}」已刪除。";
     }
 
     private void SaveProduct(object? parameter)
@@ -501,13 +501,13 @@ public sealed class MainViewModel : BindableBase
         var name = row.Name.Trim();
         if (string.IsNullOrWhiteSpace(name))
         {
-            StatusMessage = "Product name cannot be empty.";
+            StatusMessage = "產品名稱不能為空。";
             return;
         }
 
         if (!_productRepository.Update(row.Id, name, row.Price))
         {
-            StatusMessage = $"Product #{row.Id} not found.";
+            StatusMessage = $"找不到產品 #{row.Id}。";
             return;
         }
 
@@ -519,7 +519,7 @@ public sealed class MainViewModel : BindableBase
         foreach (var p in _productRepository.GetAll())
             PresetItems.Add(new PresetItem { Name = p.Name, DefaultPrice = p.DefaultPrice });
 
-        StatusMessage = $"Product '{name}' saved.";
+        StatusMessage = $"產品「{name}」已儲存。";
     }
 
     private void DeleteProduct(object? parameter)
@@ -529,7 +529,7 @@ public sealed class MainViewModel : BindableBase
 
         if (!_productRepository.Delete(row.Id))
         {
-            StatusMessage = $"Product #{row.Id} not found.";
+            StatusMessage = $"找不到產品 #{row.Id}。";
             return;
         }
 
@@ -537,7 +537,7 @@ public sealed class MainViewModel : BindableBase
         var preset = PresetItems.FirstOrDefault(p => p.Name == row.Name);
         if (preset is not null) PresetItems.Remove(preset);
 
-        StatusMessage = $"Product '{row.Name}' deleted.";
+        StatusMessage = $"產品「{row.Name}」已刪除。";
     }
 
     private void OpenAddProductPopup()
@@ -556,7 +556,7 @@ public sealed class MainViewModel : BindableBase
         {
             _printerSettingsRepository.Save(ConnectionOptions);
             _printerService.Open(ConnectionOptions);
-            StatusMessage = "Printer connected.";
+            StatusMessage = "印表機已連接。";
             AppendPrinterConsole(StatusMessage);
             IsPrinterPanelExpanded = false;
             RaisePropertyChanged(nameof(ConnectionStateText));
@@ -565,21 +565,21 @@ public sealed class MainViewModel : BindableBase
         catch (InvalidOperationException ex)
         {
             _printerService.Close();
-            StatusMessage = $"Connection failed: {ex.Message}";
+            StatusMessage = $"連接失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));
         }
         catch (DllNotFoundException ex)
         {
             _printerService.Close();
-            StatusMessage = $"Printer runtime load failed: {ex.Message}";
+            StatusMessage = $"印表機執行程式載入失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));
         }
         catch (BadImageFormatException ex)
         {
             _printerService.Close();
-            StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
+            StatusMessage = $"印表機執行程式架構不符：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
             RaisePropertyChanged(nameof(ConnectionStateText));
         }
@@ -588,7 +588,7 @@ public sealed class MainViewModel : BindableBase
     private void DisconnectPrinter()
     {
         _printerService.Close();
-        StatusMessage = "Printer disconnected.";
+        StatusMessage = "印表機已中斷連接。";
         AppendPrinterConsole(StatusMessage);
         RaisePropertyChanged(nameof(ConnectionStateText));
         RaisePropertyChanged(nameof(IsPrinterConnected));
@@ -611,12 +611,12 @@ public sealed class MainViewModel : BindableBase
                 ConnectionOptions.Endpoint = _installedPrinters[0];
             }
 
-            StatusMessage = $"Loaded {_installedPrinters.Count} installed printer(s).";
+            StatusMessage = $"已載入 {_installedPrinters.Count} 台印表機。";
             AppendPrinterConsole(StatusMessage);
         }
         catch (InvalidOperationException ex)
         {
-            StatusMessage = $"Failed to load printers: {ex.Message}";
+            StatusMessage = $"載入印表機失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
     }
@@ -626,12 +626,12 @@ public sealed class MainViewModel : BindableBase
         try
         {
             _printerService.OpenPrinterProperties(ConnectionOptions.Endpoint);
-            StatusMessage = "Opened Windows printer properties.";
+            StatusMessage = "已開啟 Windows 印表機屬性。";
             AppendPrinterConsole(StatusMessage);
         }
         catch (InvalidOperationException ex)
         {
-            StatusMessage = $"Open properties failed: {ex.Message}";
+            StatusMessage = $"開啟屬性失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
     }
@@ -642,13 +642,13 @@ public sealed class MainViewModel : BindableBase
         {
             var capabilities = _printerService.ProbePrinter(ConnectionOptions.Endpoint);
             PrinterCapabilitiesText = FormatCapabilities(capabilities);
-            StatusMessage = "Printer capabilities updated.";
+            StatusMessage = "印表機功能已更新。";
             AppendPrinterConsole(StatusMessage);
         }
         catch (InvalidOperationException ex)
         {
             PrinterCapabilitiesText = "Capability probe failed.";
-            StatusMessage = $"Capability probe failed: {ex.Message}";
+            StatusMessage = $"功能探測失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
     }
@@ -665,22 +665,22 @@ public sealed class MainViewModel : BindableBase
         {
             EnsurePrinterReady();
             _printerService.OpenDrawer();
-            StatusMessage = "Cash drawer opened.";
+            StatusMessage = "錢箱已開啟。";
             AppendPrinterConsole(StatusMessage);
         }
         catch (InvalidOperationException ex)
         {
-            StatusMessage = $"Open drawer failed: {ex.Message}";
+            StatusMessage = $"開啟錢箱失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
         catch (DllNotFoundException ex)
         {
-            StatusMessage = $"Printer runtime load failed: {ex.Message}";
+            StatusMessage = $"印表機執行程式載入失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
         catch (BadImageFormatException ex)
         {
-            StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
+            StatusMessage = $"印表機執行程式架構不符：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
     }
@@ -698,22 +698,22 @@ public sealed class MainViewModel : BindableBase
                 new ReceiptLine { Text = $"Profile: {ConnectionOptions.PaperWidthMm}mm / {ConnectionOptions.CodePage} / {ConnectionOptions.CutMode}" },
                 new ReceiptLine { Text = $"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}" }
             ]);
-            StatusMessage = "Printer test sent.";
+            StatusMessage = "印表機測試已發送。";
             AppendPrinterConsole(StatusMessage);
         }
         catch (InvalidOperationException ex)
         {
-            StatusMessage = $"Printer test failed: {ex.Message}";
+            StatusMessage = $"印表機測試失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
         catch (DllNotFoundException ex)
         {
-            StatusMessage = $"Printer runtime load failed: {ex.Message}";
+            StatusMessage = $"印表機執行程式載入失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
         catch (BadImageFormatException ex)
         {
-            StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
+            StatusMessage = $"印表機執行程式架構不符：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
     }
@@ -758,22 +758,22 @@ public sealed class MainViewModel : BindableBase
         {
             EnsurePrinterReady();
             _printerService.OpenDrawer();
-            StatusMessage = "Drawer pulse calibration sent.";
+            StatusMessage = "錢箱脈衝校正已發送。";
             AppendPrinterConsole(StatusMessage);
         }
         catch (InvalidOperationException ex)
         {
-            StatusMessage = $"Drawer pulse calibration failed: {ex.Message}";
+            StatusMessage = $"錢箱脈衝校正失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
         catch (DllNotFoundException ex)
         {
-            StatusMessage = $"Printer runtime load failed: {ex.Message}";
+            StatusMessage = $"印表機執行程式載入失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
         catch (BadImageFormatException ex)
         {
-            StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
+            StatusMessage = $"印表機執行程式架構不符：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
     }
@@ -789,17 +789,17 @@ public sealed class MainViewModel : BindableBase
         }
         catch (InvalidOperationException ex)
         {
-            StatusMessage = $"Calibration print failed: {ex.Message}";
+            StatusMessage = $"校正列印失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
         catch (DllNotFoundException ex)
         {
-            StatusMessage = $"Printer runtime load failed: {ex.Message}";
+            StatusMessage = $"印表機執行程式載入失敗：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
         catch (BadImageFormatException ex)
         {
-            StatusMessage = $"Printer runtime architecture mismatch: {ex.Message}";
+            StatusMessage = $"印表機執行程式架構不符：{ex.Message}";
             AppendPrinterConsole(StatusMessage);
         }
     }
@@ -942,12 +942,12 @@ public sealed class MainViewModel : BindableBase
                 out var finalPrice) ||
             finalPrice < 0m)
         {
-            StatusMessage = "Invalid price input.";
+            StatusMessage = "無效的價格輸入。";
             return;
         }
 
         SelectedCartLine.UnitPrice = finalPrice / SelectedCartLine.Quantity;
-        StatusMessage = $"{SelectedCartLine.Name} final price updated to HKD ${finalPrice:F2}.";
+        StatusMessage = $"{SelectedCartLine.Name} 最終價格已更新為 HKD ${finalPrice:F2}。";
         RaisePropertyChanged(nameof(SelectedCartLineTotalText));
         IsProductControlVisible = false;
         SelectedCartLine = null;
@@ -972,7 +972,7 @@ public sealed class MainViewModel : BindableBase
         CartLines.Clear();
         SelectedCartLine = null;
         IsProductControlVisible = false;
-        StatusMessage = "Cart cleared.";
+        StatusMessage = "購物車已清空。";
     }
 
     private void EditCartLine(object? parameter)
@@ -984,7 +984,7 @@ public sealed class MainViewModel : BindableBase
 
         SelectedCartLine = line;
         IsProductControlVisible = true;
-        StatusMessage = $"Editing {line.Name}.";
+        StatusMessage = $"正在編輯「{line.Name}」。";
     }
 
     private void DismissProductControl()
@@ -1011,7 +1011,7 @@ public sealed class MainViewModel : BindableBase
             IsProductControlVisible = false;
         }
 
-        StatusMessage = $"{line.Name} removed from cart.";
+        StatusMessage = $"已從購物車移除「{line.Name}」。";
     }
 
     private void PrintReceipt()
@@ -1096,11 +1096,11 @@ public sealed class MainViewModel : BindableBase
         }
     }
 
-    public string AmountDueText => $"Amount Due: HKD ${Total:F2}";
+    public string AmountDueText => $"應付金額: HKD ${Total:F2}";
 
     public decimal PaidTotal => Payments.Sum(p => p.TenderedAmount ?? p.Amount);
 
-    public string PaidTotalText => $"Paid: HKD ${PaidTotal:F2}";
+    public string PaidTotalText => $"已支付: HKD ${PaidTotal:F2}";
 
     public decimal OutstandingAmount
     {
@@ -1110,7 +1110,7 @@ public sealed class MainViewModel : BindableBase
         }
     }
 
-    public string OutstandingText => $"Outstanding: HKD ${OutstandingAmount:F2}";
+    public string OutstandingText => $"還欠金額: HKD ${OutstandingAmount:F2}";
 
     private decimal RemainingAmount
     {
@@ -1174,7 +1174,7 @@ public sealed class MainViewModel : BindableBase
         MoneyPadInputText = Total.ToString("0.##", CultureInfo.InvariantCulture);
         IsCheckoutPopupVisible = true;
         RaiseCheckoutTotalsChanged();
-        StatusMessage = "Checkout: enter payment(s).";
+        StatusMessage = "結帳：請輸入付款資料。";
     }
 
     private void CancelCheckout()
@@ -1183,7 +1183,7 @@ public sealed class MainViewModel : BindableBase
         Payments.Clear();
         MoneyPadInputText = "0";
         RaiseCheckoutTotalsChanged();
-        StatusMessage = "Checkout cancelled.";
+        StatusMessage = "結帳已取消。";
     }
 
     private void AppendMoneyPadInput(object? parameter)
@@ -1322,7 +1322,7 @@ public sealed class MainViewModel : BindableBase
         Payments.Add(line);
         RaiseCheckoutTotalsChanged();
         MoneyPadInputText = RemainingAmount.ToString("0.##", CultureInfo.InvariantCulture);
-        StatusMessage = $"Added {line.DisplayText}.";
+        StatusMessage = $"已新增付款：{line.DisplayText}。";
     }
 
     private void RemovePayment(object? parameter)
@@ -1346,7 +1346,7 @@ public sealed class MainViewModel : BindableBase
     {
         if (!CanConfirmCheckout())
         {
-            StatusMessage = "Cannot confirm: outstanding balance remains.";
+            StatusMessage = "無法確認：仍有未付金額。";
             return;
         }
 
@@ -1358,7 +1358,7 @@ public sealed class MainViewModel : BindableBase
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Failed to record sale: {ex.Message}";
+            StatusMessage = $"記錄銷售失敗：{ex.Message}";
             return;
         }
 
@@ -1367,11 +1367,11 @@ public sealed class MainViewModel : BindableBase
             var lines = ReceiptComposer.Build("KLCMC POS", CartLines, Total, DateTime.Now, paymentEntries, ConnectionOptions);
             EnsurePrinterReady();
             _printerService.PrintReceipt(lines);
-            StatusMessage = "Sale recorded and receipt printed.";
+            StatusMessage = "銷售已記錄並列印收據。";
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Sale recorded; print failed: {ex.Message}";
+            StatusMessage = $"銷售已記錄；列印失敗：{ex.Message}";
         }
 
         IsCheckoutPopupVisible = false;
