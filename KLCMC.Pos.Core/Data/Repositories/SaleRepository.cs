@@ -71,7 +71,7 @@ public sealed class SaleRepository : ISaleRepository
             Total = s.Total,
             Payments = s.Payments.Select(p => new PaymentEntry
             {
-                Method = ParseMethod(p.Method),
+                Method = p.Method,
                 Amount = p.Amount,
                 TenderedAmount = p.TenderedAmount,
                 ChangeAmount = p.ChangeAmount
@@ -115,6 +115,5 @@ public sealed class SaleRepository : ISaleRepository
         };
     }
 
-    private static PaymentMethod ParseMethod(string raw) =>
-        Enum.TryParse<PaymentMethod>(raw, ignoreCase: true, out var parsed) ? parsed : PaymentMethod.Other;
+    private static string ParseMethod(string raw) => raw;
 }

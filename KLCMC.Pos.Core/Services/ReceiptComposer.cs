@@ -41,7 +41,7 @@ public static class ReceiptComposer
                 decimal totalChange = 0m;
                 foreach (var payment in paymentList)
                 {
-                    if (payment.Method == PaymentMethod.Cash && payment.TenderedAmount.HasValue)
+                    if (payment.Method == "現金" && payment.TenderedAmount.HasValue)
                     {
                         receiptLines.Add(new ReceiptLine
                         {

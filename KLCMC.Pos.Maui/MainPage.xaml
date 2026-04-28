@@ -46,7 +46,7 @@
                         Clicked="OnDailyAccountTabClicked" />
               <Button Grid.Column="2"
                       x:Name="ConfigureTabButton"
-                      Text="⚙ Configure"
+                      Text="⚙ Configuration"
                       FontAttributes="Bold"
                       HeightRequest="44"
                       BackgroundColor="#253648"
@@ -213,56 +213,30 @@
                           Command="{Binding CancelCheckoutCommand}" />
                 </Grid>
 
-                <!-- Row 1: payment method tiles -->
-                <Grid Grid.Row="1"
-                      ColumnDefinitions="*,*,*,*,*"
-                      ColumnSpacing="6">
-                  <Button Grid.Column="0"
-                          Text="💵 Cash"
-                          FontSize="14"
-                          FontAttributes="Bold"
-                          HeightRequest="52"
-                          TextColor="#D2E4FB"
-                          BackgroundColor="{Binding IsCashMethodSelected, Converter={StaticResource BoolToTileBg}}"
-                          Command="{Binding SelectPaymentMethodCommand}"
-                          CommandParameter="Cash" />
-                  <Button Grid.Column="1"
-                          Text="💳 Card"
-                          FontSize="14"
-                          FontAttributes="Bold"
-                          HeightRequest="52"
-                          TextColor="#D2E4FB"
-                          BackgroundColor="{Binding IsCardMethodSelected, Converter={StaticResource BoolToTileBg}}"
-                          Command="{Binding SelectPaymentMethodCommand}"
-                          CommandParameter="Card" />
-                  <Button Grid.Column="2"
-                          Text="🐙 Octopus"
-                          FontSize="14"
-                          FontAttributes="Bold"
-                          HeightRequest="52"
-                          TextColor="#D2E4FB"
-                          BackgroundColor="{Binding IsOctopusMethodSelected, Converter={StaticResource BoolToTileBg}}"
-                          Command="{Binding SelectPaymentMethodCommand}"
-                          CommandParameter="Octopus" />
-                  <Button Grid.Column="3"
-                          Text="📱 FPS"
-                          FontSize="14"
-                          FontAttributes="Bold"
-                          HeightRequest="52"
-                          TextColor="#D2E4FB"
-                          BackgroundColor="{Binding IsFpsMethodSelected, Converter={StaticResource BoolToTileBg}}"
-                          Command="{Binding SelectPaymentMethodCommand}"
-                          CommandParameter="FPS" />
-                  <Button Grid.Column="4"
-                          Text="… Other"
-                          FontSize="14"
-                          FontAttributes="Bold"
-                          HeightRequest="52"
-                          TextColor="#D2E4FB"
-                          BackgroundColor="{Binding IsOtherMethodSelected, Converter={StaticResource BoolToTileBg}}"
-                          Command="{Binding SelectPaymentMethodCommand}"
-                          CommandParameter="Other" />
-                </Grid>
+                <!-- Row 1: payment method tiles (dynamic) -->
+                <FlexLayout Grid.Row="1"
+                            Wrap="Wrap"
+                            Direction="Row"
+                            JustifyContent="Start"
+                            AlignItems="Start">
+                  <BindableLayout.ItemsSource>
+                    <Binding Path="CheckoutMethodOptions" />
+                  </BindableLayout.ItemsSource>
+                  <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CheckoutMethodOption">
+                      <Button Text="{Binding Name}"
+                              FontSize="14"
+                              FontAttributes="Bold"
+                              HeightRequest="52"
+                              MinimumWidthRequest="90"
+                              Margin="0,0,6,6"
+                              TextColor="#D2E4FB"
+                              BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToTileBg}}"
+                              Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.SelectPaymentMethodCommand}"
+                              CommandParameter="{Binding Name}" />
+                    </DataTemplate>
+                  </BindableLayout.ItemTemplate>
+                </FlexLayout>
 
                 <!-- Row 2: payments list -->
                 <Border Grid.Row="2"
@@ -692,7 +666,7 @@
             </Grid>
             <Grid x:Name="ConfigureTabContent"
                   IsVisible="False"
-                  RowDefinitions="Auto,Auto,Auto"
+                  RowDefinitions="Auto,Auto,Auto,Auto"
                   RowSpacing="10">
               <!-- ── Product Editor ── -->
               <Border Grid.Row="0"
@@ -776,8 +750,93 @@
                 </Grid>
               </Border>
 
-              <!-- ── Printer Configure (collapsible) ── -->
+              <!-- ── Payment Methods Editor ── -->
               <Border Grid.Row="1"
+                      Stroke="#2A3B4C"
+                      StrokeShape="RoundRectangle 14"
+                      BackgroundColor="#162A3E"
+                      Padding="14">
+                <Grid RowDefinitions="Auto,*,Auto"
+                      RowSpacing="10">
+                  <!-- Section header -->
+                  <Grid ColumnDefinitions="Auto,*,80,80"
+                        ColumnSpacing="10">
+                    <Label Grid.Column="0" Text="PAYMENT METHODS" TextColor="#D2E4FB" FontSize="13" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="SAVE" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Column="3" Text="DELETE" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
+                  </Grid>
+                  <!-- Existing method rows -->
+                  <CollectionView Grid.Row="1"
+                                  ItemsSource="{Binding PaymentMethodEditorRows}"
+                                  HeightRequest="160">
+                    <CollectionView.EmptyView>
+                      <Label Text="No payment methods configured."
+                             TextColor="#8EA0B9"
+                             FontSize="13"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Margin="0,20" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                      <DataTemplate x:DataType="vm:PaymentMethodEditorRow">
+                        <Grid ColumnDefinitions="*,80,80"
+                              ColumnSpacing="10"
+                              Padding="0,5">
+                          <Entry Grid.Column="0"
+                                 Text="{Binding Name}"
+                                 TextColor="#D2E4FB"
+                                 BackgroundColor="#0F2131"
+                                 FontSize="14" />
+                          <Button Grid.Column="1"
+                                  Text="💾"
+                                  FontSize="18"
+                                  BackgroundColor="#A2D149"
+                                  TextColor="#243600"
+                                  HeightRequest="40"
+                                  WidthRequest="64"
+                                  CornerRadius="8"
+                                  Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.SavePaymentMethodCommand}"
+                                  CommandParameter="{Binding .}" />
+                          <Button Grid.Column="2"
+                                  Text="🗑"
+                                  FontSize="18"
+                                  BackgroundColor="#4A1A1A"
+                                  TextColor="#FF6B6B"
+                                  HeightRequest="40"
+                                  WidthRequest="64"
+                                  CornerRadius="8"
+                                  Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.DeletePaymentMethodCommand}"
+                                  CommandParameter="{Binding .}" />
+                        </Grid>
+                      </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                  </CollectionView>
+                  <!-- Add new method -->
+                  <Grid Grid.Row="2"
+                        ColumnDefinitions="*,Auto"
+                        ColumnSpacing="10">
+                    <Entry Grid.Column="0"
+                           Text="{Binding NewPaymentMethodName}"
+                           Placeholder="New method name (e.g. WeChat Pay)"
+                           PlaceholderColor="#5E7A96"
+                           TextColor="#D2E4FB"
+                           BackgroundColor="#0F2131"
+                           FontSize="14" />
+                    <Button Grid.Column="1"
+                            Text="+ Add"
+                            FontSize="14"
+                            FontAttributes="Bold"
+                            BackgroundColor="#2563A8"
+                            TextColor="White"
+                            HeightRequest="44"
+                            CornerRadius="8"
+                            Command="{Binding AddPaymentMethodCommand}" />
+                  </Grid>
+                </Grid>
+              </Border>
+
+              <!-- ── Printer Configure (collapsible) ── -->
+              <Border Grid.Row="2"
                       Stroke="#2A3B4C"
                       StrokeShape="RoundRectangle 14"
                       BackgroundColor="#162A3E"
@@ -897,7 +956,7 @@
                 </VerticalStackLayout>
               </Border>
 
-              <Label Grid.Row="2"
+              <Label Grid.Row="3"
                      Text="{Binding StatusMessage}"
                      TextColor="#8EA0B9"
                      FontSize="13"

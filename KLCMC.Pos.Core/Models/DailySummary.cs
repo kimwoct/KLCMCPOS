@@ -2,7 +2,7 @@ namespace KLCMC.Pos.Core.Models;
 
 public sealed class MethodTotal
 {
-    public required PaymentMethod Method { get; init; }
+    public required string Method { get; init; }
     public required int Count { get; init; }
     public required decimal Amount { get; init; }
 }

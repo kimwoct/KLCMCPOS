@@ -30,6 +30,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProductRepository, ProductRepository>();
         builder.Services.AddSingleton<ISaleRepository, SaleRepository>();
         builder.Services.AddSingleton<IPrinterSettingsRepository, PrinterSettingsRepository>();
+        builder.Services.AddSingleton<IPaymentMethodRepository, PaymentMethodRepository>();
 
 #if WINDOWS
         builder.Services.AddSingleton<IPrinterService, PosDllPrinterService>();

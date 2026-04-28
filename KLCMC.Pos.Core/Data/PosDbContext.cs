@@ -10,6 +10,7 @@ public sealed class PosDbContext : DbContext
     }
 
     public DbSet<ProductEntity> Products => Set<ProductEntity>();
+    public DbSet<PaymentMethodEntity> PaymentMethods => Set<PaymentMethodEntity>();
     public DbSet<SaleEntity> Sales => Set<SaleEntity>();
     public DbSet<SaleLineEntity> SaleLines => Set<SaleLineEntity>();
     public DbSet<SalePaymentEntity> SalePayments => Set<SalePaymentEntity>();

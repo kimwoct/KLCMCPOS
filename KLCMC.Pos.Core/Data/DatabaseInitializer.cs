@@ -19,6 +19,7 @@ public static class DatabaseInitializer
     {
         db.Database.EnsureCreated();
         EnsurePrinterSettingsSchema(db);
+        EnsurePaymentMethodsTable(db);
 
         if (!db.Products.Any())
         {
@@ -50,6 +51,59 @@ public static class DatabaseInitializer
             });
             db.SaveChanges();
         }
+
+        if (!db.PaymentMethods.Any())
+        {
+            SeedDefaultPaymentMethods(db);
+        }
+        else
+        {
+            MigratePaymentMethodsToTraditionalChinese(db);
+        }
+    }
+
+    private static readonly Dictionary<string, string> _englishToChineseMethod = new()
+    {
+        ["Cash"]    = "現金",
+        ["Card"]    = "信用卡",
+        ["Octopus"] = "八達通",
+        ["FPS"]     = "醫療券",   // replaced by clinic-specific
+        ["Other"]   = "其他",
+    };
+
+    private static void SeedDefaultPaymentMethods(PosDbContext db)
+    {
+        var defaults = new[] { "現金", "信用卡", "醫療券", "八達通", "其他" };
+        for (var i = 0; i < defaults.Length; i++)
+            db.PaymentMethods.Add(new PaymentMethodEntity { Name = defaults[i], SortOrder = i });
+        db.SaveChanges();
+    }
+
+    // One-time migration: rename English defaults to Traditional Chinese
+    private static void MigratePaymentMethodsToTraditionalChinese(PosDbContext db)
+    {
+        var methods = db.PaymentMethods.ToList();
+        var changed = false;
+        foreach (var m in methods)
+        {
+            if (_englishToChineseMethod.TryGetValue(m.Name, out var chinese))
+            {
+                m.Name = chinese;
+                changed = true;
+            }
+        }
+        if (changed) db.SaveChanges();
+    }
+
+    private static void EnsurePaymentMethodsTable(PosDbContext db)
+    {
+        db.Database.ExecuteSqlRaw(
+            "CREATE TABLE IF NOT EXISTS \"PaymentMethods\" (" +
+            "\"Id\" INTEGER NOT NULL CONSTRAINT \"PK_PaymentMethods\" PRIMARY KEY AUTOINCREMENT," +
+            "\"Name\" TEXT NOT NULL," +
+            "\"IsActive\" INTEGER NOT NULL DEFAULT 1," +
+            "\"SortOrder\" INTEGER NOT NULL DEFAULT 0" +
+            ");");
     }
 
     private static void EnsurePrinterSettingsSchema(PosDbContext db)

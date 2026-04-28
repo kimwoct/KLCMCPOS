@@ -13,6 +13,7 @@ public sealed class MainViewModel : BindableBase
     private readonly IProductRepository _productRepository;
     private readonly ISaleRepository _saleRepository;
     private readonly IPrinterSettingsRepository _printerSettingsRepository;
+    private readonly IPaymentMethodRepository _paymentMethodRepository;
     private readonly RelayCommand _refreshInstalledPrintersCommand;
     private readonly RelayCommand _openPrinterPropertiesCommand;
     private readonly RelayCommand _probePrinterCapabilitiesCommand;
@@ -33,6 +34,9 @@ public sealed class MainViewModel : BindableBase
     private readonly RelayCommand _confirmCheckoutCommand;
     private readonly RelayCommand _openDrawerCommand;
     private readonly RelayCommand _printPrinterTestCommand;
+    private readonly RelayCommand _addPaymentMethodCommand;
+    private readonly RelayCommand _savePaymentMethodCommand;
+    private readonly RelayCommand _deletePaymentMethodCommand;
     private CartLine? _selectedCartLine;
     private bool _isPrinterPanelExpanded = false;
     private bool _isAddProductPopupVisible;
@@ -43,7 +47,8 @@ public sealed class MainViewModel : BindableBase
     private string _pricePadInputText = "0";
     private string _moneyPadInputText = "0";
     private string _printerCapabilitiesText = "No capability probe yet.";
-    private PaymentMethod _selectedNewPaymentMethod = PaymentMethod.Cash;
+    private string _selectedPaymentMethodName = "現金";
+    private string _newPaymentMethodName = string.Empty;
     private string _statusMessage = "Ready.";
     private readonly ObservableCollection<string> _printerConsoleEntries = [];
     private readonly ObservableCollection<string> _installedPrinters = [];
@@ -52,12 +57,14 @@ public sealed class MainViewModel : BindableBase
         IPrinterService printerService,
         IProductRepository productRepository,
         ISaleRepository saleRepository,
-        IPrinterSettingsRepository printerSettingsRepository)
+        IPrinterSettingsRepository printerSettingsRepository,
+        IPaymentMethodRepository paymentMethodRepository)
     {
         _printerService = printerService;
         _productRepository = productRepository;
         _saleRepository = saleRepository;
         _printerSettingsRepository = printerSettingsRepository;
+        _paymentMethodRepository = paymentMethodRepository;
 
         PresetItems = new ObservableCollection<PresetItem>(
             _productRepository.GetAll().Select(p => new PresetItem
@@ -75,7 +82,9 @@ public sealed class MainViewModel : BindableBase
         CutModes = Enum.GetValues<PrinterCutMode>();
         CartLines = new ObservableCollection<CartLine>();
         Payments = new ObservableCollection<CheckoutPaymentLine>();
-        PaymentMethods = Enum.GetValues<PaymentMethod>();
+        CheckoutMethodOptions = [];
+        PaymentMethodEditorRows = [];
+        ReloadPaymentMethodOptions();
 
         AddItemCommand = new RelayCommand(AddPresetItem);
         _addNewProductCommand = new RelayCommand(_ => AddNewProduct(), _ => CanAddNewProduct());
@@ -115,6 +124,9 @@ public sealed class MainViewModel : BindableBase
         RemovePaymentCommand = new RelayCommand(RemovePayment);
         _confirmCheckoutCommand = new RelayCommand(_ => ConfirmCheckout(), _ => CanConfirmCheckout());
         CancelCheckoutCommand = new RelayCommand(_ => CancelCheckout());
+        _addPaymentMethodCommand = new RelayCommand(_ => AddPaymentMethod(), _ => CanAddPaymentMethod());
+        _savePaymentMethodCommand = new RelayCommand(SavePaymentMethod);
+        _deletePaymentMethodCommand = new RelayCommand(DeletePaymentMethod);
         AppendPrinterConsole("Printer console ready.");
         RefreshInstalledPrinters();
         ProbePrinterCapabilities();
@@ -424,6 +436,61 @@ public sealed class MainViewModel : BindableBase
                 PriceText = p.DefaultPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
             });
         }
+    }
+
+    private void ReloadPaymentMethodOptions()
+    {
+        var methods = _paymentMethodRepository.GetAll();
+        CheckoutMethodOptions.Clear();
+        foreach (var m in methods)
+            CheckoutMethodOptions.Add(new CheckoutMethodOption { Id = m.Id, Name = m.Name, IsSelected = m.Name == _selectedPaymentMethodName });
+
+        // If current selection is no longer valid, default to first available
+        if (!CheckoutMethodOptions.Any(o => o.IsSelected))
+        {
+            _selectedPaymentMethodName = CheckoutMethodOptions[0].Name;
+            CheckoutMethodOptions[0].IsSelected = true;
+        }
+
+        ReloadPaymentMethodEditorRows(methods);
+    }
+
+    private void ReloadPaymentMethodEditorRows(IReadOnlyList<Data.Entities.PaymentMethodEntity>? methods = null)
+    {
+        methods ??= _paymentMethodRepository.GetAll();
+        PaymentMethodEditorRows.Clear();
+        foreach (var m in methods)
+            PaymentMethodEditorRows.Add(new PaymentMethodEditorRow { Id = m.Id, Name = m.Name });
+    }
+
+    private bool CanAddPaymentMethod() => !string.IsNullOrWhiteSpace(_newPaymentMethodName);
+
+    private void AddPaymentMethod()
+    {
+        var name = NewPaymentMethodName.Trim();
+        if (string.IsNullOrWhiteSpace(name)) return;
+        _paymentMethodRepository.Add(name);
+        NewPaymentMethodName = string.Empty;
+        ReloadPaymentMethodOptions();
+        StatusMessage = $"Payment method '{name}' added.";
+    }
+
+    private void SavePaymentMethod(object? parameter)
+    {
+        if (parameter is not PaymentMethodEditorRow row) return;
+        var name = row.Name.Trim();
+        if (string.IsNullOrWhiteSpace(name)) { StatusMessage = "Method name cannot be empty."; return; }
+        if (!_paymentMethodRepository.Update(row.Id, name)) { StatusMessage = $"Method #{row.Id} not found."; return; }
+        ReloadPaymentMethodOptions();
+        StatusMessage = $"Payment method '{name}' saved.";
+    }
+
+    private void DeletePaymentMethod(object? parameter)
+    {
+        if (parameter is not PaymentMethodEditorRow row) return;
+        if (!_paymentMethodRepository.Delete(row.Id)) { StatusMessage = $"Method #{row.Id} not found."; return; }
+        ReloadPaymentMethodOptions();
+        StatusMessage = $"Payment method '{row.Name}' deleted.";
     }
 
     private void SaveProduct(object? parameter)
@@ -970,7 +1037,9 @@ public sealed class MainViewModel : BindableBase
 
     public ObservableCollection<CheckoutPaymentLine> Payments { get; }
 
-    public Array PaymentMethods { get; }
+    public ObservableCollection<CheckoutMethodOption> CheckoutMethodOptions { get; }
+
+    public ObservableCollection<PaymentMethodEditorRow> PaymentMethodEditorRows { get; }
 
     public bool IsCheckoutPopupVisible
     {
@@ -978,18 +1047,16 @@ public sealed class MainViewModel : BindableBase
         private set => SetProperty(ref _isCheckoutPopupVisible, value);
     }
 
-    public PaymentMethod SelectedNewPaymentMethod
+    public string SelectedPaymentMethodName
     {
-        get => _selectedNewPaymentMethod;
+        get => _selectedPaymentMethodName;
         set
         {
-            if (SetProperty(ref _selectedNewPaymentMethod, value))
+            if (SetProperty(ref _selectedPaymentMethodName, value))
             {
+                foreach (var opt in CheckoutMethodOptions)
+                    opt.IsSelected = opt.Name == value;
                 RaisePropertyChanged(nameof(IsCashMethodSelected));
-                RaisePropertyChanged(nameof(IsCardMethodSelected));
-                RaisePropertyChanged(nameof(IsOctopusMethodSelected));
-                RaisePropertyChanged(nameof(IsFpsMethodSelected));
-                RaisePropertyChanged(nameof(IsOtherMethodSelected));
                 RaisePropertyChanged(nameof(MoneyPadLabelText));
                 RaisePropertyChanged(nameof(ChangePreviewText));
                 _addPaymentCommand.RaiseCanExecuteChanged();
@@ -997,15 +1064,21 @@ public sealed class MainViewModel : BindableBase
         }
     }
 
-    public bool IsCashMethodSelected => SelectedNewPaymentMethod == PaymentMethod.Cash;
+    public bool IsCashMethodSelected => _selectedPaymentMethodName == "現金";
 
-    public bool IsCardMethodSelected => SelectedNewPaymentMethod == PaymentMethod.Card;
+    public string NewPaymentMethodName
+    {
+        get => _newPaymentMethodName;
+        set
+        {
+            if (SetProperty(ref _newPaymentMethodName, value))
+                _addPaymentMethodCommand.RaiseCanExecuteChanged();
+        }
+    }
 
-    public bool IsOctopusMethodSelected => SelectedNewPaymentMethod == PaymentMethod.Octopus;
-
-    public bool IsFpsMethodSelected => SelectedNewPaymentMethod == PaymentMethod.FPS;
-
-    public bool IsOtherMethodSelected => SelectedNewPaymentMethod == PaymentMethod.Other;
+    public RelayCommand AddPaymentMethodCommand => _addPaymentMethodCommand;
+    public RelayCommand SavePaymentMethodCommand => _savePaymentMethodCommand;
+    public RelayCommand DeletePaymentMethodCommand => _deletePaymentMethodCommand;
 
     public string MoneyPadLabelText =>
         IsCashMethodSelected ? "Money Received (HKD)" : "Charge Amount (HKD)";
@@ -1097,7 +1170,7 @@ public sealed class MainViewModel : BindableBase
         }
 
         Payments.Clear();
-        SelectedNewPaymentMethod = PaymentMethod.Cash;
+        SelectedPaymentMethodName = "現金";
         MoneyPadInputText = Total.ToString("0.##", CultureInfo.InvariantCulture);
         IsCheckoutPopupVisible = true;
         RaiseCheckoutTotalsChanged();
@@ -1207,15 +1280,10 @@ public sealed class MainViewModel : BindableBase
 
     private void SelectPaymentMethod(object? parameter)
     {
-        if (parameter is PaymentMethod pm)
-        {
-            SelectedNewPaymentMethod = pm;
-            return;
-        }
-        if (parameter is string s && Enum.TryParse<PaymentMethod>(s, true, out var parsed))
-        {
-            SelectedNewPaymentMethod = parsed;
-        }
+        if (parameter is string name)
+            SelectedPaymentMethodName = name;
+        else if (parameter is CheckoutMethodOption opt)
+            SelectedPaymentMethodName = opt.Name;
     }
 
     private void AddPayment()
@@ -1229,13 +1297,13 @@ public sealed class MainViewModel : BindableBase
         var outstanding = RemainingAmount;
 
         CheckoutPaymentLine line;
-        if (SelectedNewPaymentMethod == PaymentMethod.Cash)
+        if (_selectedPaymentMethodName == "現金")
         {
             var applied = Math.Min(input, outstanding);
             var change = input - applied;
             line = new CheckoutPaymentLine
             {
-                Method = PaymentMethod.Cash,
+                Method = "現金",
                 Amount = applied,
                 TenderedAmount = input,
                 ChangeAmount = change > 0m ? change : 0m
@@ -1246,7 +1314,7 @@ public sealed class MainViewModel : BindableBase
             var applied = Math.Min(input, outstanding);
             line = new CheckoutPaymentLine
             {
-                Method = SelectedNewPaymentMethod,
+                Method = _selectedPaymentMethodName,
                 Amount = applied
             };
         }
