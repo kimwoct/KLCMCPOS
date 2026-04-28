@@ -6,7 +6,7 @@ public sealed class PrinterSettingEntity
 {
     public int Id { get; set; } = 1;
     public PrinterConnectionMode Mode { get; set; } = PrinterConnectionMode.Usb;
-    public string Endpoint { get; set; } = "POS-80 11.3.0.1";
+    public string Endpoint { get; set; } = "POS-80";
     public int BaudRate { get; set; } = 9600;
     public int DataBits { get; set; } = 8;
     public int StopBits { get; set; }

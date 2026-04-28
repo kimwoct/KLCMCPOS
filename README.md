@@ -14,8 +14,6 @@ KLCMCPOS is being migrated to a cross-platform architecture for **Windows 10 + m
   - Mock/file printer for macOS and non-hardware testing
 - `KLCMC.Pos.Maui` (`net8.0-maccatalyst;net8.0-windows10.0.19041.0`)
   - Cross-platform UI shell (migration target)
-- `KLCMC.Pos.App` (`net8.0-windows`, WPF)
-  - Windows 10 WPF host that reuses `KLCMC.Pos.Core` view models/services
 
 ## Platform behavior
 
@@ -24,20 +22,18 @@ KLCMCPOS is being migrated to a cross-platform architecture for **Windows 10 + m
 
 ## Printer API usage (Windows)
 
-- Open/close/status: validate and use installed printer queue name (for example `POS-80 11.3.0.1`)
+- Open/close/status: validate and use installed printer queue name (for example `POS-80`)
 - Print flow: send RAW ESC/POS bytes through WinSpool (`StartDocPrinter`, `WritePrinter`, `EndDocPrinter`)
 
 ## Build notes
 
 1. `KLCMC.Pos.Core`, `KLCMC.Pos.Printer.Mock`, and `KLCMC.Pos.Printer.Windows` build with .NET 8 SDK.
 2. `KLCMC.Pos.Maui` requires MAUI workloads/tooling support in your local .NET installation.
-3. `KLCMC.Pos.App` (WPF) requires Windows desktop build support.
 
 ### VS Code / C# Dev Kit on macOS
 
 If `ms-dotnettools.csdevkit.Projects.log` shows errors like:
 - `The target platform identifier maccatalyst was not recognized`
-- `Could not resolve SDK "Microsoft.NET.Sdk.WindowsDesktop"`
 
 then VS Code is usually resolving to Homebrew `dotnet` instead of the SDK at
 `/usr/local/share/dotnet` (which has the MAUI workloads used by this repo).
@@ -46,8 +42,8 @@ This repository pins the SDK in three layers:
 
 1. `global.json` requires SDK `9.0.100` (`rollForward: latestMajor`). This makes
    the .NET host skip Homebrew `dotnet@8` (8.0.125) and resolve to
-   `/usr/local/share/dotnet`, which ships the MAUI workloads and the
-   `Microsoft.NET.Sdk.WindowsDesktop` targets used by the WPF host.
+   `/usr/local/share/dotnet`, which ships the MAUI workloads and SDK
+   targets used by this repository.
 2. `.vscode/settings.json` pins C# / C# Dev Kit / .NET runtime acquisition to
    `/usr/local/share/dotnet/dotnet` and forces the terminal to use the same
    `DOTNET_ROOT` and `PATH`.
@@ -70,7 +66,6 @@ make the C# Dev Kit re-evaluate projects.
 1. Build `KLCMC.Pos.Core` and `KLCMC.Pos.Printer.Mock`.
 2. Run UI on target platform:
    - MAUI (target architecture path)
-   - WPF (Windows 10 desktop host)
 3. Verify cart operations and total calculation.
 4. On macOS, verify mock receipt file output.
 5. On Windows 10, install driver from `POS Printer Driver V11.3.0.3` then verify connect/print/feed/cut flow with hardware.
@@ -88,7 +83,7 @@ Persisted tables:
 
 DB file location:
 - macOS (MAUI): `<MAUI AppDataDirectory>/klcmcpos.db`
-- Windows (MAUI / WPF): `%LOCALAPPDATA%\com.klcmc.pos\klcmcpos.db`
+- Windows (MAUI): `%LOCALAPPDATA%\com.klcmc.pos\klcmcpos.db`
 
 The schema is created via `EnsureCreated` at startup — no migrations are
 shipped yet. If you change an entity, delete the `.db` file during dev or
@@ -115,7 +110,7 @@ Tap **Checkout** on the dashboard to open the multi-payment popup:
   payment breakdown and total change, the sale is persisted, and the
   cart clears.
 
-Tap **Daily Account** in the header (MAUI) or footer (WPF) to open the
+Tap **Daily Account** in the header (MAUI) to open the
 day-end view:
 
 - Date picker plus Prev / Today / Next buttons (uses local calendar date).

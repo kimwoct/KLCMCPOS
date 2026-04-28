@@ -13,17 +13,15 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$AppName     = 'KLCMC.Pos.App'
 $MauiName    = 'KLCMC.Pos.Maui'
 $RepoRoot    = Split-Path -Parent $PSScriptRoot
-$WpfProjDir  = Join-Path $RepoRoot 'KLCMC.Pos.App'
 $MauiProjDir = Join-Path $RepoRoot 'KLCMC.Pos.Maui'
 
 function Write-Step($msg) { Write-Host "==> $msg" -ForegroundColor Cyan }
 function Write-Item($msg) { Write-Host "  $msg" }
 
 Write-Step 'Stopping running instances'
-foreach ($name in @($AppName, $MauiName)) {
+foreach ($name in @($MauiName)) {
     Get-Process -Name $name -ErrorAction SilentlyContinue | ForEach-Object {
         Write-Item ("kill {0} (PID {1})" -f $_.ProcessName, $_.Id)
         try { Stop-Process -Id $_.Id -Force -ErrorAction Stop } catch {}
@@ -50,11 +48,9 @@ foreach ($loc in $shortcutLocations) {
 }
 
 Write-Step 'Removing per-user data and caches'
-$userDataTargets = @(
-    (Join-Path $env:LOCALAPPDATA $AppName),
+    $userDataTargets = @(
     (Join-Path $env:LOCALAPPDATA $MauiName),
     (Join-Path $env:LOCALAPPDATA 'KLCMC'),
-    (Join-Path $env:APPDATA      $AppName),
     (Join-Path $env:APPDATA      $MauiName),
     (Join-Path $env:APPDATA      'KLCMC')
 )
@@ -81,7 +77,7 @@ try {
 
 if ($Clean) {
     Write-Step 'Cleaning bin/ and obj/'
-    foreach ($dir in @($WpfProjDir, $MauiProjDir)) {
+    foreach ($dir in @($MauiProjDir)) {
         foreach ($sub in @('bin', 'obj')) {
             $path = Join-Path $dir $sub
             if (Test-Path $path) {

@@ -54,16 +54,16 @@
                   RowDefinitions="Auto,*,Auto,Auto"
                   RowSpacing="14">
             <HorizontalStackLayout Spacing="12"
-                                   VerticalOptions="Center">
+                                    VerticalOptions="Center">
               <Label Text="Current Sale"
-                     FontSize="40"
-                     FontAttributes="Bold"
-                     TextColor="#D2E4FB" />
-              <Label Text="{Binding TotalText}"
                      FontSize="32"
-                     FontAttributes="Bold"
-                     TextColor="#A6D64D"
-                     VerticalOptions="Center" />
+                      FontAttributes="Bold"
+                      TextColor="#D2E4FB" />
+              <Label Text="{Binding TotalText}"
+                     FontSize="26"
+                      FontAttributes="Bold"
+                      TextColor="#A6D64D"
+                      VerticalOptions="Center" />
             </HorizontalStackLayout>
 
             <CollectionView Grid.Row="1"
@@ -76,43 +76,45 @@
                           StrokeThickness="1"
                           StrokeShape="RoundRectangle 10"
                           BackgroundColor="#1A2B3C"
-                          Padding="14"
+                          Padding="12"
                           Margin="0,0,0,10">
-                    <Grid ColumnDefinitions="2*,Auto,Auto,Auto,Auto"
-                          ColumnSpacing="14">
-                      <Label FontSize="28"
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                          ColumnSpacing="10">
+                      <Label FontSize="22"
                              FontAttributes="Bold"
                              TextColor="#D2E4FB"
-                             VerticalOptions="Center">
+                              MaxLines="1"
+                              LineBreakMode="TailTruncation"
+                              VerticalOptions="Center">
                         <Label.FormattedText>
                           <FormattedString>
                             <Span Text="{Binding Name}" />
                             <Span Text=" (" />
                             <Span Text="{Binding UnitPrice, StringFormat='HKD $ {0:F2}'}"
-                                  TextColor="#69D4F8"
-                                  FontSize="26" />
+                                   TextColor="#69D4F8"
+                                   FontSize="20" />
                             <Span Text=")" />
                           </FormattedString>
                         </Label.FormattedText>
                       </Label>
                       <Label Grid.Column="1"
                              Text="{Binding Quantity, StringFormat='x{0}'}"
-                             FontSize="28"
+                             FontSize="20"
                              TextColor="#C4D4E8"
                              VerticalOptions="Center" />
                       <Label Grid.Column="2"
                              Text="{Binding LineTotal, StringFormat='HKD $ {0:F2}'}"
-                             FontSize="28"
+                             FontSize="20"
                              TextColor="#D2E4FB"
                              FontAttributes="Bold"
                              VerticalOptions="Center" />
                       <Button Grid.Column="3"
                               Text="✎"
-                              FontSize="22"
-                              WidthRequest="44"
-                              HeightRequest="44"
+                              FontSize="20"
+                              WidthRequest="40"
+                              HeightRequest="40"
                               Padding="0"
-                              CornerRadius="22"
+                              CornerRadius="20"
                               BackgroundColor="#1F3D5C"
                               TextColor="#D2E4FB"
                               VerticalOptions="Center"
@@ -120,11 +122,11 @@
                               CommandParameter="{Binding}" />
                       <Button Grid.Column="4"
                               Text="−"
-                              FontSize="26"
-                              WidthRequest="44"
-                              HeightRequest="44"
+                              FontSize="22"
+                              WidthRequest="40"
+                              HeightRequest="40"
                               Padding="0"
-                              CornerRadius="22"
+                              CornerRadius="20"
                               BackgroundColor="#3D1F1F"
                               TextColor="#FFB4AB"
                               VerticalOptions="Center"
@@ -155,15 +157,15 @@
                       ColumnSpacing="10">
                   <VerticalStackLayout Grid.Column="0" Spacing="0">
                     <Label Text="Amount Due" FontSize="13" TextColor="#8EA0B9" />
-                    <Label Text="{Binding AmountDueText}" FontSize="22" FontAttributes="Bold" TextColor="#BDEE62" />
+                    <Label Text="{Binding AmountDueText}" FontSize="18" FontAttributes="Bold" TextColor="#BDEE62" />
                   </VerticalStackLayout>
                   <VerticalStackLayout Grid.Column="1" Spacing="0">
                     <Label Text="Paid" FontSize="13" TextColor="#8EA0B9" />
-                    <Label Text="{Binding PaidTotalText}" FontSize="22" FontAttributes="Bold" TextColor="#D2E4FB" />
+                    <Label Text="{Binding PaidTotalText}" FontSize="18" FontAttributes="Bold" TextColor="#D2E4FB" />
                   </VerticalStackLayout>
                   <VerticalStackLayout Grid.Column="2" Spacing="0">
                     <Label Text="Outstanding" FontSize="13" TextColor="#8EA0B9" />
-                    <Label Text="{Binding OutstandingText}" FontSize="22" FontAttributes="Bold" TextColor="#FFD479" />
+                    <Label Text="{Binding OutstandingText}" FontSize="18" FontAttributes="Bold" TextColor="#FFD479" />
                   </VerticalStackLayout>
                   <Button Grid.Column="3"
                           Text="✕"
@@ -284,36 +286,36 @@
                             Padding="14,8">
                       <Label Text="{Binding MoneyPadInputText, StringFormat='HKD $ {0}'}"
                              TextColor="#BDEE62"
-                             FontSize="26"
+                             FontSize="22"
                              FontAttributes="Bold"
                              HorizontalTextAlignment="End" />
                     </Border>
 
-                    <Button Grid.Row="1" Grid.Column="0" Text="1" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="1" />
-                    <Button Grid.Row="1" Grid.Column="1" Text="2" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="2" />
-                    <Button Grid.Row="1" Grid.Column="2" Text="3" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="3" />
-                    <Button Grid.Row="1" Grid.Column="3" Text="$100" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="100" />
+                    <Button Grid.Row="1" Grid.Column="0" Text="1" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="1" />
+                    <Button Grid.Row="1" Grid.Column="1" Text="2" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="2" />
+                    <Button Grid.Row="1" Grid.Column="2" Text="3" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="3" />
+                    <Button Grid.Row="1" Grid.Column="3" Text="$100" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="100" />
 
-                    <Button Grid.Row="2" Grid.Column="0" Text="4" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="4" />
-                    <Button Grid.Row="2" Grid.Column="1" Text="5" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="5" />
-                    <Button Grid.Row="2" Grid.Column="2" Text="6" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="6" />
-                    <Button Grid.Row="2" Grid.Column="3" Text="$50" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="50" />
+                    <Button Grid.Row="2" Grid.Column="0" Text="4" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="4" />
+                    <Button Grid.Row="2" Grid.Column="1" Text="5" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="5" />
+                    <Button Grid.Row="2" Grid.Column="2" Text="6" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="6" />
+                    <Button Grid.Row="2" Grid.Column="3" Text="$50" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="50" />
 
-                    <Button Grid.Row="3" Grid.Column="0" Text="7" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="7" />
-                    <Button Grid.Row="3" Grid.Column="1" Text="8" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="8" />
-                    <Button Grid.Row="3" Grid.Column="2" Text="9" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="9" />
-                    <Button Grid.Row="3" Grid.Column="3" Text="$20" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="20" />
+                    <Button Grid.Row="3" Grid.Column="0" Text="7" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="7" />
+                    <Button Grid.Row="3" Grid.Column="1" Text="8" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="8" />
+                    <Button Grid.Row="3" Grid.Column="2" Text="9" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="9" />
+                    <Button Grid.Row="3" Grid.Column="3" Text="$20" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="20" />
 
-                    <Button Grid.Row="4" Grid.Column="0" Text="0" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="0" />
-                    <Button Grid.Row="4" Grid.Column="1" Text="00" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="00" />
-                    <Button Grid.Row="4" Grid.Column="2" Text="." FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="." />
-                    <Button Grid.Row="4" Grid.Column="3" Text="$10" FontSize="18" FontAttributes="Bold" HeightRequest="64" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="10" />
+                    <Button Grid.Row="4" Grid.Column="0" Text="0" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="0" />
+                    <Button Grid.Row="4" Grid.Column="1" Text="00" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="00" />
+                    <Button Grid.Row="4" Grid.Column="2" Text="." FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="." />
+                    <Button Grid.Row="4" Grid.Column="3" Text="$10" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#D18467" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="10" />
 
                     <Button Grid.Row="5" Grid.Column="0"
                             Text="C"
-                            FontSize="18"
+                            FontSize="16"
                             FontAttributes="Bold"
-                            HeightRequest="56"
+                            HeightRequest="48"
                             BackgroundColor="#3D1F1F"
                             TextColor="#FFB4AB"
                             BorderColor="#2A3B4C"
@@ -322,9 +324,9 @@
                             Command="{Binding MoneyPadClearCommand}" />
                     <Button Grid.Row="5" Grid.Column="1"
                             Text="⌫"
-                            FontSize="18"
+                            FontSize="16"
                             FontAttributes="Bold"
-                            HeightRequest="56"
+                            HeightRequest="48"
                             BackgroundColor="#3D1F1F"
                             TextColor="#FFB4AB"
                             BorderColor="#2A3B4C"
@@ -333,9 +335,9 @@
                             Command="{Binding MoneyPadBackspaceCommand}" />
                     <Button Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2"
                             Text="Exact"
-                            FontSize="18"
+                            FontSize="16"
                             FontAttributes="Bold"
-                            HeightRequest="56"
+                            HeightRequest="48"
                             BackgroundColor="#1C2A0B"
                             TextColor="#BDEE62"
                             BorderColor="#2A3B4C"
@@ -351,17 +353,17 @@
                       ColumnDefinitions="*,*"
                       ColumnSpacing="10">
                   <Button Grid.Column="0"
-                          Text="Add Payment"
-                          FontSize="16"
-                          HeightRequest="48"
+                           Text="Add Payment"
+                           FontSize="14"
+                           HeightRequest="42"
                           BackgroundColor="#1F3D5C"
                           TextColor="#D2E4FB"
                           FontAttributes="Bold"
                           Command="{Binding AddPaymentCommand}" />
                   <Button Grid.Column="1"
-                          Text="Confirm &amp; Print"
-                          FontSize="16"
-                          HeightRequest="48"
+                           Text="Confirm &amp; Print"
+                           FontSize="14"
+                           HeightRequest="42"
                           BackgroundColor="#A2D149"
                           TextColor="#243600"
                           FontAttributes="Bold"
@@ -374,17 +376,17 @@
                   ColumnDefinitions="*,Auto"
                   ColumnSpacing="12">
               <Label Text="{Binding StatusMessage}"
-                     FontSize="18"
+                     FontSize="16"
                      TextColor="#C4D4E8"
                      LineBreakMode="TailTruncation"
                      VerticalOptions="Center"
                      HorizontalTextAlignment="End" />
               <Button Grid.Column="1"
                       Text="Checkout"
-                      FontSize="24"
+                      FontSize="20"
                       FontAttributes="Bold"
-                      HeightRequest="64"
-                      Padding="24,0"
+                      HeightRequest="52"
+                      Padding="18,0"
                       BackgroundColor="#A2D149"
                       TextColor="#243600"
                       Command="{Binding PrintReceiptCommand}" />
@@ -664,7 +666,7 @@
                          VerticalOptions="Center" />
                   <Entry Grid.Row="0"
                          Grid.Column="3"
-                        Placeholder="Installed printer name (e.g. POS-80 11.3.0.1)"
+                        Placeholder="Installed printer name (e.g. POS-80)"
                          Text="{Binding ConnectionOptions.Endpoint}" />
 
                   <Button Grid.Row="1"

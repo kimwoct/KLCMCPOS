@@ -36,7 +36,7 @@ public static class DatabaseInitializer
             {
                 Id = 1,
                 Mode = KLCMC.Pos.Core.Models.PrinterConnectionMode.Usb,
-                Endpoint = "POS-80 11.3.0.1",
+                Endpoint = "POS-80",
                 BaudRate = 9600,
                 DataBits = 8,
                 StopBits = 0,
