@@ -116,4 +116,33 @@ public sealed class SaleRepository : ISaleRepository
     }
 
     private static string ParseMethod(string raw) => raw;
+
+    public void DeleteForDate(DateOnly localDate)
+    {
+        using var db = _dbFactory.CreateDbContext();
+        var localStart = localDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local);
+        var utcStart = localStart.ToUniversalTime();
+        var utcEnd = localStart.AddDays(1).ToUniversalTime();
+
+        var saleIds = db.Sales
+            .Where(s => s.CreatedAt >= utcStart && s.CreatedAt < utcEnd)
+            .Select(s => s.Id)
+            .ToList();
+
+        if (saleIds.Count == 0) return;
+
+        db.SalePayments.RemoveRange(db.SalePayments.Where(p => saleIds.Contains(p.SaleId)));
+        db.SaleLines.RemoveRange(db.SaleLines.Where(l => saleIds.Contains(l.SaleId)));
+        db.Sales.RemoveRange(db.Sales.Where(s => saleIds.Contains(s.Id)));
+        db.SaveChanges();
+    }
+
+    public void DeleteById(int saleId)
+    {
+        using var db = _dbFactory.CreateDbContext();
+        db.SalePayments.RemoveRange(db.SalePayments.Where(p => p.SaleId == saleId));
+        db.SaleLines.RemoveRange(db.SaleLines.Where(l => l.SaleId == saleId));
+        db.Sales.RemoveRange(db.Sales.Where(s => s.Id == saleId));
+        db.SaveChanges();
+    }
 }

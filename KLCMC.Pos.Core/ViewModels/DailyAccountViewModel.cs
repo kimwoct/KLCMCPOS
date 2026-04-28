@@ -9,15 +9,17 @@ public sealed class DailyAccountViewModel : BindableBase
 {
     private readonly ISaleRepository _saleRepository;
     private readonly IFileLauncher _fileLauncher;
+    private readonly IConfirmDialog _confirmDialog;
     private DateTime _selectedDate = DateTime.Today;
     private DailySummary _summary;
     private string _statusMessage = string.Empty;
     private string? _lastExportPath;
 
-    public DailyAccountViewModel(ISaleRepository saleRepository, IPrinterService printerService, IFileLauncher fileLauncher)
+    public DailyAccountViewModel(ISaleRepository saleRepository, IPrinterService printerService, IFileLauncher fileLauncher, IConfirmDialog confirmDialog)
     {
         _saleRepository = saleRepository;
         _fileLauncher = fileLauncher;
+        _confirmDialog = confirmDialog;
         _summary = DailySummary.Empty(DateOnly.FromDateTime(DateTime.Today));
 
         ByMethod = new ObservableCollection<MethodTotal>();
@@ -32,6 +34,8 @@ public sealed class DailyAccountViewModel : BindableBase
         NextDayCommand = new RelayCommand(_ => SelectedDate = SelectedDate.AddDays(1));
         ExportDailyReportCommand = new RelayCommand(_ => ExportDailyReport(), _ => Summary.TransactionCount > 0);
         OpenLastExportCommand = new RelayCommand(_ => OpenLastExport(), _ => _lastExportPath != null);
+        DeleteDayDataCommand = new RelayCommand(_ => DeleteDayData(), _ => Summary.TransactionCount > 0);
+        VoidTransactionCommand = new RelayCommand(id => VoidTransaction(id));
 
         Load();
     }
@@ -60,6 +64,7 @@ public sealed class DailyAccountViewModel : BindableBase
                 RaisePropertyChanged(nameof(GrossTotalText));
                 RaisePropertyChanged(nameof(HeaderText));
                 ((RelayCommand)ExportDailyReportCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)DeleteDayDataCommand).RaiseCanExecuteChanged();
             }
         }
     }
@@ -90,6 +95,8 @@ public sealed class DailyAccountViewModel : BindableBase
     public RelayCommand NextDayCommand { get; }
     public RelayCommand ExportDailyReportCommand { get; }
     public RelayCommand OpenLastExportCommand { get; }
+    public RelayCommand DeleteDayDataCommand { get; }
+    public RelayCommand VoidTransactionCommand { get; }
 
     public void Load()
     {
@@ -144,5 +151,52 @@ public sealed class DailyAccountViewModel : BindableBase
     {
         if (_lastExportPath != null)
             await _fileLauncher.OpenFileAsync(_lastExportPath);
+    }
+
+    private async void DeleteDayData()
+    {
+        var dateLabel = SelectedDate.ToString("yyyy-MM-dd");
+        var confirmed = await _confirmDialog.ConfirmAsync(
+            title: $"刪除 {dateLabel} 的記錄",
+            message: $"確定要刪除 {dateLabel} 的所有交易記錄嗎？此操作不可撤銷。",
+            accept: "刪除",
+            cancel: "取消");
+
+        if (!confirmed) return;
+
+        try
+        {
+            _saleRepository.DeleteForDate(DateOnly.FromDateTime(SelectedDate));
+            Load();
+            StatusMessage = $"已刪除 {dateLabel} 的所有交易記錄。";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"刪除失敗：{ex.Message}";
+        }
+    }
+
+    private async void VoidTransaction(object? parameter)
+    {
+        if (parameter is not int saleId) return;
+
+        var confirmed = await _confirmDialog.ConfirmAsync(
+            title: $"作廢交易 #{saleId}",
+            message: $"確定要作廢交易 #{saleId} 嗎？此操作不可撤銷。",
+            accept: "作廢",
+            cancel: "取消");
+
+        if (!confirmed) return;
+
+        try
+        {
+            _saleRepository.DeleteById(saleId);
+            Load();
+            StatusMessage = $"交易 #{saleId} 已作廢。";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"作廢失敗：{ex.Message}";
+        }
     }
 }

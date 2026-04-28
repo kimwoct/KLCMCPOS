@@ -8,4 +8,6 @@ public interface ISaleRepository
     SaleEntity Record(IEnumerable<CartLine> cartLines, decimal total, IEnumerable<PaymentEntry> payments);
     IReadOnlyList<SaleSummary> GetForDate(DateOnly localDate);
     DailySummary GetDailySummary(DateOnly localDate);
+    void DeleteForDate(DateOnly localDate);
+    void DeleteById(int saleId);
 }
