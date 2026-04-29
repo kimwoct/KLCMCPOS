@@ -21,6 +21,15 @@ public sealed class ProductRepository : IProductRepository
     public ProductEntity Add(string name, decimal defaultPrice)
     {
         using var db = _dbFactory.CreateDbContext();
+        var existing = db.Products.FirstOrDefault(p => p.Name == name);
+        if (existing is not null)
+        {
+            existing.DefaultPrice = defaultPrice;
+            existing.IsActive = true;
+            db.SaveChanges();
+            return existing;
+        }
+
         var product = new ProductEntity { Name = name, DefaultPrice = defaultPrice };
         db.Products.Add(product);
         db.SaveChanges();

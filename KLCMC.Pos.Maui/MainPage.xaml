@@ -1891,7 +1891,7 @@
               Padding="16"
               HorizontalOptions="Center"
               VerticalOptions="Center"
-              MaximumWidthRequest="520">
+              WidthRequest="320">
         <VerticalStackLayout Spacing="12">
           <Label Text="新增產品"
                  FontSize="24"

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using KLCMC.Pos.Core.Data.Entities;
 using KLCMC.Pos.Core.Data.Repositories;
 using KLCMC.Pos.Core.Models;
 using KLCMC.Pos.Core.Services;
@@ -532,8 +533,7 @@ public sealed class MainViewModel : BindableBase
     private bool CanAddNewProduct()
     {
         return !string.IsNullOrWhiteSpace(NewProductName) &&
-               decimal.TryParse(NewProductPriceText, NumberStyles.Number, CultureInfo.InvariantCulture, out var price) &&
-               price >= 0m;
+               TryParseNonNegativeProductPrice(NewProductPriceText, out _);
     }
 
     private void AddNewProduct()
@@ -551,10 +551,16 @@ public sealed class MainViewModel : BindableBase
             return;
         }
 
-        var price = decimal.Parse(NewProductPriceText, NumberStyles.Number, CultureInfo.InvariantCulture);
+        if (!TryParseNonNegativeProductPrice(NewProductPriceText, out var price))
+        {
+            StatusMessage = "請輸入有效的產品名稱和價格。";
+            return;
+        }
+
+        ProductEntity addedProduct;
         try
         {
-            _productRepository.Add(name, price);
+            addedProduct = _productRepository.Add(name, price);
         }
         catch (Exception ex)
         {
@@ -570,7 +576,7 @@ public sealed class MainViewModel : BindableBase
 
         ProductEditorRows.Add(new ProductEditorRow
         {
-            Id = _productRepository.GetAll().LastOrDefault(p => p.Name == name)?.Id ?? 0,
+            Id = addedProduct.Id,
             Name = name,
             PriceText = price.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
         });
@@ -585,6 +591,16 @@ public sealed class MainViewModel : BindableBase
         var newPreset = PresetItems.Last();
         AddPresetItem(newPreset);
         IsProductControlVisible = true;
+    }
+
+    private static bool TryParseNonNegativeProductPrice(string? rawPriceText, out decimal price)
+    {
+        if (decimal.TryParse(rawPriceText, NumberStyles.Number, CultureInfo.CurrentCulture, out price) && price >= 0m)
+        {
+            return true;
+        }
+
+        return decimal.TryParse(rawPriceText, NumberStyles.Number, CultureInfo.InvariantCulture, out price) && price >= 0m;
     }
 
     private void ReloadProductEditorRows()
