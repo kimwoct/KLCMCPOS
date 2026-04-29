@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using KLCMC.Pos.Core.Data.Repositories;
 using KLCMC.Pos.Core.Models;
 using KLCMC.Pos.Core.Services;
@@ -8,6 +9,7 @@ namespace KLCMC.Pos.Core.ViewModels;
 
 public sealed class MainViewModel : BindableBase
 {
+    private static readonly Regex HexColorRegex = new("^#[0-9A-Fa-f]{6}$", RegexOptions.Compiled);
     private static readonly PrinterConnectionMode[] SupportedConnectionModes =
     [
         PrinterConnectionMode.Usb,
@@ -15,11 +17,13 @@ public sealed class MainViewModel : BindableBase
     ];
 
     public event Action? SaleConfirmed;
+    public event Action<UiAppearanceOptions>? UiAppearanceChanged;
     private readonly IPrinterService _printerService;
     private readonly IProductRepository _productRepository;
     private readonly ISaleRepository _saleRepository;
     private readonly IPrinterSettingsRepository _printerSettingsRepository;
     private readonly IPaymentMethodRepository _paymentMethodRepository;
+    private readonly IUiAppearanceSettingsRepository _uiAppearanceSettingsRepository;
     private readonly RelayCommand _refreshInstalledPrintersCommand;
     private readonly RelayCommand _openPrinterPropertiesCommand;
     private readonly RelayCommand _probePrinterCapabilitiesCommand;
@@ -45,12 +49,22 @@ public sealed class MainViewModel : BindableBase
     private readonly RelayCommand _addPaymentMethodCommand;
     private readonly RelayCommand _savePaymentMethodCommand;
     private readonly RelayCommand _deletePaymentMethodCommand;
+    private readonly RelayCommand _applyAppearanceCommand;
+    private readonly RelayCommand _resetAppearanceCommand;
+    private readonly RelayCommand _toggleProductConfigSectionCommand;
+    private readonly RelayCommand _togglePaymentMethodsSectionCommand;
+    private readonly RelayCommand _togglePrinterSettingsSectionCommand;
+    private readonly RelayCommand _toggleAppearanceSectionCommand;
     private CartLine? _selectedCartLine;
     private bool _isPrinterPanelExpanded = false;
     private bool _isAddProductPopupVisible;
     private bool _isCheckoutPopupVisible;
     private bool _isProductControlVisible;
     private bool _isPrinterConfigEditMode;
+    private bool _isProductConfigExpanded = true;
+    private bool _isPaymentMethodsExpanded = true;
+    private bool _isPrinterSettingsExpanded = true;
+    private bool _isAppearanceSettingsExpanded = true;
     private string _newProductName = string.Empty;
     private string _newProductPriceText = string.Empty;
     private string _editingConnectionEndpoint = string.Empty;
@@ -61,6 +75,11 @@ public sealed class MainViewModel : BindableBase
     private string _selectedPaymentMethodName = "現金";
     private string _newPaymentMethodName = string.Empty;
     private string _statusMessage = "Ready.";
+    private double _uiFontScale = UiAppearanceOptions.DefaultFontScale;
+    private string _uiPrimaryTextColorHex = UiAppearanceOptions.DefaultPrimaryTextColor;
+    private string _uiSecondaryTextColorHex = UiAppearanceOptions.DefaultSecondaryTextColor;
+    private string _uiBackgroundColorHex = UiAppearanceOptions.DefaultBackgroundColor;
+    private string _uiAccentColorHex = UiAppearanceOptions.DefaultAccentColor;
     private readonly ObservableCollection<string> _printerConsoleEntries = [];
     private readonly ObservableCollection<string> _installedPrinters = [];
 
@@ -69,13 +88,15 @@ public sealed class MainViewModel : BindableBase
         IProductRepository productRepository,
         ISaleRepository saleRepository,
         IPrinterSettingsRepository printerSettingsRepository,
-        IPaymentMethodRepository paymentMethodRepository)
+        IPaymentMethodRepository paymentMethodRepository,
+        IUiAppearanceSettingsRepository uiAppearanceSettingsRepository)
     {
         _printerService = printerService;
         _productRepository = productRepository;
         _saleRepository = saleRepository;
         _printerSettingsRepository = printerSettingsRepository;
         _paymentMethodRepository = paymentMethodRepository;
+        _uiAppearanceSettingsRepository = uiAppearanceSettingsRepository;
 
         PresetItems = new ObservableCollection<PresetItem>(
             _productRepository.GetAll().Select(p => new PresetItem
@@ -103,6 +124,9 @@ public sealed class MainViewModel : BindableBase
         CheckoutMethodOptions = [];
         PaymentMethodEditorRows = [];
         ReloadPaymentMethodOptions();
+        var loadedAppearance = _uiAppearanceSettingsRepository.Load();
+        ApplyAppearanceToEditor(loadedAppearance);
+        UiAppearance = loadedAppearance.Clone();
 
         AddItemCommand = new RelayCommand(AddPresetItem);
         _addNewProductCommand = new RelayCommand(_ => AddNewProduct(), _ => CanAddNewProduct());
@@ -147,8 +171,18 @@ public sealed class MainViewModel : BindableBase
         _addPaymentMethodCommand = new RelayCommand(_ => AddPaymentMethod(), _ => CanAddPaymentMethod());
         _savePaymentMethodCommand = new RelayCommand(SavePaymentMethod);
         _deletePaymentMethodCommand = new RelayCommand(DeletePaymentMethod);
+        _applyAppearanceCommand = new RelayCommand(_ => ApplyAppearanceSettings());
+        _resetAppearanceCommand = new RelayCommand(_ => ResetAppearanceSettings());
+        _toggleProductConfigSectionCommand = new RelayCommand(_ => ToggleProductConfigSection());
+        _togglePaymentMethodsSectionCommand = new RelayCommand(_ => TogglePaymentMethodsSection());
+        _togglePrinterSettingsSectionCommand = new RelayCommand(_ => TogglePrinterSettingsSection());
+        _toggleAppearanceSectionCommand = new RelayCommand(_ => ToggleAppearanceSection());
         AppendPrinterConsole("Printer console ready.");
         RefreshInstalledPrinters();
+        if (!_printerService.IsOpen)
+        {
+            ConnectPrinter();
+        }
         ProbePrinterCapabilities();
 
         CartLines.CollectionChanged += (_, _) =>
@@ -221,6 +255,8 @@ public sealed class MainViewModel : BindableBase
         get => _statusMessage;
         private set => SetProperty(ref _statusMessage, value);
     }
+
+    public UiAppearanceOptions UiAppearance { get; private set; } = UiAppearanceOptions.CreateDefault();
 
     public bool IsPrinterPanelExpanded
     {
@@ -321,11 +357,72 @@ public sealed class MainViewModel : BindableBase
 
     public string PrinterPanelToggleText => IsPrinterPanelExpanded ? "▲" : "▼";
 
-    public string ConnectionStateText => _printerService.IsOpen ? "● Connected" : "● Not Connected";
+    public string ConnectionStateText => _printerService.IsOpen ? "● 已連接" : "● 未連接";
 
     public bool IsPrinterConnected => _printerService.IsOpen;
 
     public string PrinterConsoleText => string.Join(Environment.NewLine, _printerConsoleEntries);
+
+    public bool IsProductConfigExpanded
+    {
+        get => _isProductConfigExpanded;
+        set
+        {
+            if (!SetProperty(ref _isProductConfigExpanded, value))
+            {
+                return;
+            }
+
+            RaisePropertyChanged(nameof(ProductConfigToggleText));
+        }
+    }
+
+    public bool IsPaymentMethodsExpanded
+    {
+        get => _isPaymentMethodsExpanded;
+        set
+        {
+            if (!SetProperty(ref _isPaymentMethodsExpanded, value))
+            {
+                return;
+            }
+
+            RaisePropertyChanged(nameof(PaymentMethodsToggleText));
+        }
+    }
+
+    public bool IsPrinterSettingsExpanded
+    {
+        get => _isPrinterSettingsExpanded;
+        set
+        {
+            if (!SetProperty(ref _isPrinterSettingsExpanded, value))
+            {
+                return;
+            }
+
+            RaisePropertyChanged(nameof(PrinterSettingsToggleText));
+        }
+    }
+
+    public bool IsAppearanceSettingsExpanded
+    {
+        get => _isAppearanceSettingsExpanded;
+        set
+        {
+            if (!SetProperty(ref _isAppearanceSettingsExpanded, value))
+            {
+                return;
+            }
+
+            RaisePropertyChanged(nameof(AppearanceSettingsToggleText));
+        }
+    }
+
+    public string ProductConfigToggleText => IsProductConfigExpanded ? "▾" : "▸";
+    public string PaymentMethodsToggleText => IsPaymentMethodsExpanded ? "▾" : "▸";
+    public string PrinterSettingsToggleText => IsPrinterSettingsExpanded ? "▾" : "▸";
+    public string AppearanceSettingsToggleText => IsAppearanceSettingsExpanded ? "▾" : "▸";
 
     public decimal Total => CartLines.Sum(line => line.LineTotal);
 
@@ -390,6 +487,10 @@ public sealed class MainViewModel : BindableBase
     public RelayCommand BeginEditPrinterConfigCommand => _beginEditPrinterConfigCommand;
 
     public RelayCommand ApplyPrinterConfigCommand => _applyPrinterConfigCommand;
+    public RelayCommand ToggleProductConfigSectionCommand => _toggleProductConfigSectionCommand;
+    public RelayCommand TogglePaymentMethodsSectionCommand => _togglePaymentMethodsSectionCommand;
+    public RelayCommand TogglePrinterSettingsSectionCommand => _togglePrinterSettingsSectionCommand;
+    public RelayCommand ToggleAppearanceSectionCommand => _toggleAppearanceSectionCommand;
 
     private void AddPresetItem(object? parameter)
     {
@@ -719,6 +820,26 @@ public sealed class MainViewModel : BindableBase
     {
         IsPrinterPanelExpanded = !IsPrinterPanelExpanded;
         RaisePropertyChanged(nameof(PrinterPanelToggleText));
+    }
+
+    private void ToggleProductConfigSection()
+    {
+        IsProductConfigExpanded = !IsProductConfigExpanded;
+    }
+
+    private void TogglePaymentMethodsSection()
+    {
+        IsPaymentMethodsExpanded = !IsPaymentMethodsExpanded;
+    }
+
+    private void TogglePrinterSettingsSection()
+    {
+        IsPrinterSettingsExpanded = !IsPrinterSettingsExpanded;
+    }
+
+    private void ToggleAppearanceSection()
+    {
+        IsAppearanceSettingsExpanded = !IsAppearanceSettingsExpanded;
     }
 
     private void BeginEditPrinterConfig()
@@ -1191,6 +1312,47 @@ public sealed class MainViewModel : BindableBase
     public RelayCommand AddPaymentMethodCommand => _addPaymentMethodCommand;
     public RelayCommand SavePaymentMethodCommand => _savePaymentMethodCommand;
     public RelayCommand DeletePaymentMethodCommand => _deletePaymentMethodCommand;
+    public RelayCommand ApplyAppearanceCommand => _applyAppearanceCommand;
+    public RelayCommand ResetAppearanceCommand => _resetAppearanceCommand;
+
+    public double UiFontScale
+    {
+        get => _uiFontScale;
+        set
+        {
+            var clamped = Math.Clamp(value, UiAppearanceOptions.MinFontScale, UiAppearanceOptions.MaxFontScale);
+            if (SetProperty(ref _uiFontScale, clamped))
+            {
+                RaisePropertyChanged(nameof(UiFontScaleText));
+            }
+        }
+    }
+
+    public string UiFontScaleText => $"{UiFontScale:0.00}x";
+
+    public string UiPrimaryTextColorHex
+    {
+        get => _uiPrimaryTextColorHex;
+        set => SetProperty(ref _uiPrimaryTextColorHex, value);
+    }
+
+    public string UiSecondaryTextColorHex
+    {
+        get => _uiSecondaryTextColorHex;
+        set => SetProperty(ref _uiSecondaryTextColorHex, value);
+    }
+
+    public string UiBackgroundColorHex
+    {
+        get => _uiBackgroundColorHex;
+        set => SetProperty(ref _uiBackgroundColorHex, value);
+    }
+
+    public string UiAccentColorHex
+    {
+        get => _uiAccentColorHex;
+        set => SetProperty(ref _uiAccentColorHex, value);
+    }
 
     public string MoneyPadLabelText =>
         IsCashMethodSelected ? "Money Received (HKD)" : "Charge Amount (HKD)";
@@ -1486,6 +1648,96 @@ public sealed class MainViewModel : BindableBase
         SelectedCartLine = null;
         RaiseCheckoutTotalsChanged();
         SaleConfirmed?.Invoke();
+    }
+
+    private void ApplyAppearanceToEditor(UiAppearanceOptions options)
+    {
+        UiFontScale = options.FontScale;
+        UiPrimaryTextColorHex = options.PrimaryTextColor;
+        UiSecondaryTextColorHex = options.SecondaryTextColor;
+        UiBackgroundColorHex = options.BackgroundColor;
+        UiAccentColorHex = options.AccentColor;
+    }
+
+    private void ApplyAppearanceSettings()
+    {
+        if (!TryBuildAppearanceOptions(out var options, out var errorMessage))
+        {
+            StatusMessage = errorMessage;
+            return;
+        }
+
+        try
+        {
+            _uiAppearanceSettingsRepository.Save(options);
+            UiAppearance = options.Clone();
+            UiAppearanceChanged?.Invoke(UiAppearance.Clone());
+            StatusMessage = "外觀設定已套用。";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"儲存外觀設定失敗：{ex.Message}";
+        }
+    }
+
+    private void ResetAppearanceSettings()
+    {
+        var defaults = UiAppearanceOptions.CreateDefault();
+        ApplyAppearanceToEditor(defaults);
+
+        try
+        {
+            _uiAppearanceSettingsRepository.Save(defaults);
+            UiAppearance = defaults.Clone();
+            UiAppearanceChanged?.Invoke(UiAppearance.Clone());
+            StatusMessage = "已重設為預設外觀。";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"重設外觀設定失敗：{ex.Message}";
+        }
+    }
+
+    private bool TryBuildAppearanceOptions(out UiAppearanceOptions options, out string errorMessage)
+    {
+        options = UiAppearanceOptions.CreateDefault();
+        errorMessage = string.Empty;
+
+        if (UiFontScale < UiAppearanceOptions.MinFontScale || UiFontScale > UiAppearanceOptions.MaxFontScale)
+        {
+            errorMessage = $"字體縮放需介於 {UiAppearanceOptions.MinFontScale:0.0} 到 {UiAppearanceOptions.MaxFontScale:0.0}。";
+            return false;
+        }
+
+        var primary = NormalizeHexColor(UiPrimaryTextColorHex);
+        var secondary = NormalizeHexColor(UiSecondaryTextColorHex);
+        var background = NormalizeHexColor(UiBackgroundColorHex);
+        var accent = NormalizeHexColor(UiAccentColorHex);
+
+        if (!HexColorRegex.IsMatch(primary) ||
+            !HexColorRegex.IsMatch(secondary) ||
+            !HexColorRegex.IsMatch(background) ||
+            !HexColorRegex.IsMatch(accent))
+        {
+            errorMessage = "色彩格式無效，請使用 #RRGGBB。";
+            return false;
+        }
+
+        options = new UiAppearanceOptions
+        {
+            FontScale = UiFontScale,
+            PrimaryTextColor = primary,
+            SecondaryTextColor = secondary,
+            BackgroundColor = background,
+            AccentColor = accent
+        };
+
+        return true;
+    }
+
+    private static string NormalizeHexColor(string raw)
+    {
+        return (raw ?? string.Empty).Trim().ToUpperInvariant();
     }
 
     private void RaiseCheckoutTotalsChanged()

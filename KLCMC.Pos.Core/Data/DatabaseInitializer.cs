@@ -20,6 +20,7 @@ public static class DatabaseInitializer
         db.Database.EnsureCreated();
         EnsurePrinterSettingsSchema(db);
         EnsurePaymentMethodsTable(db);
+        EnsureUiAppearanceSettingsTable(db);
 
         if (!db.Products.Any())
         {
@@ -59,6 +60,20 @@ public static class DatabaseInitializer
         else
         {
             MigratePaymentMethodsToTraditionalChinese(db);
+        }
+
+        if (!db.UiAppearanceSettings.Any())
+        {
+            db.UiAppearanceSettings.Add(new UiAppearanceSettingEntity
+            {
+                Id = 1,
+                FontScale = Models.UiAppearanceOptions.DefaultFontScale,
+                PrimaryTextColor = Models.UiAppearanceOptions.DefaultPrimaryTextColor,
+                SecondaryTextColor = Models.UiAppearanceOptions.DefaultSecondaryTextColor,
+                BackgroundColor = Models.UiAppearanceOptions.DefaultBackgroundColor,
+                AccentColor = Models.UiAppearanceOptions.DefaultAccentColor
+            });
+            db.SaveChanges();
         }
     }
 
@@ -103,6 +118,19 @@ public static class DatabaseInitializer
             "\"Name\" TEXT NOT NULL," +
             "\"IsActive\" INTEGER NOT NULL DEFAULT 1," +
             "\"SortOrder\" INTEGER NOT NULL DEFAULT 0" +
+            ");");
+    }
+
+    private static void EnsureUiAppearanceSettingsTable(PosDbContext db)
+    {
+        db.Database.ExecuteSqlRaw(
+            "CREATE TABLE IF NOT EXISTS \"UiAppearanceSettings\" (" +
+            "\"Id\" INTEGER NOT NULL CONSTRAINT \"PK_UiAppearanceSettings\" PRIMARY KEY," +
+            "\"FontScale\" REAL NOT NULL DEFAULT 1.0," +
+            "\"PrimaryTextColor\" TEXT NOT NULL DEFAULT '#D2E4FB'," +
+            "\"SecondaryTextColor\" TEXT NOT NULL DEFAULT '#8EA0B9'," +
+            "\"BackgroundColor\" TEXT NOT NULL DEFAULT '#031425'," +
+            "\"AccentColor\" TEXT NOT NULL DEFAULT '#A2D149'" +
             ");");
     }
 

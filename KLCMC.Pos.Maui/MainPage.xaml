@@ -7,12 +7,12 @@
              x:Class="KLCMC.Pos.Maui.MainPage"
              x:Name="RootPage"
              Title=""
-             BackgroundColor="#031425">
+             BackgroundColor="{DynamicResource ThemeBackgroundColor}">
   <ContentPage.Resources>
-    <conv:BoolToTileBgConverter x:Key="BoolToTileBg" />
+    <conv:BoolToTileBgConverter x:Key="BoolToTileBg"/>
     <conv:BoolToTileBgConverter x:Key="BoolToConnectedColorConverter"
                                 SelectedColor="#4CAF50"
-                                UnselectedColor="#F44336" />
+                                UnselectedColor="#F44336"/>
   </ContentPage.Resources>
   <Grid RowDefinitions="*"
         RowSpacing="14"
@@ -25,318 +25,400 @@
               StrokeShape="RoundRectangle 14"
               BackgroundColor="#0F2131"
               Padding="12">
-          <Grid RowDefinitions="Auto,*"
-                RowSpacing="12">
-            <Grid ColumnDefinitions="*,*,*"
-                  ColumnSpacing="10">
-              <Button x:Name="CurrentSaleTabButton"
-                      Text="當前銷售"
-                      FontAttributes="Bold"
-                      HeightRequest="44"
-                      BackgroundColor="#1F3D5C"
-                      TextColor="#D2E4FB"
-                      Clicked="OnCurrentSaleTabClicked" />
-                <Button Grid.Column="1"
-                        x:Name="DailyAccountTabButton"
-                        Text="📊 每日帳目"
-                        FontAttributes="Bold"
-                        HeightRequest="44"
-                        BackgroundColor="#253648"
-                        TextColor="#8EA0B9"
-                        Clicked="OnDailyAccountTabClicked" />
-              <Button Grid.Column="2"
-                      x:Name="ConfigureTabButton"
-                      Text="⚙ 設置"
-                      FontAttributes="Bold"
-                      HeightRequest="44"
-                      BackgroundColor="#253648"
-                      TextColor="#8EA0B9"
-                      Clicked="OnConfigureTabClicked" />
-            </Grid>
+        <Grid RowDefinitions="Auto,*"
+              RowSpacing="12">
+          <Grid ColumnDefinitions="*,*,*"
+                ColumnSpacing="10">
+            <Button x:Name="CurrentSaleTabButton"
+                    Text="當前銷售"
+                    FontAttributes="Bold"
+                    HeightRequest="44"
+                    BackgroundColor="#1F3D5C"
+                    TextColor="#D2E4FB"
+                    Clicked="OnCurrentSaleTabClicked"/>
+            <Button Grid.Column="1"
+                    x:Name="DailyAccountTabButton"
+                    Text="📊 每日帳目"
+                    FontAttributes="Bold"
+                    HeightRequest="44"
+                    BackgroundColor="#253648"
+                    TextColor="#8EA0B9"
+                    Clicked="OnDailyAccountTabClicked"/>
+            <Button Grid.Column="2"
+                    x:Name="ConfigureTabButton"
+                    Text="⚙ 設置"
+                    FontAttributes="Bold"
+                    HeightRequest="44"
+                    BackgroundColor="#253648"
+                    TextColor="#8EA0B9"
+                    Clicked="OnConfigureTabClicked"/>
+          </Grid>
 
-            <Grid Grid.Row="1">
+          <Grid Grid.Row="1">
             <Grid x:Name="CurrentSaleTabContent"
                   RowDefinitions="Auto,*,Auto"
                   RowSpacing="14">
-            <HorizontalStackLayout Spacing="12"
-                                    VerticalOptions="Center">
-              <Label Text="當前銷售"
-                     FontSize="32"
-                      FontAttributes="Bold"
-                      TextColor="#D2E4FB" />
-              <Label Text="{Binding TotalText}"
-                     FontSize="26"
-                      FontAttributes="Bold"
-                      TextColor="#A6D64D"
-                      VerticalOptions="Center" />
-            </HorizontalStackLayout>
+              <HorizontalStackLayout Spacing="12"
+                                     VerticalOptions="Center">
+                <Label Text="當前銷售"
+                       FontSize="{DynamicResource FontSizePageTitle}"
+                       FontAttributes="Bold"
+                       TextColor="{DynamicResource ThemePrimaryTextColor}"/>
+                <Label Text="{Binding TotalText}"
+                       FontSize="{DynamicResource FontSizePageSubTitle}"
+                       FontAttributes="Bold"
+                       TextColor="{DynamicResource ThemeAccentColor}"
+                       VerticalOptions="Center"/>
+              </HorizontalStackLayout>
 
-            <CollectionView Grid.Row="1"
-                            ItemsSource="{Binding CartLines}"
-                            SelectionMode="Single"
-                            SelectedItem="{Binding SelectedCartLine}">
-              <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical"
-                                   ItemSpacing="8" />
-              </CollectionView.ItemsLayout>
-              <CollectionView.ItemTemplate>
-                <DataTemplate>
+              <CollectionView Grid.Row="1"
+                              ItemsSource="{Binding CartLines}"
+                              SelectionMode="Single"
+                              SelectedItem="{Binding SelectedCartLine}">
+                <CollectionView.ItemsLayout>
+                  <LinearItemsLayout Orientation="Vertical"
+                                     ItemSpacing="8"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                  <DataTemplate>
+                    <Border Stroke="#253648"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="#1A2B3C"
+                            Padding="12"
+                            Margin="0,0,0,4">
+                      <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroupList>
+                          <VisualStateGroup Name="CommonStates">
+                            <VisualState Name="Normal">
+                              <VisualState.Setters>
+                                <Setter Property="StrokeThickness"
+                                    Value="1"/>
+                                <Setter Property="Stroke"
+                                    Value="#253648"/>
+                              </VisualState.Setters>
+                            </VisualState>
+                            <VisualState Name="Selected">
+                              <VisualState.Setters>
+                                <Setter Property="StrokeThickness"
+                                    Value="4"/>
+                                <Setter Property="Stroke"
+                                    Value="#69D4F8"/>
+                              </VisualState.Setters>
+                            </VisualState>
+                          </VisualStateGroup>
+                        </VisualStateGroupList>
+                      </VisualStateManager.VisualStateGroups>
+                      <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+                            ColumnSpacing="10">
+                        <Label FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="#D2E4FB"
+                               MaxLines="1"
+                               LineBreakMode="TailTruncation"
+                               VerticalOptions="Center">
+                          <Label.FormattedText>
+                            <FormattedString>
+                              <Span Text="{Binding Name}"/>
+                              <Span Text=" ("/>
+                              <Span Text="{Binding UnitPrice, StringFormat='HKD $ {0:F2}'}"
+                                    TextColor="#69D4F8"
+                                    FontSize="20"/>
+                              <Span Text=")"/>
+                            </FormattedString>
+                          </Label.FormattedText>
+                        </Label>
+                        <Label Grid.Column="1"
+                               Text="{Binding Quantity, StringFormat='x{0}'}"
+                               FontSize="20"
+                               TextColor="#C4D4E8"
+                               VerticalOptions="Center"/>
+                        <Label Grid.Column="2"
+                               Text="{Binding LineTotal, StringFormat='HKD $ {0:F2}'}"
+                               FontSize="20"
+                               TextColor="#D2E4FB"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center"/>
+                        <Button Grid.Column="3"
+                                Text="−"
+                                FontSize="22"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                Padding="0"
+                                CornerRadius="20"
+                                BackgroundColor="#3D1F1F"
+                                TextColor="#FFB4AB"
+                                VerticalOptions="Center"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveCartLineCommand}"
+                                CommandParameter="{Binding}"/>
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </CollectionView.ItemTemplate>
+              </CollectionView>
+
+              <Grid Grid.Row="2"
+                    ColumnDefinitions="*,Auto"
+                    ColumnSpacing="12">
+                <Label Text="{Binding StatusMessage}"
+                       FontSize="{DynamicResource FontSizeBody}"
+                       TextColor="{DynamicResource ThemeSecondaryTextColor}"
+                       LineBreakMode="TailTruncation"
+                       VerticalOptions="Center"
+                       HorizontalTextAlignment="End"/>
+                <Button Grid.Column="1"
+                        Text="結帳"
+                        FontSize="{DynamicResource FontSizeButton}"
+                        FontAttributes="Bold"
+                        HeightRequest="52"
+                        Padding="18,0"
+                        BackgroundColor="{DynamicResource ThemeAccentColor}"
+                        TextColor="#243600"
+                        Command="{Binding PrintReceiptCommand}"/>
+              </Grid>
+
+              <BoxView Grid.RowSpan="3"
+                       IsVisible="{Binding IsProductControlVisible}"
+                       BackgroundColor="#80000000"
+                       ZIndex="11"/>
+              <Border x:Name="ProductControlPopup"
+                      Grid.RowSpan="3"
+                      IsVisible="{Binding IsProductControlVisible}"
+                      Stroke="#2A3B4C"
+                      StrokeThickness="1"
+                      StrokeShape="RoundRectangle 14"
+                      BackgroundColor="#0F2131"
+                      Padding="12"
+                      ZIndex="12"
+                      MinimumWidthRequest="500"
+                      MaximumWidthRequest="760"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                  <PanGestureRecognizer PanUpdated="OnProductControlPanUpdated"/>
+                </Border.GestureRecognizers>
+                <VerticalStackLayout Spacing="10">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="產品控制"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#D2E4FB"
+                           VerticalOptions="Center"/>
+                    <Button Grid.Column="1"
+                            Text="✕"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            WidthRequest="36"
+                            HeightRequest="36"
+                            Padding="0"
+                            CornerRadius="18"
+                            BackgroundColor="#3D1F1F"
+                            TextColor="#FFB4AB"
+                            VerticalOptions="Start"
+                            Command="{Binding DismissProductControlCommand}"/>
+                  </Grid>
+
+                  <Entry Text="{Binding SelectedCartLine.Remark, Mode=TwoWay, FallbackValue=''}"
+                         Placeholder="{Binding SelectedCartLineName}"
+                         PlaceholderColor="#BDEE62"
+                         TextColor="#D2E4FB"
+                         FontSize="28"
+                         BackgroundColor="#1A2B3C"
+                         IsEnabled="{Binding HasSelectedCartLine}"/>
+
                   <Border Stroke="#253648"
-                          StrokeThickness="1"
                           StrokeShape="RoundRectangle 10"
                           BackgroundColor="#1A2B3C"
-                          Padding="12"
-                          Margin="0,0,0,4">
-                    <VisualStateManager.VisualStateGroups>
-                      <VisualStateGroupList>
-                        <VisualStateGroup Name="CommonStates">
-                          <VisualState Name="Normal">
-                            <VisualState.Setters>
-                              <Setter Property="StrokeThickness" Value="1" />
-                              <Setter Property="Stroke" Value="#253648" />
-                            </VisualState.Setters>
-                          </VisualState>
-                          <VisualState Name="Selected">
-                            <VisualState.Setters>
-                              <Setter Property="StrokeThickness" Value="4" />
-                              <Setter Property="Stroke" Value="#69D4F8" />
-                            </VisualState.Setters>
-                          </VisualState>
-                        </VisualStateGroup>
-                      </VisualStateGroupList>
-                    </VisualStateManager.VisualStateGroups>
-                    <Grid ColumnDefinitions="*,Auto,Auto,Auto"
-                          ColumnSpacing="10">
-                      <Label FontSize="22"
-                             FontAttributes="Bold"
-                             TextColor="#D2E4FB"
-                              MaxLines="1"
-                              LineBreakMode="TailTruncation"
-                              VerticalOptions="Center">
-                        <Label.FormattedText>
-                          <FormattedString>
-                            <Span Text="{Binding Name}" />
-                            <Span Text=" (" />
-                            <Span Text="{Binding UnitPrice, StringFormat='HKD $ {0:F2}'}"
-                                   TextColor="#69D4F8"
-                                   FontSize="20" />
-                            <Span Text=")" />
-                          </FormattedString>
-                        </Label.FormattedText>
-                      </Label>
-                      <Label Grid.Column="1"
-                             Text="{Binding Quantity, StringFormat='x{0}'}"
-                             FontSize="20"
-                             TextColor="#C4D4E8"
-                             VerticalOptions="Center" />
-                      <Label Grid.Column="2"
-                             Text="{Binding LineTotal, StringFormat='HKD $ {0:F2}'}"
-                             FontSize="20"
-                             TextColor="#D2E4FB"
-                             FontAttributes="Bold"
-                             VerticalOptions="Center" />
-                      <Button Grid.Column="3"
-                              Text="−"
-                              FontSize="22"
-                              WidthRequest="40"
-                              HeightRequest="40"
-                              Padding="0"
-                              CornerRadius="20"
-                              BackgroundColor="#3D1F1F"
-                              TextColor="#FFB4AB"
-                              VerticalOptions="Center"
-                              Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveCartLineCommand}"
-                              CommandParameter="{Binding}" />
-                    </Grid>
+                          Padding="12,8">
+                    <Label Text="{Binding PricePadInputText, StringFormat='HKD $ {0}'}"
+                           TextColor="#BDEE62"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="End"/>
                   </Border>
-                </DataTemplate>
-              </CollectionView.ItemTemplate>
-            </CollectionView>
 
-            <Grid Grid.Row="2"
-                  ColumnDefinitions="*,Auto"
-                  ColumnSpacing="12">
-              <Label Text="{Binding StatusMessage}"
-                     FontSize="16"
-                     TextColor="#C4D4E8"
-                     LineBreakMode="TailTruncation"
-                     VerticalOptions="Center"
-                     HorizontalTextAlignment="End" />
-              <Button Grid.Column="1"
-                      Text="結帳"
-                      FontSize="20"
-                      FontAttributes="Bold"
-                      HeightRequest="52"
-                      Padding="18,0"
-                      BackgroundColor="#A2D149"
-                      TextColor="#243600"
-                      Command="{Binding PrintReceiptCommand}" />
-            </Grid>
+                  <Grid RowDefinitions="*,*,*,*"
+                        ColumnDefinitions="*,*,*,*"
+                        ColumnSpacing="8"
+                        RowSpacing="8"
+                        IsEnabled="{Binding HasSelectedCartLine}">
+                    <Grid.Resources>
+                      <Style x:Key="NumKey"
+                          TargetType="Button">
+                        <Setter Property="HeightRequest"
+                            Value="60"/>
+                        <Setter Property="FontSize"
+                            Value="22"/>
+                        <Setter Property="FontAttributes"
+                            Value="Bold"/>
+                        <Setter Property="BackgroundColor"
+                            Value="#1A2B3C"/>
+                        <Setter Property="TextColor"
+                            Value="#D2E4FB"/>
+                        <Setter Property="BorderColor"
+                            Value="#2A3B4C"/>
+                        <Setter Property="BorderWidth"
+                            Value="1"/>
+                        <Setter Property="CornerRadius"
+                            Value="10"/>
+                      </Style>
+                      <Style x:Key="QuickAmount"
+                          TargetType="Button"
+                          BasedOn="{StaticResource NumKey}">
+                        <Setter Property="BackgroundColor"
+                            Value="#E07A5F"/>
+                        <Setter Property="TextColor"
+                            Value="White"/>
+                        <Setter Property="FontSize"
+                            Value="18"/>
+                      </Style>
+                    </Grid.Resources>
 
-            <BoxView Grid.RowSpan="3"
-                     IsVisible="{Binding IsProductControlVisible}"
-                     BackgroundColor="#80000000"
-                     ZIndex="11" />
-            <Border x:Name="ProductControlPopup"
-                    Grid.RowSpan="3"
-                    IsVisible="{Binding IsProductControlVisible}"
-                    Stroke="#2A3B4C"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 14"
-                    BackgroundColor="#0F2131"
-                    Padding="12"
-                    ZIndex="12"
-                    MinimumWidthRequest="500"
-                    MaximumWidthRequest="760"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center">
-              <Border.GestureRecognizers>
-                <PanGestureRecognizer PanUpdated="OnProductControlPanUpdated" />
-              </Border.GestureRecognizers>
-              <VerticalStackLayout Spacing="10">
-                <Grid ColumnDefinitions="*,Auto">
-                  <Label Text="產品控制"
-                         FontSize="18"
-                         FontAttributes="Bold"
-                         TextColor="#D2E4FB"
-                         VerticalOptions="Center" />
-                  <Button Grid.Column="1"
-                          Text="✕"
-                          FontSize="16"
-                          FontAttributes="Bold"
-                          WidthRequest="36"
-                          HeightRequest="36"
-                          Padding="0"
-                          CornerRadius="18"
-                          BackgroundColor="#3D1F1F"
-                          TextColor="#FFB4AB"
-                          VerticalOptions="Start"
-                          Command="{Binding DismissProductControlCommand}" />
-                </Grid>
+                    <Button Grid.Row="0"
+                        Grid.Column="0"
+                        Style="{StaticResource NumKey}"
+                        Text="1"
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="1"/>
+                    <Button Grid.Row="0"
+                        Grid.Column="1"
+                        Style="{StaticResource NumKey}"
+                        Text="2"
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="2"/>
+                    <Button Grid.Row="0"
+                        Grid.Column="2"
+                        Style="{StaticResource NumKey}"
+                        Text="3"
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="3"/>
+                    <Button Grid.Row="0"
+                        Grid.Column="3"
+                        Style="{StaticResource QuickAmount}"
+                        Text="$100"
+                            Command="{Binding SetPricePadAmountCommand}"
+                        CommandParameter="100"/>
 
-                <Entry Text="{Binding SelectedCartLine.Remark, Mode=TwoWay, FallbackValue=''}"
-                       Placeholder="{Binding SelectedCartLineName}"
-                       PlaceholderColor="#BDEE62"
-                       TextColor="#D2E4FB"
-                       FontSize="28"
-                       BackgroundColor="#1A2B3C"
-                       IsEnabled="{Binding HasSelectedCartLine}" />
+                    <Button Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource NumKey}"
+                        Text="4"
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="4"/>
+                    <Button Grid.Row="1"
+                        Grid.Column="1"
+                        Style="{StaticResource NumKey}"
+                        Text="5"
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="5"/>
+                    <Button Grid.Row="1"
+                        Grid.Column="2"
+                        Style="{StaticResource NumKey}"
+                        Text="6"
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="6"/>
+                    <Button Grid.Row="1"
+                        Grid.Column="3"
+                        Style="{StaticResource QuickAmount}"
+                        Text="$50"
+                            Command="{Binding SetPricePadAmountCommand}"
+                        CommandParameter="50"/>
 
-                <Border Stroke="#253648"
-                        StrokeShape="RoundRectangle 10"
-                        BackgroundColor="#1A2B3C"
-                        Padding="12,8">
-                  <Label Text="{Binding PricePadInputText, StringFormat='HKD $ {0}'}"
-                         TextColor="#BDEE62"
-                         FontSize="28"
-                         FontAttributes="Bold"
-                         HorizontalTextAlignment="End" />
-                </Border>
+                    <Button Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource NumKey}"
+                        Text="7"
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="7"/>
+                    <Button Grid.Row="2"
+                        Grid.Column="1"
+                        Style="{StaticResource NumKey}"
+                        Text="8"
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="8"/>
+                    <Button Grid.Row="2"
+                        Grid.Column="2"
+                        Style="{StaticResource NumKey}"
+                        Text="9"
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="9"/>
+                    <Button Grid.Row="2"
+                        Grid.Column="3"
+                        Style="{StaticResource QuickAmount}"
+                        Text="$20"
+                            Command="{Binding SetPricePadAmountCommand}"
+                        CommandParameter="20"/>
 
-                <Grid RowDefinitions="*,*,*,*"
-                      ColumnDefinitions="*,*,*,*"
-                      ColumnSpacing="8"
-                      RowSpacing="8"
-                      IsEnabled="{Binding HasSelectedCartLine}">
-                  <Grid.Resources>
-                    <Style x:Key="NumKey" TargetType="Button">
-                      <Setter Property="HeightRequest" Value="60" />
-                      <Setter Property="FontSize" Value="22" />
-                      <Setter Property="FontAttributes" Value="Bold" />
-                      <Setter Property="BackgroundColor" Value="#1A2B3C" />
-                      <Setter Property="TextColor" Value="#D2E4FB" />
-                      <Setter Property="BorderColor" Value="#2A3B4C" />
-                      <Setter Property="BorderWidth" Value="1" />
-                      <Setter Property="CornerRadius" Value="10" />
-                    </Style>
-                    <Style x:Key="QuickAmount" TargetType="Button" BasedOn="{StaticResource NumKey}">
-                      <Setter Property="BackgroundColor" Value="#E07A5F" />
-                      <Setter Property="TextColor" Value="White" />
-                      <Setter Property="FontSize" Value="18" />
-                    </Style>
-                  </Grid.Resources>
+                    <Button Grid.Row="3"
+                        Grid.Column="0"
+                        Style="{StaticResource NumKey}"
+                        Text="0"
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="0"/>
+                    <Button Grid.Row="3"
+                        Grid.Column="1"
+                        Style="{StaticResource NumKey}"
+                        Text="00"
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="00"/>
+                    <Button Grid.Row="3"
+                        Grid.Column="2"
+                        Style="{StaticResource NumKey}"
+                        Text="."
+                            Command="{Binding PricePadInputCommand}"
+                        CommandParameter="."/>
+                    <Button Grid.Row="3"
+                        Grid.Column="3"
+                        Style="{StaticResource QuickAmount}"
+                        Text="$10"
+                            Command="{Binding SetPricePadAmountCommand}"
+                        CommandParameter="10"/>
+                  </Grid>
 
-                  <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource NumKey}" Text="1"
-                          Command="{Binding PricePadInputCommand}" CommandParameter="1" />
-                  <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource NumKey}" Text="2"
-                          Command="{Binding PricePadInputCommand}" CommandParameter="2" />
-                  <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource NumKey}" Text="3"
-                          Command="{Binding PricePadInputCommand}" CommandParameter="3" />
-                  <Button Grid.Row="0" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$100"
-                          Command="{Binding SetPricePadAmountCommand}" CommandParameter="100" />
-
-                  <Button Grid.Row="1" Grid.Column="0" Style="{StaticResource NumKey}" Text="4"
-                          Command="{Binding PricePadInputCommand}" CommandParameter="4" />
-                  <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource NumKey}" Text="5"
-                          Command="{Binding PricePadInputCommand}" CommandParameter="5" />
-                  <Button Grid.Row="1" Grid.Column="2" Style="{StaticResource NumKey}" Text="6"
-                          Command="{Binding PricePadInputCommand}" CommandParameter="6" />
-                  <Button Grid.Row="1" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$50"
-                          Command="{Binding SetPricePadAmountCommand}" CommandParameter="50" />
-
-                  <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource NumKey}" Text="7"
-                          Command="{Binding PricePadInputCommand}" CommandParameter="7" />
-                  <Button Grid.Row="2" Grid.Column="1" Style="{StaticResource NumKey}" Text="8"
-                          Command="{Binding PricePadInputCommand}" CommandParameter="8" />
-                  <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource NumKey}" Text="9"
-                          Command="{Binding PricePadInputCommand}" CommandParameter="9" />
-                  <Button Grid.Row="2" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$20"
-                          Command="{Binding SetPricePadAmountCommand}" CommandParameter="20" />
-
-                  <Button Grid.Row="3" Grid.Column="0" Style="{StaticResource NumKey}" Text="0"
-                          Command="{Binding PricePadInputCommand}" CommandParameter="0" />
-                  <Button Grid.Row="3" Grid.Column="1" Style="{StaticResource NumKey}" Text="00"
-                          Command="{Binding PricePadInputCommand}" CommandParameter="00" />
-                  <Button Grid.Row="3" Grid.Column="2" Style="{StaticResource NumKey}" Text="."
-                          Command="{Binding PricePadInputCommand}" CommandParameter="." />
-                  <Button Grid.Row="3" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$10"
-                          Command="{Binding SetPricePadAmountCommand}" CommandParameter="10" />
-                </Grid>
-
-                <Grid ColumnDefinitions="*,*,2*"
-                      ColumnSpacing="8"
-                      IsEnabled="{Binding HasSelectedCartLine}">
-                  <Button Grid.Column="0"
-                          Text="C"
-                          HeightRequest="56"
-                          FontSize="18"
-                          FontAttributes="Bold"
-                          BackgroundColor="#3D1F1F"
-                          TextColor="#FFB4AB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
-                          Command="{Binding PricePadClearCommand}" />
-                  <Button Grid.Column="1"
-                          Text="⌫"
-                          HeightRequest="56"
-                          FontSize="18"
-                          FontAttributes="Bold"
-                          BackgroundColor="#3D1F1F"
-                          TextColor="#FFB4AB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
-                          Command="{Binding PricePadBackspaceCommand}" />
-                  <Button Grid.Column="2"
-                          Text="套用價格"
-                          HeightRequest="56"
-                          FontSize="20"
-                          FontAttributes="Bold"
-                          BackgroundColor="#A2D149"
-                          TextColor="#243600"
-                          CornerRadius="10"
-                          Command="{Binding ApplyFinalPriceCommand}" />
-                </Grid>
-              </VerticalStackLayout>
-            </Border>
+                  <Grid ColumnDefinitions="*,*,2*"
+                        ColumnSpacing="8"
+                        IsEnabled="{Binding HasSelectedCartLine}">
+                    <Button Grid.Column="0"
+                            Text="C"
+                            HeightRequest="56"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            BackgroundColor="#3D1F1F"
+                            TextColor="#FFB4AB"
+                            BorderColor="#2A3B4C"
+                            BorderWidth="1"
+                            CornerRadius="10"
+                            Command="{Binding PricePadClearCommand}"/>
+                    <Button Grid.Column="1"
+                            Text="⌫"
+                            HeightRequest="56"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            BackgroundColor="#3D1F1F"
+                            TextColor="#FFB4AB"
+                            BorderColor="#2A3B4C"
+                            BorderWidth="1"
+                            CornerRadius="10"
+                            Command="{Binding PricePadBackspaceCommand}"/>
+                    <Button Grid.Column="2"
+                            Text="套用價格"
+                            HeightRequest="56"
+                            FontSize="20"
+                            FontAttributes="Bold"
+                            BackgroundColor="#A2D149"
+                            TextColor="#243600"
+                            CornerRadius="10"
+                            Command="{Binding ApplyFinalPriceCommand}"/>
+                  </Grid>
+                </VerticalStackLayout>
+              </Border>
             </Grid>
 
             <!-- Checkout modal backdrop -->
             <BoxView IsVisible="{Binding IsCheckoutPopupVisible}"
                      BackgroundColor="#000000"
                      Opacity="0.55"
-                     ZIndex="9" />
+                     ZIndex="9"/>
 
             <!-- Checkout modal overlay -->
             <ScrollView IsVisible="{Binding IsCheckoutPopupVisible}"
@@ -349,208 +431,448 @@
                       StrokeShape="RoundRectangle 16"
                       BackgroundColor="#27435F"
                       Padding="14">
-              <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
-                    RowSpacing="10">
-                <!-- Row 0: totals + close X -->
-                <Grid Grid.Row="0"
-                      ColumnDefinitions="*,*,*,Auto"
-                      ColumnSpacing="10">
-                  <VerticalStackLayout Grid.Column="0" Spacing="0">
-                    <Label Text="應付金額" FontSize="13" TextColor="#8EA0B9" />
-                    <Label Text="{Binding AmountDueText}" FontSize="18" FontAttributes="Bold" TextColor="#BDEE62" />
-                  </VerticalStackLayout>
-                  <VerticalStackLayout Grid.Column="1" Spacing="0">
-                    <Label Text="已付" FontSize="13" TextColor="#8EA0B9" />
-                    <Label Text="{Binding PaidTotalText}" FontSize="18" FontAttributes="Bold" TextColor="#D2E4FB" />
-                  </VerticalStackLayout>
-                  <VerticalStackLayout Grid.Column="2" Spacing="0">
-                    <Label Text="餘額" FontSize="13" TextColor="#8EA0B9" />
-                    <Label Text="{Binding OutstandingText}" FontSize="18" FontAttributes="Bold" TextColor="#FFD479" />
-                  </VerticalStackLayout>
-                  <Button Grid.Column="3"
-                          Text="✕"
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                      RowSpacing="10">
+                  <!-- Row 0: totals + close X -->
+                  <Grid Grid.Row="0"
+                        ColumnDefinitions="*,*,*,Auto"
+                        ColumnSpacing="10">
+                    <VerticalStackLayout Grid.Column="0"
+                        Spacing="0">
+                      <Label Text="應付金額"
+                          FontSize="13"
+                          TextColor="#8EA0B9"/>
+                      <Label Text="{Binding AmountDueText}"
                           FontSize="18"
                           FontAttributes="Bold"
-                          WidthRequest="36"
-                          HeightRequest="36"
-                          Padding="0"
-                          CornerRadius="18"
-                          BackgroundColor="#3D1F1F"
-                          TextColor="#FFB4AB"
-                          VerticalOptions="Start"
-                          Command="{Binding CancelCheckoutCommand}" />
-                </Grid>
+                          TextColor="#BDEE62"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1"
+                        Spacing="0">
+                      <Label Text="已付"
+                          FontSize="13"
+                          TextColor="#8EA0B9"/>
+                      <Label Text="{Binding PaidTotalText}"
+                          FontSize="18"
+                          FontAttributes="Bold"
+                          TextColor="#D2E4FB"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="2"
+                        Spacing="0">
+                      <Label Text="餘額"
+                          FontSize="13"
+                          TextColor="#8EA0B9"/>
+                      <Label Text="{Binding OutstandingText}"
+                          FontSize="18"
+                          FontAttributes="Bold"
+                          TextColor="#FFD479"/>
+                    </VerticalStackLayout>
+                    <Button Grid.Column="3"
+                            Text="✕"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            WidthRequest="36"
+                            HeightRequest="36"
+                            Padding="0"
+                            CornerRadius="18"
+                            BackgroundColor="#3D1F1F"
+                            TextColor="#FFB4AB"
+                            VerticalOptions="Start"
+                            Command="{Binding CancelCheckoutCommand}"/>
+                  </Grid>
 
-                <!-- Row 1: payment method tiles (dynamic) -->
-                <FlexLayout Grid.Row="1"
-                            Wrap="Wrap"
-                            Direction="Row"
-                            JustifyContent="Start"
-                            AlignItems="Start">
-                  <BindableLayout.ItemsSource>
-                    <Binding Path="CheckoutMethodOptions" />
-                  </BindableLayout.ItemsSource>
-                  <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="vm:CheckoutMethodOption">
-                      <Button Text="{Binding Name}"
-                              FontSize="14"
-                              FontAttributes="Bold"
-                              HeightRequest="52"
-                              MinimumWidthRequest="90"
-                              Margin="0,0,6,6"
-                              TextColor="#D2E4FB"
-                              BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToTileBg}}"
-                              Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.SelectPaymentMethodCommand}"
-                              CommandParameter="{Binding Name}" />
-                    </DataTemplate>
-                  </BindableLayout.ItemTemplate>
-                </FlexLayout>
-
-                <!-- Row 2: payments list -->
-                <Border Grid.Row="2"
-                        Stroke="#2A3B4C"
-                        StrokeShape="RoundRectangle 8"
-                        BackgroundColor="#1A2B3C"
-                        Padding="8"
-                        MinimumHeightRequest="60">
-                  <CollectionView ItemsSource="{Binding Payments}"
-                                  HeightRequest="80">
-                    <CollectionView.EmptyView>
-                      <Label Text="尚未新增付款。"
-                             TextColor="#8EA0B9"
-                             FontSize="14"
-                             HorizontalOptions="Center"
-                             VerticalOptions="Center" />
-                    </CollectionView.EmptyView>
-                    <CollectionView.ItemTemplate>
-                      <DataTemplate>
-                        <Grid ColumnDefinitions="*,Auto"
-                              Padding="6,3"
-                              ColumnSpacing="8">
-                          <Label Text="{Binding DisplayText}"
-                                 TextColor="#D2E4FB"
-                                 FontSize="16"
-                                 VerticalOptions="Center" />
-                          <Button Grid.Column="1"
-                                  Text="刪除"
-                                  FontSize="12"
-                                  BackgroundColor="#3D1F1F"
-                                  TextColor="#FFB4AB"
-                                  Padding="10,4"
-                                  Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemovePaymentCommand}"
-                                  CommandParameter="{Binding}" />
-                        </Grid>
+                  <!-- Row 1: payment method tiles (dynamic) -->
+                  <FlexLayout Grid.Row="1"
+                              Wrap="Wrap"
+                              Direction="Row"
+                              JustifyContent="Start"
+                              AlignItems="Start">
+                    <BindableLayout.ItemsSource>
+                      <Binding Path="CheckoutMethodOptions"/>
+                    </BindableLayout.ItemsSource>
+                    <BindableLayout.ItemTemplate>
+                      <DataTemplate x:DataType="vm:CheckoutMethodOption">
+                        <Button Text="{Binding Name}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                HeightRequest="52"
+                                MinimumWidthRequest="90"
+                                Margin="0,0,6,6"
+                                TextColor="#D2E4FB"
+                                BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToTileBg}}"
+                                Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.SelectPaymentMethodCommand}"
+                                CommandParameter="{Binding Name}"/>
                       </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                  </CollectionView>
-                </Border>
+                    </BindableLayout.ItemTemplate>
+                  </FlexLayout>
 
-                <!-- Row 3: money pad -->
-                <Grid Grid.Row="3"
-                      ColumnDefinitions="*">
-                  <Grid RowDefinitions="Auto,*,*,*,*,Auto"
-                        ColumnDefinitions="*,*,*,*"
-                        RowSpacing="6"
-                        ColumnSpacing="6">
-                    <Border Grid.Row="0"
-                            Grid.ColumnSpan="4"
-                            Stroke="#2A3B4C"
-                            StrokeShape="RoundRectangle 10"
-                            BackgroundColor="#1A2B3C"
-                            Padding="14,8">
-                      <Label Text="{Binding MoneyPadInputText, StringFormat='HKD $ {0}'}"
-                             TextColor="#BDEE62"
-                             FontSize="22"
-                             FontAttributes="Bold"
-                             HorizontalTextAlignment="End" />
-                    </Border>
+                  <!-- Row 2: payments list -->
+                  <Border Grid.Row="2"
+                          Stroke="#2A3B4C"
+                          StrokeShape="RoundRectangle 8"
+                          BackgroundColor="#1A2B3C"
+                          Padding="8"
+                          MinimumHeightRequest="60">
+                    <CollectionView ItemsSource="{Binding Payments}"
+                                    HeightRequest="80">
+                      <CollectionView.EmptyView>
+                        <Label Text="尚未新增付款。"
+                               TextColor="#8EA0B9"
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                      </CollectionView.EmptyView>
+                      <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                          <Grid ColumnDefinitions="*,Auto"
+                                Padding="6,3"
+                                ColumnSpacing="8">
+                            <Label Text="{Binding DisplayText}"
+                                   TextColor="#D2E4FB"
+                                   FontSize="16"
+                                   VerticalOptions="Center"/>
+                            <Button Grid.Column="1"
+                                    Text="刪除"
+                                    FontSize="12"
+                                    BackgroundColor="#3D1F1F"
+                                    TextColor="#FFB4AB"
+                                    Padding="10,4"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemovePaymentCommand}"
+                                    CommandParameter="{Binding}"/>
+                          </Grid>
+                        </DataTemplate>
+                      </CollectionView.ItemTemplate>
+                    </CollectionView>
+                  </Border>
 
-                    <Button Grid.Row="1" Grid.Column="0" Text="1" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="1" />
-                    <Button Grid.Row="1" Grid.Column="1" Text="2" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="2" />
-                    <Button Grid.Row="1" Grid.Column="2" Text="3" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="3" />
-                    <Button Grid.Row="1" Grid.Column="3" Text="$100" FontSize="18" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="100" />
+                  <!-- Row 3: money pad -->
+                  <Grid Grid.Row="3"
+                        ColumnDefinitions="*">
+                    <Grid RowDefinitions="Auto,*,*,*,*,Auto"
+                          ColumnDefinitions="*,*,*,*"
+                          RowSpacing="6"
+                          ColumnSpacing="6">
+                      <Border Grid.Row="0"
+                              Grid.ColumnSpan="4"
+                              Stroke="#2A3B4C"
+                              StrokeShape="RoundRectangle 10"
+                              BackgroundColor="#1A2B3C"
+                              Padding="14,8">
+                        <Label Text="{Binding MoneyPadInputText, StringFormat='HKD $ {0}'}"
+                               TextColor="#BDEE62"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="End"/>
+                      </Border>
 
-                    <Button Grid.Row="2" Grid.Column="0" Text="4" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="4" />
-                    <Button Grid.Row="2" Grid.Column="1" Text="5" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="5" />
-                    <Button Grid.Row="2" Grid.Column="2" Text="6" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="6" />
-                    <Button Grid.Row="2" Grid.Column="3" Text="$50" FontSize="18" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="50" />
+                      <Button Grid.Row="1"
+                          Grid.Column="0"
+                          Text="1"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="1"/>
+                      <Button Grid.Row="1"
+                          Grid.Column="1"
+                          Text="2"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="2"/>
+                      <Button Grid.Row="1"
+                          Grid.Column="2"
+                          Text="3"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="3"/>
+                      <Button Grid.Row="1"
+                          Grid.Column="3"
+                          Text="$100"
+                          FontSize="18"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#E07A5F"
+                          TextColor="White"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadQuickAmountCommand}"
+                          CommandParameter="100"/>
 
-                    <Button Grid.Row="3" Grid.Column="0" Text="7" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="7" />
-                    <Button Grid.Row="3" Grid.Column="1" Text="8" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="8" />
-                    <Button Grid.Row="3" Grid.Column="2" Text="9" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="9" />
-                    <Button Grid.Row="3" Grid.Column="3" Text="$20" FontSize="18" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="20" />
+                      <Button Grid.Row="2"
+                          Grid.Column="0"
+                          Text="4"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="4"/>
+                      <Button Grid.Row="2"
+                          Grid.Column="1"
+                          Text="5"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="5"/>
+                      <Button Grid.Row="2"
+                          Grid.Column="2"
+                          Text="6"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="6"/>
+                      <Button Grid.Row="2"
+                          Grid.Column="3"
+                          Text="$50"
+                          FontSize="18"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#E07A5F"
+                          TextColor="White"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadQuickAmountCommand}"
+                          CommandParameter="50"/>
 
-                    <Button Grid.Row="4" Grid.Column="0" Text="0" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="0" />
-                    <Button Grid.Row="4" Grid.Column="1" Text="00" FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="00" />
-                    <Button Grid.Row="4" Grid.Column="2" Text="." FontSize="16" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#1A2B3C" TextColor="#D2E4FB" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadInputCommand}" CommandParameter="." />
-                    <Button Grid.Row="4" Grid.Column="3" Text="$10" FontSize="18" FontAttributes="Bold" HeightRequest="54" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="10" />
+                      <Button Grid.Row="3"
+                          Grid.Column="0"
+                          Text="7"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="7"/>
+                      <Button Grid.Row="3"
+                          Grid.Column="1"
+                          Text="8"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="8"/>
+                      <Button Grid.Row="3"
+                          Grid.Column="2"
+                          Text="9"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="9"/>
+                      <Button Grid.Row="3"
+                          Grid.Column="3"
+                          Text="$20"
+                          FontSize="18"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#E07A5F"
+                          TextColor="White"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadQuickAmountCommand}"
+                          CommandParameter="20"/>
 
-                    <Button Grid.Row="5" Grid.Column="0"
-                            Text="C"
-                            FontSize="16"
+                      <Button Grid.Row="4"
+                          Grid.Column="0"
+                          Text="0"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="0"/>
+                      <Button Grid.Row="4"
+                          Grid.Column="1"
+                          Text="00"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="00"/>
+                      <Button Grid.Row="4"
+                          Grid.Column="2"
+                          Text="."
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#1A2B3C"
+                          TextColor="#D2E4FB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadInputCommand}"
+                          CommandParameter="."/>
+                      <Button Grid.Row="4"
+                          Grid.Column="3"
+                          Text="$10"
+                          FontSize="18"
+                          FontAttributes="Bold"
+                          HeightRequest="54"
+                          BackgroundColor="#E07A5F"
+                          TextColor="White"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadQuickAmountCommand}"
+                          CommandParameter="10"/>
+
+                      <Button Grid.Row="5"
+                          Grid.Column="0"
+                              Text="C"
+                              FontSize="16"
+                              FontAttributes="Bold"
+                              HeightRequest="48"
+                              BackgroundColor="#3D1F1F"
+                              TextColor="#FFB4AB"
+                              BorderColor="#2A3B4C"
+                              BorderWidth="1"
+                              CornerRadius="10"
+                              Command="{Binding MoneyPadClearCommand}"/>
+                      <Button Grid.Row="5"
+                          Grid.Column="1"
+                              Text="⌫"
+                              FontSize="16"
+                              FontAttributes="Bold"
+                              HeightRequest="48"
+                              BackgroundColor="#3D1F1F"
+                              TextColor="#FFB4AB"
+                              BorderColor="#2A3B4C"
+                              BorderWidth="1"
+                              CornerRadius="10"
+                              Command="{Binding MoneyPadBackspaceCommand}"/>
+                      <Button Grid.Row="5"
+                          Grid.Column="2"
+                          Text="$500"
+                          FontSize="18"
+                          FontAttributes="Bold"
+                          HeightRequest="48"
+                          BackgroundColor="#E07A5F"
+                          TextColor="White"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadQuickAmountCommand}"
+                          CommandParameter="500"/>
+                      <Button Grid.Row="5"
+                          Grid.Column="3"
+                          Text="$1000"
+                          FontSize="18"
+                          FontAttributes="Bold"
+                          HeightRequest="48"
+                          BackgroundColor="#E07A5F"
+                          TextColor="White"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding MoneyPadQuickAmountCommand}"
+                          CommandParameter="1000"/>
+                    </Grid>
+                  </Grid>
+
+                  <!-- Row 4: footer Add Payment + Confirm -->
+                  <Grid Grid.Row="4"
+                        ColumnDefinitions="*,*"
+                        ColumnSpacing="10">
+                    <Button Grid.Column="0"
+                            Text="新增付款"
+                            FontSize="14"
+                            HeightRequest="42"
+                            BackgroundColor="#A2D149"
+                            TextColor="#243600"
                             FontAttributes="Bold"
-                            HeightRequest="48"
-                            BackgroundColor="#3D1F1F"
-                            TextColor="#FFB4AB"
-                            BorderColor="#2A3B4C"
-                            BorderWidth="1"
-                            CornerRadius="10"
-                            Command="{Binding MoneyPadClearCommand}" />
-                    <Button Grid.Row="5" Grid.Column="1"
-                            Text="⌫"
-                            FontSize="16"
+                            Command="{Binding AddPaymentCommand}"/>
+                    <Button Grid.Column="1"
+                            Text="確認並收銀"
+                            FontSize="14"
+                            HeightRequest="42"
+                            BackgroundColor="#A2D149"
+                            TextColor="#243600"
                             FontAttributes="Bold"
-                            HeightRequest="48"
-                            BackgroundColor="#3D1F1F"
-                            TextColor="#FFB4AB"
-                            BorderColor="#2A3B4C"
-                            BorderWidth="1"
-                            CornerRadius="10"
-                            Command="{Binding MoneyPadBackspaceCommand}" />
-                    <Button Grid.Row="5" Grid.Column="2" Text="$500" FontSize="18" FontAttributes="Bold" HeightRequest="48" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="500" />
-                    <Button Grid.Row="5" Grid.Column="3" Text="$1000" FontSize="18" FontAttributes="Bold" HeightRequest="48" BackgroundColor="#E07A5F" TextColor="White" BorderColor="#2A3B4C" BorderWidth="1" CornerRadius="10" Command="{Binding MoneyPadQuickAmountCommand}" CommandParameter="1000" />
+                            Command="{Binding ConfirmCheckoutCommand}">
+                      <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup Name="CommonStates">
+                          <VisualState Name="Normal">
+                            <VisualState.Setters>
+                              <Setter Property="BackgroundColor"
+                                  Value="#A2D149"/>
+                              <Setter Property="TextColor"
+                                  Value="#243600"/>
+                            </VisualState.Setters>
+                          </VisualState>
+                          <VisualState Name="Disabled">
+                            <VisualState.Setters>
+                              <Setter Property="BackgroundColor"
+                                  Value="#253648"/>
+                              <Setter Property="TextColor"
+                                  Value="#4A6070"/>
+                            </VisualState.Setters>
+                          </VisualState>
+                        </VisualStateGroup>
+                      </VisualStateManager.VisualStateGroups>
+                    </Button>
                   </Grid>
                 </Grid>
-
-                <!-- Row 4: footer Add Payment + Confirm -->
-                <Grid Grid.Row="4"
-                      ColumnDefinitions="*,*"
-                      ColumnSpacing="10">
-                  <Button Grid.Column="0"
-                          Text="新增付款"
-                          FontSize="14"
-                          HeightRequest="42"
-                          BackgroundColor="#A2D149"
-                          TextColor="#243600"
-                          FontAttributes="Bold"
-                          Command="{Binding AddPaymentCommand}" />
-                  <Button Grid.Column="1"
-                          Text="確認並收銀"
-                          FontSize="14"
-                          HeightRequest="42"
-                          BackgroundColor="#A2D149"
-                          TextColor="#243600"
-                          FontAttributes="Bold"
-                          Command="{Binding ConfirmCheckoutCommand}">
-                    <VisualStateManager.VisualStateGroups>
-                      <VisualStateGroup Name="CommonStates">
-                        <VisualState Name="Normal">
-                          <VisualState.Setters>
-                            <Setter Property="BackgroundColor" Value="#A2D149" />
-                            <Setter Property="TextColor" Value="#243600" />
-                          </VisualState.Setters>
-                        </VisualState>
-                        <VisualState Name="Disabled">
-                          <VisualState.Setters>
-                            <Setter Property="BackgroundColor" Value="#253648" />
-                            <Setter Property="TextColor" Value="#4A6070" />
-                          </VisualState.Setters>
-                        </VisualState>
-                      </VisualStateGroup>
-                    </VisualStateManager.VisualStateGroups>
-                  </Button>
-                </Grid>
-              </Grid>
               </Border>
             </ScrollView>
             <Grid x:Name="DailyAccountTabContent"
@@ -566,41 +888,41 @@
                        FontSize="20"
                        FontAttributes="Bold"
                        TextColor="#D2E4FB"
-                       VerticalOptions="Center" />
+                       VerticalOptions="Center"/>
                 <HorizontalStackLayout Grid.Column="1"
                                        Spacing="8">
                   <Button Text="◀ 上一日"
                           BackgroundColor="#253648"
                           TextColor="#D2E4FB"
                           Padding="12,6"
-                          Command="{Binding PrevDayCommand}" />
+                          Command="{Binding PrevDayCommand}"/>
                   <Button Text="今日"
                           BackgroundColor="#1F3D5C"
                           TextColor="#D2E4FB"
                           FontAttributes="Bold"
                           Padding="12,6"
-                          Command="{Binding TodayCommand}" />
+                          Command="{Binding TodayCommand}"/>
                   <Button Text="下一日 ▶"
                           BackgroundColor="#253648"
                           TextColor="#D2E4FB"
                           Padding="12,6"
-                          Command="{Binding NextDayCommand}" />
+                          Command="{Binding NextDayCommand}"/>
                   <DatePicker Date="{Binding SelectedDate}"
                               TextColor="#D2E4FB"
                               BackgroundColor="#1A2B3C"
-                              FontSize="14" />
+                              FontSize="14"/>
                   <Button Text="📊 匯出 Excel"
                           BackgroundColor="#A2D149"
                           TextColor="#243600"
                           FontAttributes="Bold"
                           Padding="12,6"
-                          Command="{Binding ExportDailyReportCommand}" />
+                          Command="{Binding ExportDailyReportCommand}"/>
                   <Button Text="🗑 清除記錄"
                           BackgroundColor="#5C1F1F"
                           TextColor="#FFB4AB"
                           FontAttributes="Bold"
                           Padding="12,6"
-                          Command="{Binding DeleteDayDataCommand}" />
+                          Command="{Binding DeleteDayDataCommand}"/>
                 </HorizontalStackLayout>
               </Grid>
 
@@ -615,12 +937,39 @@
                     <Grid ColumnDefinitions="60,2*,90,1.5*,88,56"
                           Padding="14,10"
                           BackgroundColor="#0A1823">
-                      <Label Grid.Column="0" Text="編號" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
-                      <Label Grid.Column="1" Text="產品" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
-                      <Label Grid.Column="2" Text="時間" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
-                      <Label Grid.Column="3" Text="付款方式" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" />
-                      <Label Grid.Column="4" Text="金額" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="End" />
-                      <Label Grid.Column="5" Text="" />
+                      <Label Grid.Column="0"
+                          Text="編號"
+                          TextColor="#5E7A96"
+                          FontSize="11"
+                          FontAttributes="Bold"
+                          CharacterSpacing="1.2"/>
+                      <Label Grid.Column="1"
+                          Text="產品"
+                          TextColor="#5E7A96"
+                          FontSize="11"
+                          FontAttributes="Bold"
+                          CharacterSpacing="1.2"/>
+                      <Label Grid.Column="2"
+                          Text="時間"
+                          TextColor="#5E7A96"
+                          FontSize="11"
+                          FontAttributes="Bold"
+                          CharacterSpacing="1.2"/>
+                      <Label Grid.Column="3"
+                          Text="付款方式"
+                          TextColor="#5E7A96"
+                          FontSize="11"
+                          FontAttributes="Bold"
+                          CharacterSpacing="1.2"/>
+                      <Label Grid.Column="4"
+                          Text="金額"
+                          TextColor="#5E7A96"
+                          FontSize="11"
+                          FontAttributes="Bold"
+                          CharacterSpacing="1.2"
+                          HorizontalOptions="End"/>
+                      <Label Grid.Column="5"
+                          Text=""/>
                     </Grid>
                   </CollectionView.Header>
                   <CollectionView.EmptyView>
@@ -629,7 +978,7 @@
                            FontSize="14"
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
-                           Margin="0,40" />
+                           Margin="0,40"/>
                   </CollectionView.EmptyView>
                   <CollectionView.ItemTemplate>
                     <DataTemplate>
@@ -645,8 +994,9 @@
                                  VerticalOptions="Start">
                             <Label.FormattedText>
                               <FormattedString>
-                                <Span Text="#" TextColor="#5E7A96" />
-                                <Span Text="{Binding Id}" />
+                                <Span Text="#"
+                                    TextColor="#5E7A96"/>
+                                <Span Text="{Binding Id}"/>
                               </FormattedString>
                             </Label.FormattedText>
                           </Label>
@@ -656,18 +1006,22 @@
                                                Spacing="3"
                                                VerticalOptions="Start">
                             <BindableLayout.ItemsSource>
-                              <Binding Path="Lines" />
+                              <Binding Path="Lines"/>
                             </BindableLayout.ItemsSource>
                             <BindableLayout.ItemTemplate>
                               <DataTemplate>
                                 <Label FontSize="13">
                                   <Label.FormattedText>
                                     <FormattedString>
-                                      <Span Text="{Binding Quantity}" TextColor="#8EA0B9" />
-                                      <Span Text="× " TextColor="#8EA0B9" />
-                                      <Span Text="{Binding Name}" TextColor="#D2E4FB" />
-                                      <Span Text="  " />
-                                      <Span Text="{Binding LineTotal, StringFormat='${0:F2}'}" TextColor="#BDEE62" />
+                                      <Span Text="{Binding Quantity}"
+                                          TextColor="#8EA0B9"/>
+                                      <Span Text="× "
+                                          TextColor="#8EA0B9"/>
+                                      <Span Text="{Binding Name}"
+                                          TextColor="#D2E4FB"/>
+                                      <Span Text="  "/>
+                                      <Span Text="{Binding LineTotal, StringFormat='${0:F2}'}"
+                                          TextColor="#BDEE62"/>
                                     </FormattedString>
                                   </Label.FormattedText>
                                 </Label>
@@ -682,10 +1036,10 @@
                             <Label Text="{Binding CreatedAtLocal, StringFormat='{0:yyyy-MM-dd}'}"
                                    TextColor="#D2E4FB"
                                    FontSize="12"
-                                   FontAttributes="Bold" />
+                                   FontAttributes="Bold"/>
                             <Label Text="{Binding CreatedAtLocal, StringFormat='{0:HH:mm:ss}'}"
                                    TextColor="#8EA0B9"
-                                   FontSize="11" />
+                                   FontSize="11"/>
                           </VerticalStackLayout>
 
                           <!-- Payment methods (BindableLayout) -->
@@ -693,16 +1047,20 @@
                                                Spacing="3"
                                                VerticalOptions="Start">
                             <BindableLayout.ItemsSource>
-                              <Binding Path="Payments" />
+                              <Binding Path="Payments"/>
                             </BindableLayout.ItemsSource>
                             <BindableLayout.ItemTemplate>
                               <DataTemplate>
                                 <Label FontSize="12">
                                   <Label.FormattedText>
                                     <FormattedString>
-                                      <Span Text="{Binding Method}" TextColor="#8EA0B9" FontAttributes="Bold" />
-                                      <Span Text="  $" TextColor="#5E7A96" />
-                                      <Span Text="{Binding Amount, StringFormat='{0:F2}'}" TextColor="#D2E4FB" />
+                                      <Span Text="{Binding Method}"
+                                          TextColor="#8EA0B9"
+                                          FontAttributes="Bold"/>
+                                      <Span Text="  $"
+                                          TextColor="#5E7A96"/>
+                                      <Span Text="{Binding Amount, StringFormat='{0:F2}'}"
+                                          TextColor="#D2E4FB"/>
                                     </FormattedString>
                                   </Label.FormattedText>
                                 </Label>
@@ -719,8 +1077,10 @@
                                  VerticalOptions="Start">
                             <Label.FormattedText>
                               <FormattedString>
-                                <Span Text="$" TextColor="#8EA0B9" FontSize="12" />
-                                <Span Text="{Binding Total, StringFormat='{0:F2}'}" />
+                                <Span Text="$"
+                                    TextColor="#8EA0B9"
+                                    FontSize="12"/>
+                                <Span Text="{Binding Total, StringFormat='{0:F2}'}"/>
                               </FormattedString>
                             </Label.FormattedText>
                           </Label>
@@ -737,10 +1097,12 @@
                                   HeightRequest="30"
                                   VerticalOptions="Center"
                                   Command="{Binding Source={x:Reference DailyAccountTabContent}, Path=BindingContext.VoidTransactionCommand}"
-                                  CommandParameter="{Binding Id}" />
+                                  CommandParameter="{Binding Id}"/>
                         </Grid>
                         <!-- Row separator -->
-                        <BoxView HeightRequest="1" BackgroundColor="#162436" HorizontalOptions="Fill" />
+                        <BoxView HeightRequest="1"
+                            BackgroundColor="#162436"
+                            HorizontalOptions="Fill"/>
                       </VerticalStackLayout>
                     </DataTemplate>
                   </CollectionView.ItemTemplate>
@@ -763,7 +1125,9 @@
                               Wrap="Wrap"
                               AlignItems="Center">
                     <BindableLayout.EmptyView>
-                      <Label Text="暫無數據。" TextColor="#5E7A96" FontSize="12" />
+                      <Label Text="暫無數據。"
+                          TextColor="#5E7A96"
+                          FontSize="12"/>
                     </BindableLayout.EmptyView>
                     <BindableLayout.ItemTemplate>
                       <DataTemplate>
@@ -773,22 +1137,25 @@
                                  TextColor="#5E7A96"
                                  FontSize="10"
                                  FontAttributes="Bold"
-                                 CharacterSpacing="1.5" />
+                                 CharacterSpacing="1.5"/>
                           <Label TextColor="#D2E4FB"
                                  FontSize="20"
                                  FontAttributes="Bold">
                             <Label.FormattedText>
                               <FormattedString>
-                                <Span Text="$" TextColor="#8EA0B9" FontSize="13" />
-                                <Span Text="{Binding Amount, StringFormat='{0:F2}'}" />
+                                <Span Text="$"
+                                    TextColor="#8EA0B9"
+                                    FontSize="13"/>
+                                <Span Text="{Binding Amount, StringFormat='{0:F2}'}"/>
                               </FormattedString>
                             </Label.FormattedText>
                           </Label>
-                          <Label TextColor="#5E7A96" FontSize="11">
+                          <Label TextColor="#5E7A96"
+                              FontSize="11">
                             <Label.FormattedText>
                               <FormattedString>
-                                <Span Text="{Binding Count}" />
-                                <Span Text=" txn(s)" />
+                                <Span Text="{Binding Count}"/>
+                                <Span Text=" txn(s)"/>
                               </FormattedString>
                             </Label.FormattedText>
                           </Label>
@@ -810,26 +1177,26 @@
                                TextColor="#5E7A96"
                                FontSize="9"
                                FontAttributes="Bold"
-                               CharacterSpacing="1.5" />
+                               CharacterSpacing="1.5"/>
                         <Label Text="{Binding GrossTotalText}"
                                TextColor="#BDEE62"
                                FontSize="22"
-                               FontAttributes="Bold" />
+                               FontAttributes="Bold"/>
                       </VerticalStackLayout>
                       <BoxView WidthRequest="1"
                                BackgroundColor="#2A3B4C"
                                Margin="16,0"
-                               VerticalOptions="Fill" />
+                               VerticalOptions="Fill"/>
                       <VerticalStackLayout Spacing="3">
                         <Label Text="交易次數"
                                TextColor="#5E7A96"
                                FontSize="9"
                                FontAttributes="Bold"
-                               CharacterSpacing="1.5" />
+                               CharacterSpacing="1.5"/>
                         <Label Text="{Binding TransactionCountText}"
                                TextColor="#D2E4FB"
                                FontSize="22"
-                               FontAttributes="Bold" />
+                               FontAttributes="Bold"/>
                       </VerticalStackLayout>
                     </HorizontalStackLayout>
                   </Border>
@@ -837,11 +1204,13 @@
               </Border>
 
               <!-- Status message -->
-              <HorizontalStackLayout Grid.Row="3" Spacing="0" Padding="2,4,2,0">
+              <HorizontalStackLayout Grid.Row="3"
+                  Spacing="0"
+                  Padding="2,4,2,0">
                 <Label Text="{Binding StatusMessage}"
                        TextColor="#8EA0B9"
                        FontSize="12"
-                       VerticalOptions="Center" />
+                       VerticalOptions="Center"/>
                 <Label Text="{Binding LastExportFileName}"
                        IsVisible="{Binding HasLastExport}"
                        TextColor="#4DA3FF"
@@ -849,14 +1218,14 @@
                        TextDecorations="Underline"
                        VerticalOptions="Center">
                   <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding OpenLastExportCommand}" />
+                    <TapGestureRecognizer Command="{Binding OpenLastExportCommand}"/>
                   </Label.GestureRecognizers>
                 </Label>
               </HorizontalStackLayout>
             </Grid>
             <Grid x:Name="ConfigureTabContent"
                   IsVisible="False"
-                  RowDefinitions="Auto,Auto,Auto,Auto"
+                  RowDefinitions="Auto,Auto,Auto,Auto,Auto"
                   RowSpacing="10">
               <!-- ── Product Editor ── -->
               <Border Grid.Row="0"
@@ -864,80 +1233,121 @@
                       StrokeShape="RoundRectangle 14"
                       BackgroundColor="#162A3E"
                       Padding="14">
-                <Grid RowDefinitions="Auto,*"
-                      RowSpacing="10">
-                  <!-- Section header + column labels -->
-                  <Grid ColumnDefinitions="Auto,*,120,80,80"
+                <VerticalStackLayout Spacing="10">
+                  <Grid ColumnDefinitions="Auto,*,Auto"
                         ColumnSpacing="10">
-                    <Label Grid.Column="0" Text="產品" TextColor="#D2E4FB" FontSize="13" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
-                    <Label Grid.Column="2" Text="預設價格" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
-                    <Label Grid.Column="3" Text="儲存" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
-                    <Label Grid.Column="4" Text="刪除" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Column="0"
+                           Text="📦 產品"
+                           TextColor="#D2E4FB"
+                           FontSize="13"
+                           FontAttributes="Bold"
+                           CharacterSpacing="1.2"
+                           VerticalOptions="Center"/>
+                    <Button Grid.Column="2"
+                            Text="{Binding ProductConfigToggleText}"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            Padding="4,0"
+                            BackgroundColor="Transparent"
+                            TextColor="#D2E4FB"
+                            Command="{Binding ToggleProductConfigSectionCommand}"/>
                   </Grid>
-                  <!-- Product rows -->
-                  <CollectionView Grid.Row="1"
-                                  ItemsSource="{Binding ProductEditorRows}"
-                                  HeightRequest="220">
-                    <CollectionView.EmptyView>
-                      <Label Text="暫無產品。請在產品面板新增產品。"
-                             TextColor="#8EA0B9"
-                             FontSize="13"
+
+                  <Grid RowDefinitions="Auto,*"
+                        RowSpacing="10"
+                        IsVisible="{Binding IsProductConfigExpanded}">
+                    <!-- Section header + column labels -->
+                    <Grid ColumnDefinitions="Auto,*,120,80,80"
+                          ColumnSpacing="10">
+                      <Label Grid.Column="2"
+                             Text="預設價格"
+                             TextColor="#5E7A96"
+                             FontSize="11"
+                             FontAttributes="Bold"
+                             CharacterSpacing="1.2"
+                             VerticalOptions="Center"/>
+                      <Label Grid.Column="3"
+                             Text="儲存"
+                             TextColor="#5E7A96"
+                             FontSize="11"
+                             FontAttributes="Bold"
+                             CharacterSpacing="1.2"
                              HorizontalOptions="Center"
-                             VerticalOptions="Center"
-                             Margin="0,20" />
-                    </CollectionView.EmptyView>
-                    <CollectionView.ItemTemplate>
-                      <DataTemplate x:DataType="vm:ProductEditorRow">
-                        <Grid ColumnDefinitions="Auto,*,120,80,80"
-                              ColumnSpacing="10"
-                              Padding="0,5">
-                          <Label Grid.Column="0"
-                                 TextColor="#5E7A96"
-                                 FontSize="13"
-                                 VerticalOptions="Center">
-                            <Label.FormattedText>
-                              <FormattedString>
-                                <Span Text="#" />
-                                <Span Text="{Binding Id}" />
-                              </FormattedString>
-                            </Label.FormattedText>
-                          </Label>
-                          <Entry Grid.Column="1"
-                                 Text="{Binding Name}"
-                                 TextColor="#D2E4FB"
-                                 BackgroundColor="#0F2131"
-                                 FontSize="14" />
-                          <Entry Grid.Column="2"
-                                 Text="{Binding PriceText}"
-                                 TextColor="#BDEE62"
-                                 BackgroundColor="#0F2131"
-                                 FontSize="14"
-                                 Keyboard="Numeric" />
-                          <Button Grid.Column="3"
-                                  Text="💾"
-                                  FontSize="18"
-                                  BackgroundColor="#A2D149"
-                                  TextColor="#243600"
-                                  HeightRequest="40"
-                                  WidthRequest="64"
-                                  CornerRadius="8"
-                                  Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.SaveProductCommand}"
-                                  CommandParameter="{Binding .}" />
-                          <Button Grid.Column="4"
-                                  Text="🗑"
-                                  FontSize="18"
-                                  BackgroundColor="#4A1A1A"
-                                  TextColor="#FF6B6B"
-                                  HeightRequest="40"
-                                  WidthRequest="64"
-                                  CornerRadius="8"
-                                  Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.DeleteProductCommand}"
-                                  CommandParameter="{Binding .}" />
-                        </Grid>
-                      </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                  </CollectionView>
-                </Grid>
+                             VerticalOptions="Center"/>
+                      <Label Grid.Column="4"
+                             Text="刪除"
+                             TextColor="#5E7A96"
+                             FontSize="11"
+                             FontAttributes="Bold"
+                             CharacterSpacing="1.2"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"/>
+                    </Grid>
+                    <!-- Product rows -->
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding ProductEditorRows}"
+                                    HeightRequest="220">
+                      <CollectionView.EmptyView>
+                        <Label Text="暫無產品。請在產品面板新增產品。"
+                               TextColor="#8EA0B9"
+                               FontSize="13"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Margin="0,20"/>
+                      </CollectionView.EmptyView>
+                      <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ProductEditorRow">
+                          <Grid ColumnDefinitions="Auto,*,120,80,80"
+                                ColumnSpacing="10"
+                                Padding="0,5">
+                            <Label Grid.Column="0"
+                                   TextColor="#5E7A96"
+                                   FontSize="13"
+                                   VerticalOptions="Center">
+                              <Label.FormattedText>
+                                <FormattedString>
+                                  <Span Text="#"/>
+                                  <Span Text="{Binding Id}"/>
+                                </FormattedString>
+                              </Label.FormattedText>
+                            </Label>
+                            <Entry Grid.Column="1"
+                                   Text="{Binding Name}"
+                                   TextColor="#D2E4FB"
+                                   BackgroundColor="#0F2131"
+                                   FontSize="14"/>
+                            <Entry Grid.Column="2"
+                                   Text="{Binding PriceText}"
+                                   TextColor="#BDEE62"
+                                   BackgroundColor="#0F2131"
+                                   FontSize="14"
+                                   Keyboard="Numeric"/>
+                            <Button Grid.Column="3"
+                                    Text="💾"
+                                    FontSize="18"
+                                    BackgroundColor="#A2D149"
+                                    TextColor="#243600"
+                                    HeightRequest="40"
+                                    WidthRequest="64"
+                                    CornerRadius="8"
+                                    Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.SaveProductCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            <Button Grid.Column="4"
+                                    Text="🗑"
+                                    FontSize="18"
+                                    BackgroundColor="#4A1A1A"
+                                    TextColor="#FF6B6B"
+                                    HeightRequest="40"
+                                    WidthRequest="64"
+                                    CornerRadius="8"
+                                    Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.DeleteProductCommand}"
+                                    CommandParameter="{Binding .}"/>
+                          </Grid>
+                        </DataTemplate>
+                      </CollectionView.ItemTemplate>
+                    </CollectionView>
+                  </Grid>
+                </VerticalStackLayout>
               </Border>
 
               <!-- ── Payment Methods Editor ── -->
@@ -946,83 +1356,118 @@
                       StrokeShape="RoundRectangle 14"
                       BackgroundColor="#162A3E"
                       Padding="14">
-                <Grid RowDefinitions="Auto,*,Auto"
-                      RowSpacing="10">
-                  <!-- Section header -->
-                  <Grid ColumnDefinitions="Auto,*,80,80"
+                <VerticalStackLayout Spacing="10">
+                  <Grid ColumnDefinitions="Auto,*,Auto"
                         ColumnSpacing="10">
-                    <Label Grid.Column="0" Text="付款方式" TextColor="#D2E4FB" FontSize="13" FontAttributes="Bold" CharacterSpacing="1.2" VerticalOptions="Center" />
-                    <Label Grid.Column="2" Text="儲存" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
-                    <Label Grid.Column="3" Text="刪除" TextColor="#5E7A96" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.2" HorizontalOptions="Center" VerticalOptions="Center" />
-                  </Grid>
-                  <!-- Existing method rows -->
-                  <CollectionView Grid.Row="1"
-                                  ItemsSource="{Binding PaymentMethodEditorRows}"
-                                  HeightRequest="160">
-                    <CollectionView.EmptyView>
-                      <Label Text="尚未設定付款方式。"
-                             TextColor="#8EA0B9"
-                             FontSize="13"
-                             HorizontalOptions="Center"
-                             VerticalOptions="Center"
-                             Margin="0,20" />
-                    </CollectionView.EmptyView>
-                    <CollectionView.ItemTemplate>
-                      <DataTemplate x:DataType="vm:PaymentMethodEditorRow">
-                        <Grid ColumnDefinitions="*,80,80"
-                              ColumnSpacing="10"
-                              Padding="0,5">
-                          <Entry Grid.Column="0"
-                                 Text="{Binding Name}"
-                                 TextColor="#D2E4FB"
-                                 BackgroundColor="#0F2131"
-                                 FontSize="14" />
-                          <Button Grid.Column="1"
-                                  Text="💾"
-                                  FontSize="18"
-                                  BackgroundColor="#A2D149"
-                                  TextColor="#243600"
-                                  HeightRequest="40"
-                                  WidthRequest="64"
-                                  CornerRadius="8"
-                                  Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.SavePaymentMethodCommand}"
-                                  CommandParameter="{Binding .}" />
-                          <Button Grid.Column="2"
-                                  Text="🗑"
-                                  FontSize="18"
-                                  BackgroundColor="#4A1A1A"
-                                  TextColor="#FF6B6B"
-                                  HeightRequest="40"
-                                  WidthRequest="64"
-                                  CornerRadius="8"
-                                  Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.DeletePaymentMethodCommand}"
-                                  CommandParameter="{Binding .}" />
-                        </Grid>
-                      </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                  </CollectionView>
-                  <!-- Add new method -->
-                  <Grid Grid.Row="2"
-                        ColumnDefinitions="*,Auto"
-                        ColumnSpacing="10">
-                    <Entry Grid.Column="0"
-                           Text="{Binding NewPaymentMethodName}"
-                           Placeholder="新付款方式名稱（如：微信支付）"
-                           PlaceholderColor="#5E7A96"
+                    <Label Grid.Column="0"
+                           Text="💳 付款方式"
                            TextColor="#D2E4FB"
-                           BackgroundColor="#0F2131"
-                           FontSize="14" />
-                    <Button Grid.Column="1"
-                            Text="+ 新增"
-                            FontSize="14"
+                           FontSize="13"
+                           FontAttributes="Bold"
+                           CharacterSpacing="1.2"
+                           VerticalOptions="Center"/>
+                    <Button Grid.Column="2"
+                            Text="{Binding PaymentMethodsToggleText}"
+                            FontSize="18"
                             FontAttributes="Bold"
-                            BackgroundColor="#2563A8"
-                            TextColor="White"
-                            HeightRequest="44"
-                            CornerRadius="8"
-                            Command="{Binding AddPaymentMethodCommand}" />
+                            Padding="4,0"
+                            BackgroundColor="Transparent"
+                            TextColor="#D2E4FB"
+                            Command="{Binding TogglePaymentMethodsSectionCommand}"/>
                   </Grid>
-                </Grid>
+
+                  <Grid RowDefinitions="Auto,*,Auto"
+                        RowSpacing="10"
+                        IsVisible="{Binding IsPaymentMethodsExpanded}">
+                    <!-- Section header -->
+                    <Grid ColumnDefinitions="Auto,*,80,80"
+                          ColumnSpacing="10">
+                      <Label Grid.Column="2"
+                             Text="儲存"
+                             TextColor="#5E7A96"
+                             FontSize="11"
+                             FontAttributes="Bold"
+                             CharacterSpacing="1.2"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"/>
+                      <Label Grid.Column="3"
+                             Text="刪除"
+                             TextColor="#5E7A96"
+                             FontSize="11"
+                             FontAttributes="Bold"
+                             CharacterSpacing="1.2"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"/>
+                    </Grid>
+                    <!-- Existing method rows -->
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding PaymentMethodEditorRows}"
+                                    HeightRequest="160">
+                      <CollectionView.EmptyView>
+                        <Label Text="尚未設定付款方式。"
+                               TextColor="#8EA0B9"
+                               FontSize="13"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Margin="0,20"/>
+                      </CollectionView.EmptyView>
+                      <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:PaymentMethodEditorRow">
+                          <Grid ColumnDefinitions="*,80,80"
+                                ColumnSpacing="10"
+                                Padding="0,5">
+                            <Entry Grid.Column="0"
+                                   Text="{Binding Name}"
+                                   TextColor="#D2E4FB"
+                                   BackgroundColor="#0F2131"
+                                   FontSize="14"/>
+                            <Button Grid.Column="1"
+                                    Text="💾"
+                                    FontSize="18"
+                                    BackgroundColor="#A2D149"
+                                    TextColor="#243600"
+                                    HeightRequest="40"
+                                    WidthRequest="64"
+                                    CornerRadius="8"
+                                    Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.SavePaymentMethodCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            <Button Grid.Column="2"
+                                    Text="🗑"
+                                    FontSize="18"
+                                    BackgroundColor="#4A1A1A"
+                                    TextColor="#FF6B6B"
+                                    HeightRequest="40"
+                                    WidthRequest="64"
+                                    CornerRadius="8"
+                                    Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.DeletePaymentMethodCommand}"
+                                    CommandParameter="{Binding .}"/>
+                          </Grid>
+                        </DataTemplate>
+                      </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <!-- Add new method -->
+                    <Grid Grid.Row="2"
+                          ColumnDefinitions="*,Auto"
+                          ColumnSpacing="10">
+                      <Entry Grid.Column="0"
+                             Text="{Binding NewPaymentMethodName}"
+                             Placeholder="新付款方式名稱（如：微信支付）"
+                             PlaceholderColor="#5E7A96"
+                             TextColor="#D2E4FB"
+                             BackgroundColor="#0F2131"
+                             FontSize="14"/>
+                      <Button Grid.Column="1"
+                              Text="+ 新增"
+                              FontSize="14"
+                              FontAttributes="Bold"
+                              BackgroundColor="#2563A8"
+                              TextColor="White"
+                              HeightRequest="44"
+                              CornerRadius="8"
+                              Command="{Binding AddPaymentMethodCommand}"/>
+                    </Grid>
+                  </Grid>
+                </VerticalStackLayout>
               </Border>
 
               <!-- ── Printer Configure (collapsible) ── -->
@@ -1030,118 +1475,276 @@
                       Stroke="#2A3B4C"
                       StrokeShape="RoundRectangle 14"
                       BackgroundColor="#162A3E"
-                      Padding="0">
-                <VerticalStackLayout Spacing="0">
-
-                  <!-- Clickable header -->
-                  <Grid ColumnDefinitions="Auto,*"
-                        ColumnSpacing="10"
-                        Padding="16,14">
+                      Padding="14">
+                <VerticalStackLayout Spacing="10">
+                  <Grid ColumnDefinitions="Auto,*,Auto"
+                        ColumnSpacing="10">
                     <Label Grid.Column="0"
                            Text="🖨 印表機設置"
                            FontSize="18"
                            FontAttributes="Bold"
                            TextColor="#D2E4FB"
-                           VerticalOptions="Center" />
-                    <!-- Connection badge -->
-                    <Border Grid.Column="1"
-                            StrokeThickness="0"
-                            StrokeShape="RoundRectangle 999"
-                            BackgroundColor="#BDEE62"
-                            Padding="10,4"
-                            HorizontalOptions="Start"
-                            VerticalOptions="Center">
-                      <Label Text="{Binding ConnectionStateText}"
-                             FontSize="13"
-                             FontAttributes="Bold"
-                             TextColor="{Binding IsPrinterConnected, Converter={StaticResource BoolToConnectedColorConverter}}" />
-                    </Border>
+                           VerticalOptions="Center"/>
+                    <Button Grid.Column="2"
+                            Text="{Binding PrinterSettingsToggleText}"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            Padding="4,0"
+                            BackgroundColor="Transparent"
+                            TextColor="#D2E4FB"
+                            Command="{Binding TogglePrinterSettingsSectionCommand}"/>
                   </Grid>
 
-                  <!-- Separator -->
-                  <BoxView HeightRequest="1"
-                           BackgroundColor="#2A3B4C" />
-
                   <VerticalStackLayout Spacing="10"
-                                       Padding="16,14">
+                                       IsVisible="{Binding IsPrinterSettingsExpanded}">
+                    <Grid ColumnDefinitions="Auto,*"
+                          ColumnSpacing="10">
+                      <Label Grid.Column="0"
+                             Text="連接狀態"
+                             TextColor="#8EA0B9"
+                             VerticalOptions="Center"/>
+                      <Border Grid.Column="1"
+                              StrokeThickness="0"
+                              StrokeShape="RoundRectangle 999"
+                              BackgroundColor="#0F2131"
+                              Padding="10,4"
+                              HorizontalOptions="Start"
+                              VerticalOptions="Center">
+                        <Label Text="{Binding ConnectionStateText}"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="{Binding IsPrinterConnected, Converter={StaticResource BoolToConnectedColorConverter}}"/>
+                      </Border>
+                    </Grid>
+
+                    <BoxView HeightRequest="1"
+                             BackgroundColor="#2A3B4C"/>
+
                     <!-- Mode + Port -->
                     <Grid ColumnDefinitions="Auto,*,Auto,*"
                           ColumnSpacing="10">
-                      <Label Grid.Column="0" Text="模式" TextColor="#8EA0B9" VerticalOptions="Center" />
+                      <Label Grid.Column="0"
+                          Text="模式"
+                          TextColor="#8EA0B9"
+                          VerticalOptions="Center"/>
                       <Picker Grid.Column="1"
                               Title="USB 或 COM"
                               ItemsSource="{Binding ConnectionModes}"
-                              SelectedItem="{Binding ConnectionOptions.Mode}" />
-                      <Label Grid.Column="2" Text="連接埠" TextColor="#8EA0B9" VerticalOptions="Center" />
+                              SelectedItem="{Binding ConnectionOptions.Mode}"/>
+                      <Label Grid.Column="2"
+                          Text="連接埠"
+                          TextColor="#8EA0B9"
+                          VerticalOptions="Center"/>
                       <Entry Grid.Column="3"
                              Placeholder="已安裝印表機名稱（如：POS-80）"
-                             Text="{Binding ConnectionOptions.Endpoint}" />
+                             Text="{Binding ConnectionOptions.Endpoint}"/>
                     </Grid>
                     <!-- Connect / Disconnect -->
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Grid ColumnDefinitions="*,*"
+                        ColumnSpacing="10">
                       <Button Grid.Column="0"
                               Text="連接印表機"
                               HeightRequest="48"
                               FontAttributes="Bold"
                               BackgroundColor="#209DC0"
                               TextColor="White"
-                              Command="{Binding ConnectPrinterCommand}" />
+                              Command="{Binding ConnectPrinterCommand}"/>
                       <Button Grid.Column="1"
                               Text="中斷連接"
                               HeightRequest="48"
                               FontAttributes="Bold"
                               BackgroundColor="#253648"
                               TextColor="#D2E4FB"
-                              Command="{Binding DisconnectPrinterCommand}" />
+                              Command="{Binding DisconnectPrinterCommand}"/>
                     </Grid>
                     <!-- Open Drawer / Print Test -->
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Grid ColumnDefinitions="*,*"
+                        ColumnSpacing="10">
                       <Button Grid.Column="0"
                               Text="開錢箱"
                               HeightRequest="48"
                               FontAttributes="Bold"
                               BackgroundColor="#D18467"
                               TextColor="White"
-                              Command="{Binding OpenDrawerCommand}" />
+                              Command="{Binding OpenDrawerCommand}"/>
                       <Button Grid.Column="1"
                               Text="列印測試"
                               HeightRequest="48"
                               FontAttributes="Bold"
                               BackgroundColor="#1F3D5C"
                               TextColor="#D2E4FB"
-                              Command="{Binding PrintPrinterTestCommand}" />
+                              Command="{Binding PrintPrinterTestCommand}"/>
+                    </Grid>
+                    <!-- Console (always visible in expanded card) -->
+                    <BoxView HeightRequest="1"
+                             BackgroundColor="#2A3B4C"/>
+                    <Grid RowDefinitions="Auto,*"
+                          RowSpacing="6"
+                          Padding="0,2,0,0">
+                      <Label Text="印表機控制台"
+                             FontSize="14"
+                             FontAttributes="Bold"
+                             TextColor="#D2E4FB"/>
+                      <ScrollView Grid.Row="1"
+                                  HeightRequest="140">
+                        <Label Text="{Binding PrinterConsoleText}"
+                               TextColor="#8EA0B9"
+                               FontFamily="Courier New"
+                               FontSize="13"
+                               LineBreakMode="WordWrap"/>
+                      </ScrollView>
                     </Grid>
                   </VerticalStackLayout>
-
-                  <!-- Console (always visible) -->
-                  <BoxView HeightRequest="1" BackgroundColor="#2A3B4C" />
-                  <Grid RowDefinitions="Auto,*"
-                        RowSpacing="6"
-                        Padding="16,12">
-                    <Label Text="印表機控制台"
-                           FontSize="14"
-                           FontAttributes="Bold"
-                           TextColor="#D2E4FB" />
-                    <ScrollView Grid.Row="1" HeightRequest="140">
-                      <Label Text="{Binding PrinterConsoleText}"
-                             TextColor="#8EA0B9"
-                             FontFamily="Courier New"
-                             FontSize="13"
-                             LineBreakMode="WordWrap" />
-                    </ScrollView>
-                  </Grid>
 
                 </VerticalStackLayout>
               </Border>
 
-              <Label Grid.Row="3"
+              <Border Grid.Row="3"
+                      Stroke="#2A3B4C"
+                      StrokeShape="RoundRectangle 14"
+                      BackgroundColor="#162A3E"
+                      Padding="14">
+                <VerticalStackLayout Spacing="12">
+                  <Grid ColumnDefinitions="Auto,*,Auto"
+                        ColumnSpacing="10">
+                    <Label Grid.Column="0"
+                           Text="🎨 自訂外觀設定"
+                           FontSize="{DynamicResource FontSizeSectionTitle}"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource ThemePrimaryTextColor}"/>
+                    <Button Grid.Column="2"
+                            Text="{Binding AppearanceSettingsToggleText}"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            Padding="4,0"
+                            BackgroundColor="Transparent"
+                            TextColor="{DynamicResource ThemePrimaryTextColor}"
+                            Command="{Binding ToggleAppearanceSectionCommand}"/>
+                  </Grid>
+
+                  <VerticalStackLayout Spacing="12"
+                                       IsVisible="{Binding IsAppearanceSettingsExpanded}">
+                    <Grid ColumnDefinitions="Auto,*,Auto"
+                          ColumnSpacing="10">
+                      <Label Grid.Column="0"
+                             Text="字體縮放"
+                             TextColor="{DynamicResource ThemeSecondaryTextColor}"
+                             VerticalOptions="Center"/>
+                      <Slider Grid.Column="1"
+                              Minimum="0.8"
+                              Maximum="1.6"
+                              Value="{Binding UiFontScale}"/>
+                      <Label Grid.Column="2"
+                             Text="{Binding UiFontScaleText}"
+                             TextColor="{DynamicResource ThemePrimaryTextColor}"
+                             VerticalOptions="Center"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="2*,Auto,2*,Auto"
+                          RowDefinitions="Auto,Auto"
+                          ColumnSpacing="10"
+                          RowSpacing="8">
+                      <Label Grid.Row="0"
+                             Grid.Column="0"
+                             Text="主文字 #RRGGBB"
+                             TextColor="{DynamicResource ThemeSecondaryTextColor}"/>
+                      <BoxView Grid.Row="0"
+                               Grid.Column="1"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               CornerRadius="4"
+                               Color="{Binding UiPrimaryTextColorHex}"/>
+                      <Entry Grid.Row="0"
+                             Grid.Column="2"
+                             Text="{Binding UiPrimaryTextColorHex}"
+                             Placeholder="#D2E4FB"
+                             TextColor="{DynamicResource ThemePrimaryTextColor}"
+                             BackgroundColor="#0F2131"/>
+
+                      <Label Grid.Row="1"
+                             Grid.Column="0"
+                             Text="次文字 #RRGGBB"
+                             TextColor="{DynamicResource ThemeSecondaryTextColor}"/>
+                      <BoxView Grid.Row="1"
+                               Grid.Column="1"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               CornerRadius="4"
+                               Color="{Binding UiSecondaryTextColorHex}"/>
+                      <Entry Grid.Row="1"
+                             Grid.Column="2"
+                             Text="{Binding UiSecondaryTextColorHex}"
+                             Placeholder="#8EA0B9"
+                             TextColor="{DynamicResource ThemePrimaryTextColor}"
+                             BackgroundColor="#0F2131"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="2*,Auto,2*,Auto"
+                          RowDefinitions="Auto,Auto"
+                          ColumnSpacing="10"
+                          RowSpacing="8">
+                      <Label Grid.Row="0"
+                             Grid.Column="0"
+                             Text="背景 #RRGGBB"
+                             TextColor="{DynamicResource ThemeSecondaryTextColor}"/>
+                      <BoxView Grid.Row="0"
+                               Grid.Column="1"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               CornerRadius="4"
+                               Color="{Binding UiBackgroundColorHex}"/>
+                      <Entry Grid.Row="0"
+                             Grid.Column="2"
+                             Text="{Binding UiBackgroundColorHex}"
+                             Placeholder="#031425"
+                             TextColor="{DynamicResource ThemePrimaryTextColor}"
+                             BackgroundColor="#0F2131"/>
+
+                      <Label Grid.Row="1"
+                             Grid.Column="0"
+                             Text="強調色 #RRGGBB"
+                             TextColor="{DynamicResource ThemeSecondaryTextColor}"/>
+                      <BoxView Grid.Row="1"
+                               Grid.Column="1"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               CornerRadius="4"
+                               Color="{Binding UiAccentColorHex}"/>
+                      <Entry Grid.Row="1"
+                             Grid.Column="2"
+                             Text="{Binding UiAccentColorHex}"
+                             Placeholder="#A2D149"
+                             TextColor="{DynamicResource ThemePrimaryTextColor}"
+                             BackgroundColor="#0F2131"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*"
+                          ColumnSpacing="10">
+                      <Button Grid.Column="0"
+                              Text="套用外觀"
+                              FontAttributes="Bold"
+                              BackgroundColor="{DynamicResource ThemeAccentColor}"
+                              TextColor="#243600"
+                              Command="{Binding ApplyAppearanceCommand}"/>
+                      <Button Grid.Column="1"
+                              Text="重設預設"
+                              FontAttributes="Bold"
+                              BackgroundColor="#253648"
+                              TextColor="{DynamicResource ThemePrimaryTextColor}"
+                              Command="{Binding ResetAppearanceCommand}"/>
+                    </Grid>
+                  </VerticalStackLayout>
+                </VerticalStackLayout>
+              </Border>
+
+              <Label Grid.Row="4"
                      Text="{Binding StatusMessage}"
                      TextColor="#8EA0B9"
                      FontSize="13"
-                     VerticalOptions="Start" />
-            </Grid>
+                     VerticalOptions="Start"/>
             </Grid>
           </Grid>
+        </Grid>
       </Border>
 
       <Grid Grid.Column="0"
@@ -1155,79 +1758,49 @@
           <VerticalStackLayout Spacing="10">
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="10">
-              <VerticalStackLayout Spacing="2">
-                <Label Text="印表機連接"
-                       FontSize="18"
-                       FontAttributes="Bold"
-                       TextColor="#D2E4FB" />
-                <Label Text="{Binding ConnectionStateText}">
-                  <Label.Triggers>
-                    <DataTrigger TargetType="Label"
-                                 Binding="{Binding IsPrinterConnected}"
-                                 Value="True">
-                      <Setter Property="TextColor"
-                              Value="#BDEE62" />
-                    </DataTrigger>
-                    <DataTrigger TargetType="Label"
-                                 Binding="{Binding IsPrinterConnected}"
-                                 Value="False">
-                      <Setter Property="TextColor"
-                              Value="#FFB4AB" />
-                    </DataTrigger>
-                  </Label.Triggers>
-                </Label>
-              </VerticalStackLayout>
-              <Button Grid.Column="1"
-                      Text="✎"
-                      FontSize="16"
-                      FontAttributes="Bold"
-                      WidthRequest="36"
-                      HeightRequest="36"
-                      Padding="0"
-                      CornerRadius="18"
-                      BackgroundColor="#1F3D5C"
-                      TextColor="#D2E4FB"
-                      VerticalOptions="Start"
-                      Command="{Binding BeginEditPrinterConfigCommand}" />
-            </Grid>
 
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
-                  ColumnDefinitions="*,*"
-                  ColumnSpacing="8"
-                  RowSpacing="8">
-              <Picker Grid.Row="0"
-                      Grid.Column="0"
-                      Title="模式"
-                      ItemsSource="{Binding ConnectionModes}"
-                      ItemDisplayBinding="{Binding .}"
-                      SelectedItem="{Binding EditingConnectionMode, Mode=TwoWay}"
-                      IsEnabled="{Binding IsPrinterConfigEditMode}" />
-              <Entry Grid.Row="0"
-                     Grid.Column="1"
-                     Placeholder="已安裝印表機名稱"
-                     IsEnabled="{Binding IsPrinterConfigEditMode}"
-                     Text="{Binding EditingConnectionEndpoint, Mode=TwoWay}" />
-              <HorizontalStackLayout Grid.Row="4"
-                                      Grid.ColumnSpan="2"
-                                      Spacing="8">
-                <Button Text="連接"
-                        BackgroundColor="#209DC0"
-                        TextColor="White"
-                        FontAttributes="Bold"
-                        Command="{Binding ConnectPrinterCommand}" />
-                <Button Text="中斷連接"
-                        BackgroundColor="#253648"
-                        TextColor="#D2E4FB"
-                        FontAttributes="Bold"
-                        Command="{Binding DisconnectPrinterCommand}" />
-                <Button Text="套用"
-                        FontAttributes="Bold"
-                        BackgroundColor="#A2D149"
-                        TextColor="#243600"
-                        IsVisible="{Binding IsPrinterConfigEditMode}"
-                        IsEnabled="{Binding IsPrinterConfigEditMode}"
-                        Command="{Binding ApplyPrinterConfigCommand}" />
-              </HorizontalStackLayout>
+              <Grid Grid.Row="4"
+                    Grid.ColumnSpan="3"
+                    ColumnDefinitions="*,Auto"
+                    ColumnSpacing="8">
+                <VerticalStackLayout Grid.Column="0"
+                                     Spacing="2">
+                  <Label Text="印表機連接"
+                         FontSize="18"
+                         FontAttributes="Bold"
+                         TextColor="#D2E4FB"/>
+                  <Label Text="{Binding ConnectionStateText}">
+                    <Label.Triggers>
+                      <DataTrigger TargetType="Label"
+                                   Binding="{Binding IsPrinterConnected}"
+                                   Value="True">
+                        <Setter Property="TextColor"
+                                Value="#BDEE62"/>
+                      </DataTrigger>
+                      <DataTrigger TargetType="Label"
+                                   Binding="{Binding IsPrinterConnected}"
+                                   Value="False">
+                        <Setter Property="TextColor"
+                                Value="#FFB4AB"/>
+                      </DataTrigger>
+                    </Label.Triggers>
+                  </Label>
+                </VerticalStackLayout>
+                <HorizontalStackLayout Grid.Column="1"
+                                       Spacing="8">
+                  <Button Text="連接"
+                          BackgroundColor="#209DC0"
+                          TextColor="White"
+                          FontAttributes="Bold"
+                          Command="{Binding ConnectPrinterCommand}"/>
+                  <Button Text="中斷連接"
+                          BackgroundColor="#253648"
+                          TextColor="#D2E4FB"
+                          FontAttributes="Bold"
+                          Command="{Binding DisconnectPrinterCommand}"/>
+                </HorizontalStackLayout>
+              </Grid>
+
             </Grid>
           </VerticalStackLayout>
         </Border>
@@ -1245,13 +1818,13 @@
                 <Label Text="產品"
                        TextColor="#D2E4FB"
                        FontSize="24"
-                       FontAttributes="Bold" />
+                       FontAttributes="Bold"/>
                 <Button Grid.Column="1"
                         Text="+ 新增產品"
                         FontAttributes="Bold"
                         BackgroundColor="#A2D149"
                         TextColor="#243600"
-                        Command="{Binding OpenAddProductPopupCommand}" />
+                        Command="{Binding OpenAddProductPopupCommand}"/>
               </Grid>
 
               <CollectionView Grid.Row="1"
@@ -1261,7 +1834,7 @@
                   <GridItemsLayout Orientation="Vertical"
                                    Span="3"
                                    HorizontalItemSpacing="10"
-                                   VerticalItemSpacing="10" />
+                                   VerticalItemSpacing="10"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                   <DataTemplate>
@@ -1273,7 +1846,7 @@
                             MinimumHeightRequest="110">
                       <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AddItemCommand}"
-                                              CommandParameter="{Binding}" />
+                                              CommandParameter="{Binding}"/>
                       </Border.GestureRecognizers>
                       <VerticalStackLayout Spacing="8"
                                            VerticalOptions="Center"
@@ -1282,15 +1855,15 @@
                                FontSize="18"
                                FontAttributes="Bold"
                                TextColor="#D2E4FB"
-                               HorizontalTextAlignment="Center" />
+                               HorizontalTextAlignment="Center"/>
                         <Label Text="{Binding DefaultPrice, StringFormat='HKD $ {0:F2}'}"
                                TextColor="#69D4F8"
                                FontAttributes="Bold"
-                               HorizontalTextAlignment="Center" />
+                               HorizontalTextAlignment="Center"/>
                         <Label Text="點擊新增"
                                FontSize="12"
                                TextColor="#8EA0B9"
-                               HorizontalTextAlignment="Center" />
+                               HorizontalTextAlignment="Center"/>
                       </VerticalStackLayout>
                     </Border>
                   </DataTemplate>
@@ -1305,7 +1878,7 @@
                Text="在 macOS 上，目前預設印表機為模擬/檔案輸出。"
                FontSize="12"
                TextColor="#8EA0B9"
-               Opacity="0.9" />
+               Opacity="0.9"/>
       </Grid>
     </Grid>
     <Grid Grid.RowSpan="1"
@@ -1323,13 +1896,13 @@
           <Label Text="新增產品"
                  FontSize="24"
                  FontAttributes="Bold"
-                 TextColor="#D2E4FB" />
+                 TextColor="#D2E4FB"/>
 
           <Entry Placeholder="產品名稱"
-                 Text="{Binding NewProductName}" />
+                 Text="{Binding NewProductName}"/>
           <Entry Placeholder="價格（如：12.5）"
                  Keyboard="Numeric"
-                 Text="{Binding NewProductPriceText}" />
+                 Text="{Binding NewProductPriceText}"/>
 
           <Grid ColumnDefinitions="*,*"
                 ColumnSpacing="10">
@@ -1338,13 +1911,13 @@
                     BackgroundColor="#253648"
                     TextColor="#D2E4FB"
                     FontAttributes="Bold"
-                    Command="{Binding CloseAddProductPopupCommand}" />
+                    Command="{Binding CloseAddProductPopupCommand}"/>
             <Button Grid.Column="1"
                     Text="新增"
                     BackgroundColor="#A2D149"
                     TextColor="#243600"
                     FontAttributes="Bold"
-                    Command="{Binding AddNewProductCommand}" />
+                    Command="{Binding AddNewProductCommand}"/>
           </Grid>
         </VerticalStackLayout>
       </Border>

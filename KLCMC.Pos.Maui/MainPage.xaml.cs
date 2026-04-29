@@ -1,5 +1,6 @@
 using KLCMC.Pos.Core.ViewModels;
 using System.ComponentModel;
+using KLCMC.Pos.Core.Models;
 
 namespace KLCMC.Pos.Maui;
 
@@ -16,6 +17,7 @@ public partial class MainPage : ContentPage
     private double _productControlStartY;
     private double _productControlLastX;
     private double _productControlLastY;
+    private MainTab _activeTab = MainTab.CurrentSale;
 
     private MainViewModel MainViewModel => (MainViewModel)BindingContext;
 
@@ -29,6 +31,8 @@ public partial class MainPage : ContentPage
         DailyAccountTabContent.BindingContext = DailyAccountViewModel;
         viewModel.SaleConfirmed += DailyAccountViewModel.Load;
         viewModel.PropertyChanged += OnMainViewModelPropertyChanged;
+        viewModel.UiAppearanceChanged += OnUiAppearanceChanged;
+        ApplyUiAppearance(viewModel.UiAppearance);
         CurrentSaleTabContent.SizeChanged += OnCurrentSaleTabContentSizeChanged;
         SetActiveTab(MainTab.CurrentSale);
     }
@@ -69,22 +73,88 @@ public partial class MainPage : ContentPage
 
     private void SetActiveTab(MainTab tab)
     {
+        _activeTab = tab;
         var isCurrentSale = tab == MainTab.CurrentSale;
         var isDailyAccount = tab == MainTab.DailyAccount;
         var isConfigure = tab == MainTab.Configure;
+        var activeTextColor = GetThemeColor("ThemePrimaryTextColor", "#D2E4FB");
+        var inactiveTextColor = GetThemeColor("ThemeSecondaryTextColor", "#8EA0B9");
 
         CurrentSaleTabContent.IsVisible = isCurrentSale;
         DailyAccountTabContent.IsVisible = isDailyAccount;
         ConfigureTabContent.IsVisible = isConfigure;
 
         CurrentSaleTabButton.BackgroundColor = isCurrentSale ? Color.FromArgb("#1F3D5C") : Color.FromArgb("#253648");
-        CurrentSaleTabButton.TextColor = isCurrentSale ? Color.FromArgb("#D2E4FB") : Color.FromArgb("#8EA0B9");
+        CurrentSaleTabButton.TextColor = isCurrentSale ? activeTextColor : inactiveTextColor;
 
         DailyAccountTabButton.BackgroundColor = isDailyAccount ? Color.FromArgb("#1F3D5C") : Color.FromArgb("#253648");
-        DailyAccountTabButton.TextColor = isDailyAccount ? Color.FromArgb("#D2E4FB") : Color.FromArgb("#8EA0B9");
+        DailyAccountTabButton.TextColor = isDailyAccount ? activeTextColor : inactiveTextColor;
 
         ConfigureTabButton.BackgroundColor = isConfigure ? Color.FromArgb("#1F3D5C") : Color.FromArgb("#253648");
-        ConfigureTabButton.TextColor = isConfigure ? Color.FromArgb("#D2E4FB") : Color.FromArgb("#8EA0B9");
+        ConfigureTabButton.TextColor = isConfigure ? activeTextColor : inactiveTextColor;
+    }
+
+    private void OnUiAppearanceChanged(UiAppearanceOptions options)
+    {
+        ApplyUiAppearance(options);
+    }
+
+    private void ApplyUiAppearance(UiAppearanceOptions options)
+    {
+        var fontScale = Math.Clamp(options.FontScale, UiAppearanceOptions.MinFontScale, UiAppearanceOptions.MaxFontScale);
+        SetColorResource("ThemeBackgroundColor", options.BackgroundColor);
+        SetColorResource("ThemePrimaryTextColor", options.PrimaryTextColor);
+        SetColorResource("ThemeSecondaryTextColor", options.SecondaryTextColor);
+        SetColorResource("ThemeAccentColor", options.AccentColor);
+
+        SetDoubleResource("ThemeFontScale", fontScale);
+        SetDoubleResource("FontSizePageTitle", 32d * fontScale);
+        SetDoubleResource("FontSizePageSubTitle", 26d * fontScale);
+        SetDoubleResource("FontSizeBody", 16d * fontScale);
+        SetDoubleResource("FontSizeButton", 20d * fontScale);
+        SetDoubleResource("FontSizeSectionTitle", 18d * fontScale);
+        SetActiveTab(_activeTab);
+    }
+
+    private void SetColorResource(string key, string value)
+    {
+        if (!Color.TryParse(value, out var parsed))
+        {
+            return;
+        }
+
+        Resources[key] = parsed;
+        var appResources = Application.Current?.Resources;
+        if (appResources is not null)
+        {
+            appResources[key] = parsed;
+        }
+    }
+
+    private void SetDoubleResource(string key, double value)
+    {
+        Resources[key] = value;
+        var appResources = Application.Current?.Resources;
+        if (appResources is not null)
+        {
+            appResources[key] = value;
+        }
+    }
+
+    private Color GetThemeColor(string key, string fallback)
+    {
+        if (Resources.TryGetValue(key, out var localValue) && localValue is Color localColor)
+        {
+            return localColor;
+        }
+
+        var appResources = Application.Current?.Resources;
+        if (appResources is not null && appResources.TryGetValue(key, out var appValue) && appValue is Color appColor)
+        {
+            return appColor;
+        }
+
+        return Color.FromArgb(fallback);
     }
 
     private void OnProductControlPanUpdated(object? sender, PanUpdatedEventArgs e)

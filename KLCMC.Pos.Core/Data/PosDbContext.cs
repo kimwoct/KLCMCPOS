@@ -15,6 +15,7 @@ public sealed class PosDbContext : DbContext
     public DbSet<SaleLineEntity> SaleLines => Set<SaleLineEntity>();
     public DbSet<SalePaymentEntity> SalePayments => Set<SalePaymentEntity>();
     public DbSet<PrinterSettingEntity> PrinterSettings => Set<PrinterSettingEntity>();
+    public DbSet<UiAppearanceSettingEntity> UiAppearanceSettings => Set<UiAppearanceSettingEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -62,6 +63,14 @@ public sealed class PosDbContext : DbContext
         {
             b.Property(p => p.Endpoint).HasMaxLength(120);
             b.Property(p => p.CodePage).HasMaxLength(40);
+        });
+
+        modelBuilder.Entity<UiAppearanceSettingEntity>(b =>
+        {
+            b.Property(p => p.PrimaryTextColor).IsRequired().HasMaxLength(7);
+            b.Property(p => p.SecondaryTextColor).IsRequired().HasMaxLength(7);
+            b.Property(p => p.BackgroundColor).IsRequired().HasMaxLength(7);
+            b.Property(p => p.AccentColor).IsRequired().HasMaxLength(7);
         });
     }
 }
