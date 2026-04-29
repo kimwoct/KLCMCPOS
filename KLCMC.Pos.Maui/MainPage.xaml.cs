@@ -79,18 +79,20 @@ public partial class MainPage : ContentPage
         var isConfigure = tab == MainTab.Configure;
         var activeTextColor = GetThemeColor("ThemePrimaryTextColor", "#D2E4FB");
         var inactiveTextColor = GetThemeColor("ThemeSecondaryTextColor", "#8EA0B9");
+        var activeTabBackgroundColor = GetThemeColor("ThemeActionBlueColor", "#1F3D5C");
+        var inactiveTabBackgroundColor = GetThemeColor("ThemeBorderMutedColor", "#253648");
 
         CurrentSaleTabContent.IsVisible = isCurrentSale;
         DailyAccountTabContent.IsVisible = isDailyAccount;
         ConfigureTabContent.IsVisible = isConfigure;
 
-        CurrentSaleTabButton.BackgroundColor = isCurrentSale ? Color.FromArgb("#1F3D5C") : Color.FromArgb("#253648");
+        CurrentSaleTabButton.BackgroundColor = isCurrentSale ? activeTabBackgroundColor : inactiveTabBackgroundColor;
         CurrentSaleTabButton.TextColor = isCurrentSale ? activeTextColor : inactiveTextColor;
 
-        DailyAccountTabButton.BackgroundColor = isDailyAccount ? Color.FromArgb("#1F3D5C") : Color.FromArgb("#253648");
+        DailyAccountTabButton.BackgroundColor = isDailyAccount ? activeTabBackgroundColor : inactiveTabBackgroundColor;
         DailyAccountTabButton.TextColor = isDailyAccount ? activeTextColor : inactiveTextColor;
 
-        ConfigureTabButton.BackgroundColor = isConfigure ? Color.FromArgb("#1F3D5C") : Color.FromArgb("#253648");
+        ConfigureTabButton.BackgroundColor = isConfigure ? activeTabBackgroundColor : inactiveTabBackgroundColor;
         ConfigureTabButton.TextColor = isConfigure ? activeTextColor : inactiveTextColor;
     }
 
@@ -102,16 +104,43 @@ public partial class MainPage : ContentPage
     private void ApplyUiAppearance(UiAppearanceOptions options)
     {
         var fontScale = Math.Clamp(options.FontScale, UiAppearanceOptions.MinFontScale, UiAppearanceOptions.MaxFontScale);
-        SetColorResource("ThemeBackgroundColor", options.BackgroundColor);
-        SetColorResource("ThemePrimaryTextColor", options.PrimaryTextColor);
-        SetColorResource("ThemeSecondaryTextColor", options.SecondaryTextColor);
-        SetColorResource("ThemeAccentColor", options.AccentColor);
+        var background = ParseColor(options.BackgroundColor, "#031425");
+        var primary = ParseColor(options.PrimaryTextColor, "#D2E4FB");
+        var secondary = ParseColor(options.SecondaryTextColor, "#8EA0B9");
+        var accent = ParseColor(options.AccentColor, "#A2D149");
+
+        SetColorResource("ThemeBackgroundColor", background);
+        SetColorResource("ThemeSurfaceColor", Blend(background, primary, 0.08f));
+        SetColorResource("ThemeSurfaceAltColor", Blend(background, primary, 0.13f));
+        SetColorResource("ThemeModalSurfaceColor", Blend(background, primary, 0.20f));
+        SetColorResource("ThemeCardColor", Blend(background, primary, 0.16f));
+        SetColorResource("ThemeHeaderBarColor", Blend(background, Color.FromArgb("#000000"), 0.35f));
+        SetColorResource("ThemeBorderColor", Blend(background, secondary, 0.55f));
+        SetColorResource("ThemeBorderMutedColor", Blend(background, secondary, 0.38f));
+        SetColorResource("ThemeInfoTextColor", Blend(secondary, primary, 0.22f));
+        SetColorResource("ThemePrimaryTextColor", primary);
+        SetColorResource("ThemeTertiaryTextColor", Blend(primary, secondary, 0.45f));
+        SetColorResource("ThemeSecondaryTextColor", secondary);
+        SetColorResource("ThemeSuccessTextColor", accent);
+        SetColorResource("ThemeHighlightColor", Blend(accent, primary, 0.35f));
+        SetColorResource("ThemeActionBlueColor", Blend(background, accent, 0.45f));
+        SetColorResource("ThemeActionBlueSoftColor", Blend(background, accent, 0.62f));
+        SetColorResource("ThemeActionTealColor", Blend(accent, Color.FromArgb("#2BA4CC"), 0.5f));
+        SetColorResource("ThemeActionWarmColor", Blend(accent, Color.FromArgb("#D18467"), 0.55f));
+        SetColorResource("ThemeQuickAmountColor", Blend(accent, Color.FromArgb("#E07A5F"), 0.60f));
+        SetColorResource("ThemeAccentColor", accent);
 
         SetDoubleResource("ThemeFontScale", fontScale);
         SetDoubleResource("FontSizePageTitle", 32d * fontScale);
         SetDoubleResource("FontSizePageSubTitle", 26d * fontScale);
         SetDoubleResource("FontSizeBody", 16d * fontScale);
+        SetDoubleResource("FontSizeBodySmall", 14d * fontScale);
+        SetDoubleResource("FontSizeCaption", 12d * fontScale);
+        SetDoubleResource("FontSizeMicro", 11d * fontScale);
+        SetDoubleResource("FontSizeTiny", 10d * fontScale);
         SetDoubleResource("FontSizeButton", 20d * fontScale);
+        SetDoubleResource("FontSizeButtonSmall", 14d * fontScale);
+        SetDoubleResource("FontSizeNumeric", 18d * fontScale);
         SetDoubleResource("FontSizeSectionTitle", 18d * fontScale);
         SetActiveTab(_activeTab);
     }
@@ -123,11 +152,16 @@ public partial class MainPage : ContentPage
             return;
         }
 
-        Resources[key] = parsed;
+        SetColorResource(key, parsed);
+    }
+
+    private void SetColorResource(string key, Color value)
+    {
+        Resources[key] = value;
         var appResources = Application.Current?.Resources;
         if (appResources is not null)
         {
-            appResources[key] = parsed;
+            appResources[key] = value;
         }
     }
 
@@ -155,6 +189,21 @@ public partial class MainPage : ContentPage
         }
 
         return Color.FromArgb(fallback);
+    }
+
+    private static Color ParseColor(string value, string fallback)
+    {
+        return Color.TryParse(value, out var parsed) ? parsed : Color.FromArgb(fallback);
+    }
+
+    private static Color Blend(Color from, Color to, float amount)
+    {
+        var ratio = Math.Clamp(amount, 0f, 1f);
+        return new Color(
+            from.Red + ((to.Red - from.Red) * ratio),
+            from.Green + ((to.Green - from.Green) * ratio),
+            from.Blue + ((to.Blue - from.Blue) * ratio),
+            from.Alpha + ((to.Alpha - from.Alpha) * ratio));
     }
 
     private void OnProductControlPanUpdated(object? sender, PanUpdatedEventArgs e)

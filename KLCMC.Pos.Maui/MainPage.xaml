@@ -11,8 +11,48 @@
   <ContentPage.Resources>
     <conv:BoolToTileBgConverter x:Key="BoolToTileBg"/>
     <conv:BoolToTileBgConverter x:Key="BoolToConnectedColorConverter"
-                                SelectedColor="#4CAF50"
-                                UnselectedColor="#F44336"/>
+                                SelectedColor="#BDEE62"
+                                UnselectedColor="#FFB4AB"/>
+    <Style TargetType="Label">
+      <Setter Property="TextColor" Value="{DynamicResource ThemePrimaryTextColor}"/>
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}"/>
+    </Style>
+    <Style TargetType="Button">
+      <Setter Property="TextColor" Value="{DynamicResource ThemePrimaryTextColor}"/>
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBodySmall}"/>
+    </Style>
+    <Style TargetType="Entry">
+      <Setter Property="TextColor" Value="{DynamicResource ThemePrimaryTextColor}"/>
+      <Setter Property="BackgroundColor" Value="{DynamicResource ThemeSurfaceColor}"/>
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBodySmall}"/>
+    </Style>
+    <Style TargetType="DatePicker">
+      <Setter Property="TextColor" Value="{DynamicResource ThemePrimaryTextColor}"/>
+      <Setter Property="BackgroundColor" Value="{DynamicResource ThemeSurfaceAltColor}"/>
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBodySmall}"/>
+    </Style>
+    <Style x:Key="DangerRoundIconButtonStyle" TargetType="Button">
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}"/>
+      <Setter Property="FontAttributes" Value="Bold"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="CornerRadius" Value="18"/>
+      <Setter Property="BackgroundColor" Value="{DynamicResource ThemeDangerSurfaceColor}"/>
+      <Setter Property="TextColor" Value="{DynamicResource ThemeDangerTextColor}"/>
+    </Style>
+    <Style x:Key="NumpadButtonStyle" TargetType="Button">
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}"/>
+      <Setter Property="FontAttributes" Value="Bold"/>
+      <Setter Property="BackgroundColor" Value="{DynamicResource ThemeSurfaceAltColor}"/>
+      <Setter Property="TextColor" Value="{DynamicResource ThemePrimaryTextColor}"/>
+      <Setter Property="BorderColor" Value="{DynamicResource ThemeBorderColor}"/>
+      <Setter Property="BorderWidth" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+    </Style>
+    <Style x:Key="QuickAmountButtonStyle" TargetType="Button" BasedOn="{StaticResource NumpadButtonStyle}">
+      <Setter Property="BackgroundColor" Value="{DynamicResource ThemeQuickAmountColor}"/>
+      <Setter Property="TextColor" Value="{DynamicResource ThemeWhiteColor}"/>
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeNumeric}"/>
+    </Style>
   </ContentPage.Resources>
   <Grid RowDefinitions="*"
         RowSpacing="14"
@@ -20,10 +60,10 @@
     <Grid ColumnDefinitions="1*,1.5*"
           ColumnSpacing="14">
       <Border Grid.Column="1"
-              Stroke="#2A3B4C"
+              Stroke="{DynamicResource ThemeBorderColor}"
               StrokeThickness="1"
               StrokeShape="RoundRectangle 14"
-              BackgroundColor="#0F2131"
+              BackgroundColor="{DynamicResource ThemeSurfaceColor}"
               Padding="12">
         <Grid RowDefinitions="Auto,*"
               RowSpacing="12">
@@ -33,24 +73,24 @@
                     Text="當前銷售"
                     FontAttributes="Bold"
                     HeightRequest="44"
-                    BackgroundColor="#1F3D5C"
-                    TextColor="#D2E4FB"
+                    BackgroundColor="{DynamicResource ThemeActionBlueColor}"
+                    TextColor="{DynamicResource ThemePrimaryTextColor}"
                     Clicked="OnCurrentSaleTabClicked"/>
             <Button Grid.Column="1"
                     x:Name="DailyAccountTabButton"
                     Text="📊 每日帳目"
                     FontAttributes="Bold"
                     HeightRequest="44"
-                    BackgroundColor="#253648"
-                    TextColor="#8EA0B9"
+                    BackgroundColor="{DynamicResource ThemeBorderMutedColor}"
+                    TextColor="{DynamicResource ThemeSecondaryTextColor}"
                     Clicked="OnDailyAccountTabClicked"/>
             <Button Grid.Column="2"
                     x:Name="ConfigureTabButton"
                     Text="⚙ 設置"
                     FontAttributes="Bold"
                     HeightRequest="44"
-                    BackgroundColor="#253648"
-                    TextColor="#8EA0B9"
+                    BackgroundColor="{DynamicResource ThemeBorderMutedColor}"
+                    TextColor="{DynamicResource ThemeSecondaryTextColor}"
                     Clicked="OnConfigureTabClicked"/>
           </Grid>
 
@@ -81,10 +121,10 @@
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                   <DataTemplate>
-                    <Border Stroke="#253648"
+                    <Border Stroke="{DynamicResource ThemeBorderMutedColor}"
                             StrokeThickness="1"
                             StrokeShape="RoundRectangle 10"
-                            BackgroundColor="#1A2B3C"
+                            BackgroundColor="{DynamicResource ThemeSurfaceAltColor}"
                             Padding="12"
                             Margin="0,0,0,4">
                       <VisualStateManager.VisualStateGroups>
@@ -95,7 +135,7 @@
                                 <Setter Property="StrokeThickness"
                                     Value="1"/>
                                 <Setter Property="Stroke"
-                                    Value="#253648"/>
+                                    Value="{DynamicResource ThemeBorderMutedColor}"/>
                               </VisualState.Setters>
                             </VisualState>
                             <VisualState Name="Selected">
@@ -103,7 +143,7 @@
                                 <Setter Property="StrokeThickness"
                                     Value="4"/>
                                 <Setter Property="Stroke"
-                                    Value="#69D4F8"/>
+                                    Value="{DynamicResource ThemeHighlightColor}"/>
                               </VisualState.Setters>
                             </VisualState>
                           </VisualStateGroup>
@@ -111,9 +151,9 @@
                       </VisualStateManager.VisualStateGroups>
                       <Grid ColumnDefinitions="*,Auto,Auto,Auto"
                             ColumnSpacing="10">
-                        <Label FontSize="22"
+                        <Label FontSize="{DynamicResource FontSizeNumeric}"
                                FontAttributes="Bold"
-                               TextColor="#D2E4FB"
+                               TextColor="{DynamicResource ThemePrimaryTextColor}"
                                MaxLines="1"
                                LineBreakMode="TailTruncation"
                                VerticalOptions="Center">
@@ -121,33 +161,33 @@
                             <FormattedString>
                               <Span Text="{Binding Name}"/>
                               <Span Text=" ("/>
-                              <Span Text="{Binding UnitPrice, StringFormat='HKD $ {0:F2}'}"
-                                    TextColor="#69D4F8"
-                                    FontSize="20"/>
+                               <Span Text="{Binding UnitPrice, StringFormat='HKD $ {0:F2}'}"
+                                    TextColor="{DynamicResource ThemeHighlightColor}"
+                                    FontSize="{DynamicResource FontSizeButton}"/>
                               <Span Text=")"/>
                             </FormattedString>
                           </Label.FormattedText>
                         </Label>
                         <Label Grid.Column="1"
                                Text="{Binding Quantity, StringFormat='x{0}'}"
-                               FontSize="20"
-                               TextColor="#C4D4E8"
+                               FontSize="{DynamicResource FontSizeButton}"
+                               TextColor="{DynamicResource ThemeTertiaryTextColor}"
                                VerticalOptions="Center"/>
                         <Label Grid.Column="2"
                                Text="{Binding LineTotal, StringFormat='HKD $ {0:F2}'}"
-                               FontSize="20"
-                               TextColor="#D2E4FB"
+                               FontSize="{DynamicResource FontSizeButton}"
+                               TextColor="{DynamicResource ThemePrimaryTextColor}"
                                FontAttributes="Bold"
                                VerticalOptions="Center"/>
                         <Button Grid.Column="3"
                                 Text="−"
-                                FontSize="22"
+                                FontSize="{DynamicResource FontSizeNumeric}"
                                 WidthRequest="40"
                                 HeightRequest="40"
                                 Padding="0"
                                 CornerRadius="20"
-                                BackgroundColor="#3D1F1F"
-                                TextColor="#FFB4AB"
+                                BackgroundColor="{DynamicResource ThemeDangerSurfaceColor}"
+                                TextColor="{DynamicResource ThemeDangerTextColor}"
                                 VerticalOptions="Center"
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveCartLineCommand}"
                                 CommandParameter="{Binding}"/>
@@ -170,24 +210,25 @@
                         Text="結帳"
                         FontSize="{DynamicResource FontSizeButton}"
                         FontAttributes="Bold"
-                        HeightRequest="52"
-                        Padding="18,0"
+                        HeightRequest="64"
+                        MinimumWidthRequest="150"
+                        Padding="28,0"
                         BackgroundColor="{DynamicResource ThemeAccentColor}"
-                        TextColor="#243600"
+                        TextColor="{DynamicResource ThemePrimaryButtonTextColor}"
                         Command="{Binding PrintReceiptCommand}"/>
               </Grid>
 
               <BoxView Grid.RowSpan="3"
                        IsVisible="{Binding IsProductControlVisible}"
-                       BackgroundColor="#80000000"
+                       BackgroundColor="{DynamicResource ThemeOverlayColor}"
                        ZIndex="11"/>
               <Border x:Name="ProductControlPopup"
                       Grid.RowSpan="3"
                       IsVisible="{Binding IsProductControlVisible}"
-                      Stroke="#2A3B4C"
+                      Stroke="{DynamicResource ThemeBorderColor}"
                       StrokeThickness="1"
                       StrokeShape="RoundRectangle 14"
-                      BackgroundColor="#0F2131"
+                      BackgroundColor="{DynamicResource ThemeSurfaceColor}"
                       Padding="12"
                       ZIndex="12"
                       MinimumWidthRequest="500"
@@ -200,39 +241,39 @@
                 <VerticalStackLayout Spacing="10">
                   <Grid ColumnDefinitions="*,Auto">
                     <Label Text="產品控制"
-                           FontSize="18"
+                           FontSize="{DynamicResource FontSizeSectionTitle}"
                            FontAttributes="Bold"
-                           TextColor="#D2E4FB"
+                           TextColor="{DynamicResource ThemePrimaryTextColor}"
                            VerticalOptions="Center"/>
                     <Button Grid.Column="1"
                             Text="✕"
-                            FontSize="16"
+                            FontSize="{DynamicResource FontSizeBody}"
                             FontAttributes="Bold"
                             WidthRequest="36"
                             HeightRequest="36"
                             Padding="0"
                             CornerRadius="18"
-                            BackgroundColor="#3D1F1F"
-                            TextColor="#FFB4AB"
+                            BackgroundColor="{DynamicResource ThemeDangerSurfaceColor}"
+                            TextColor="{DynamicResource ThemeDangerTextColor}"
                             VerticalOptions="Start"
                             Command="{Binding DismissProductControlCommand}"/>
                   </Grid>
 
                   <Entry Text="{Binding SelectedCartLine.Remark, Mode=TwoWay, FallbackValue=''}"
                          Placeholder="{Binding SelectedCartLineName}"
-                         PlaceholderColor="#BDEE62"
-                         TextColor="#D2E4FB"
-                         FontSize="28"
-                         BackgroundColor="#1A2B3C"
+                         PlaceholderColor="{DynamicResource ThemeSuccessTextColor}"
+                         TextColor="{DynamicResource ThemePrimaryTextColor}"
+                         FontSize="{DynamicResource FontSizePageTitle}"
+                         BackgroundColor="{DynamicResource ThemeSurfaceAltColor}"
                          IsEnabled="{Binding HasSelectedCartLine}"/>
 
-                  <Border Stroke="#253648"
+                  <Border Stroke="{DynamicResource ThemeBorderMutedColor}"
                           StrokeShape="RoundRectangle 10"
-                          BackgroundColor="#1A2B3C"
+                          BackgroundColor="{DynamicResource ThemeSurfaceAltColor}"
                           Padding="12,8">
                     <Label Text="{Binding PricePadInputText, StringFormat='HKD $ {0}'}"
-                           TextColor="#BDEE62"
-                           FontSize="28"
+                           TextColor="{DynamicResource ThemeSuccessTextColor}"
+                           FontSize="{DynamicResource FontSizePageTitle}"
                            FontAttributes="Bold"
                            HorizontalTextAlignment="End"/>
                   </Border>
@@ -248,15 +289,15 @@
                         <Setter Property="HeightRequest"
                             Value="60"/>
                         <Setter Property="FontSize"
-                            Value="22"/>
+                            Value="{DynamicResource FontSizeNumeric}"/>
                         <Setter Property="FontAttributes"
                             Value="Bold"/>
                         <Setter Property="BackgroundColor"
-                            Value="#1A2B3C"/>
+                            Value="{DynamicResource ThemeSurfaceAltColor}"/>
                         <Setter Property="TextColor"
-                            Value="#D2E4FB"/>
+                            Value="{DynamicResource ThemePrimaryTextColor}"/>
                         <Setter Property="BorderColor"
-                            Value="#2A3B4C"/>
+                            Value="{DynamicResource ThemeBorderColor}"/>
                         <Setter Property="BorderWidth"
                             Value="1"/>
                         <Setter Property="CornerRadius"
@@ -266,11 +307,11 @@
                           TargetType="Button"
                           BasedOn="{StaticResource NumKey}">
                         <Setter Property="BackgroundColor"
-                            Value="#E07A5F"/>
+                            Value="{DynamicResource ThemeQuickAmountColor}"/>
                         <Setter Property="TextColor"
-                            Value="White"/>
+                            Value="{DynamicResource ThemeWhiteColor}"/>
                         <Setter Property="FontSize"
-                            Value="18"/>
+                            Value="{DynamicResource FontSizeNumeric}"/>
                       </Style>
                     </Grid.Resources>
 
@@ -381,32 +422,32 @@
                     <Button Grid.Column="0"
                             Text="C"
                             HeightRequest="56"
-                            FontSize="18"
+                            FontSize="{DynamicResource FontSizeSectionTitle}"
                             FontAttributes="Bold"
-                            BackgroundColor="#3D1F1F"
-                            TextColor="#FFB4AB"
-                            BorderColor="#2A3B4C"
+                            BackgroundColor="{DynamicResource ThemeDangerSurfaceColor}"
+                            TextColor="{DynamicResource ThemeDangerTextColor}"
+                            BorderColor="{DynamicResource ThemeBorderColor}"
                             BorderWidth="1"
                             CornerRadius="10"
                             Command="{Binding PricePadClearCommand}"/>
                     <Button Grid.Column="1"
                             Text="⌫"
                             HeightRequest="56"
-                            FontSize="18"
+                            FontSize="{DynamicResource FontSizeSectionTitle}"
                             FontAttributes="Bold"
-                            BackgroundColor="#3D1F1F"
-                            TextColor="#FFB4AB"
-                            BorderColor="#2A3B4C"
+                            BackgroundColor="{DynamicResource ThemeDangerSurfaceColor}"
+                            TextColor="{DynamicResource ThemeDangerTextColor}"
+                            BorderColor="{DynamicResource ThemeBorderColor}"
                             BorderWidth="1"
                             CornerRadius="10"
                             Command="{Binding PricePadBackspaceCommand}"/>
                     <Button Grid.Column="2"
                             Text="套用價格"
                             HeightRequest="56"
-                            FontSize="20"
+                            FontSize="{DynamicResource FontSizeButton}"
                             FontAttributes="Bold"
-                            BackgroundColor="#A2D149"
-                            TextColor="#243600"
+                            BackgroundColor="{DynamicResource ThemeAccentColor}"
+                            TextColor="{DynamicResource ThemePrimaryButtonTextColor}"
                             CornerRadius="10"
                             Command="{Binding ApplyFinalPriceCommand}"/>
                   </Grid>
@@ -416,7 +457,7 @@
 
             <!-- Checkout modal backdrop -->
             <BoxView IsVisible="{Binding IsCheckoutPopupVisible}"
-                     BackgroundColor="#000000"
+                     BackgroundColor="{DynamicResource ThemeBlackColor}"
                      Opacity="0.55"
                      ZIndex="9"/>
 
@@ -426,10 +467,10 @@
                         VerticalOptions="Center"
                         HorizontalOptions="Fill"
                         Margin="20">
-              <Border Stroke="#2A3B4C"
+              <Border Stroke="{DynamicResource ThemeBorderColor}"
                       StrokeThickness="1"
                       StrokeShape="RoundRectangle 16"
-                      BackgroundColor="#27435F"
+                      BackgroundColor="{DynamicResource ThemeModalSurfaceColor}"
                       Padding="14">
                 <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
                       RowSpacing="10">
@@ -440,43 +481,43 @@
                     <VerticalStackLayout Grid.Column="0"
                         Spacing="0">
                       <Label Text="應付金額"
-                          FontSize="13"
-                          TextColor="#8EA0B9"/>
+                          FontSize="{DynamicResource FontSizeBodySmall}"
+                          TextColor="{DynamicResource ThemeSecondaryTextColor}"/>
                       <Label Text="{Binding AmountDueText}"
-                          FontSize="18"
+                          FontSize="{DynamicResource FontSizeSectionTitle}"
                           FontAttributes="Bold"
-                          TextColor="#BDEE62"/>
+                          TextColor="{DynamicResource ThemeSuccessTextColor}"/>
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="1"
                         Spacing="0">
                       <Label Text="已付"
-                          FontSize="13"
-                          TextColor="#8EA0B9"/>
+                          FontSize="{DynamicResource FontSizeBodySmall}"
+                          TextColor="{DynamicResource ThemeSecondaryTextColor}"/>
                       <Label Text="{Binding PaidTotalText}"
-                          FontSize="18"
+                          FontSize="{DynamicResource FontSizeSectionTitle}"
                           FontAttributes="Bold"
-                          TextColor="#D2E4FB"/>
+                          TextColor="{DynamicResource ThemePrimaryTextColor}"/>
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="2"
                         Spacing="0">
                       <Label Text="餘額"
-                          FontSize="13"
-                          TextColor="#8EA0B9"/>
+                          FontSize="{DynamicResource FontSizeBodySmall}"
+                          TextColor="{DynamicResource ThemeSecondaryTextColor}"/>
                       <Label Text="{Binding OutstandingText}"
-                          FontSize="18"
+                          FontSize="{DynamicResource FontSizeSectionTitle}"
                           FontAttributes="Bold"
-                          TextColor="#FFD479"/>
+                          TextColor="{DynamicResource ThemeWarningTextColor}"/>
                     </VerticalStackLayout>
                     <Button Grid.Column="3"
                             Text="✕"
-                            FontSize="18"
+                            FontSize="{DynamicResource FontSizeSectionTitle}"
                             FontAttributes="Bold"
                             WidthRequest="36"
                             HeightRequest="36"
                             Padding="0"
                             CornerRadius="18"
-                            BackgroundColor="#3D1F1F"
-                            TextColor="#FFB4AB"
+                            BackgroundColor="{DynamicResource ThemeDangerSurfaceColor}"
+                            TextColor="{DynamicResource ThemeDangerTextColor}"
                             VerticalOptions="Start"
                             Command="{Binding CancelCheckoutCommand}"/>
                   </Grid>
@@ -493,12 +534,12 @@
                     <BindableLayout.ItemTemplate>
                       <DataTemplate x:DataType="vm:CheckoutMethodOption">
                         <Button Text="{Binding Name}"
-                                FontSize="14"
+                                FontSize="{DynamicResource FontSizeBodySmall}"
                                 FontAttributes="Bold"
                                 HeightRequest="52"
                                 MinimumWidthRequest="90"
                                 Margin="0,0,6,6"
-                                TextColor="#D2E4FB"
+                                TextColor="{DynamicResource ThemePrimaryTextColor}"
                                 BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToTileBg}}"
                                 Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.SelectPaymentMethodCommand}"
                                 CommandParameter="{Binding Name}"/>
@@ -508,17 +549,17 @@
 
                   <!-- Row 2: payments list -->
                   <Border Grid.Row="2"
-                          Stroke="#2A3B4C"
+                          Stroke="{DynamicResource ThemeBorderColor}"
                           StrokeShape="RoundRectangle 8"
-                          BackgroundColor="#1A2B3C"
+                          BackgroundColor="{DynamicResource ThemeSurfaceAltColor}"
                           Padding="8"
                           MinimumHeightRequest="60">
                     <CollectionView ItemsSource="{Binding Payments}"
                                     HeightRequest="80">
                       <CollectionView.EmptyView>
                         <Label Text="尚未新增付款。"
-                               TextColor="#8EA0B9"
-                               FontSize="14"
+                               TextColor="{DynamicResource ThemeSecondaryTextColor}"
+                               FontSize="{DynamicResource FontSizeBodySmall}"
                                HorizontalOptions="Center"
                                VerticalOptions="Center"/>
                       </CollectionView.EmptyView>
@@ -528,14 +569,14 @@
                                 Padding="6,3"
                                 ColumnSpacing="8">
                             <Label Text="{Binding DisplayText}"
-                                   TextColor="#D2E4FB"
-                                   FontSize="16"
+                                   TextColor="{DynamicResource ThemePrimaryTextColor}"
+                                   FontSize="{DynamicResource FontSizeBody}"
                                    VerticalOptions="Center"/>
                             <Button Grid.Column="1"
                                     Text="刪除"
-                                    FontSize="12"
-                                    BackgroundColor="#3D1F1F"
-                                    TextColor="#FFB4AB"
+                                    FontSize="{DynamicResource FontSizeCaption}"
+                                    BackgroundColor="{DynamicResource ThemeDangerSurfaceColor}"
+                                    TextColor="{DynamicResource ThemeDangerTextColor}"
                                     Padding="10,4"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemovePaymentCommand}"
                                     CommandParameter="{Binding}"/>
@@ -554,277 +595,161 @@
                           ColumnSpacing="6">
                       <Border Grid.Row="0"
                               Grid.ColumnSpan="4"
-                              Stroke="#2A3B4C"
+                              Stroke="{DynamicResource ThemeBorderColor}"
                               StrokeShape="RoundRectangle 10"
-                              BackgroundColor="#1A2B3C"
+                              BackgroundColor="{DynamicResource ThemeSurfaceAltColor}"
                               Padding="14,8">
                         <Label Text="{Binding MoneyPadInputText, StringFormat='HKD $ {0}'}"
-                               TextColor="#BDEE62"
-                               FontSize="22"
+                               TextColor="{DynamicResource ThemeSuccessTextColor}"
+                               FontSize="{DynamicResource FontSizeNumeric}"
                                FontAttributes="Bold"
                                HorizontalTextAlignment="End"/>
                       </Border>
 
                       <Button Grid.Row="1"
                           Grid.Column="0"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="1"
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="1"/>
                       <Button Grid.Row="1"
                           Grid.Column="1"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="2"
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="2"/>
                       <Button Grid.Row="1"
                           Grid.Column="2"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="3"
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="3"/>
                       <Button Grid.Row="1"
                           Grid.Column="3"
+                          Style="{StaticResource QuickAmountButtonStyle}"
                           Text="$100"
-                          FontSize="18"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#E07A5F"
-                          TextColor="White"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadQuickAmountCommand}"
                           CommandParameter="100"/>
 
                       <Button Grid.Row="2"
                           Grid.Column="0"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="4"
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="4"/>
                       <Button Grid.Row="2"
                           Grid.Column="1"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="5"
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="5"/>
                       <Button Grid.Row="2"
                           Grid.Column="2"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="6"
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="6"/>
                       <Button Grid.Row="2"
                           Grid.Column="3"
+                          Style="{StaticResource QuickAmountButtonStyle}"
                           Text="$50"
-                          FontSize="18"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#E07A5F"
-                          TextColor="White"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadQuickAmountCommand}"
                           CommandParameter="50"/>
 
                       <Button Grid.Row="3"
                           Grid.Column="0"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="7"
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="7"/>
                       <Button Grid.Row="3"
                           Grid.Column="1"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="8"
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="8"/>
                       <Button Grid.Row="3"
                           Grid.Column="2"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="9"
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="9"/>
                       <Button Grid.Row="3"
                           Grid.Column="3"
+                          Style="{StaticResource QuickAmountButtonStyle}"
                           Text="$20"
-                          FontSize="18"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#E07A5F"
-                          TextColor="White"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadQuickAmountCommand}"
                           CommandParameter="20"/>
 
                       <Button Grid.Row="4"
                           Grid.Column="0"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="0"
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="0"/>
                       <Button Grid.Row="4"
                           Grid.Column="1"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="00"
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="00"/>
                       <Button Grid.Row="4"
                           Grid.Column="2"
+                          Style="{StaticResource NumpadButtonStyle}"
                           Text="."
-                          FontSize="16"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#1A2B3C"
-                          TextColor="#D2E4FB"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadInputCommand}"
                           CommandParameter="."/>
                       <Button Grid.Row="4"
                           Grid.Column="3"
+                          Style="{StaticResource QuickAmountButtonStyle}"
                           Text="$10"
-                          FontSize="18"
-                          FontAttributes="Bold"
                           HeightRequest="54"
-                          BackgroundColor="#E07A5F"
-                          TextColor="White"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadQuickAmountCommand}"
                           CommandParameter="10"/>
 
                       <Button Grid.Row="5"
                           Grid.Column="0"
+                              Style="{StaticResource NumpadButtonStyle}"
                               Text="C"
-                              FontSize="16"
-                              FontAttributes="Bold"
                               HeightRequest="48"
-                              BackgroundColor="#3D1F1F"
-                              TextColor="#FFB4AB"
-                              BorderColor="#2A3B4C"
-                              BorderWidth="1"
-                              CornerRadius="10"
+                              BackgroundColor="{DynamicResource ThemeDangerSurfaceColor}"
+                              TextColor="{DynamicResource ThemeDangerTextColor}"
                               Command="{Binding MoneyPadClearCommand}"/>
                       <Button Grid.Row="5"
                           Grid.Column="1"
+                              Style="{StaticResource NumpadButtonStyle}"
                               Text="⌫"
-                              FontSize="16"
-                              FontAttributes="Bold"
                               HeightRequest="48"
-                              BackgroundColor="#3D1F1F"
-                              TextColor="#FFB4AB"
-                              BorderColor="#2A3B4C"
-                              BorderWidth="1"
-                              CornerRadius="10"
+                              BackgroundColor="{DynamicResource ThemeDangerSurfaceColor}"
+                              TextColor="{DynamicResource ThemeDangerTextColor}"
                               Command="{Binding MoneyPadBackspaceCommand}"/>
                       <Button Grid.Row="5"
                           Grid.Column="2"
+                          Style="{StaticResource QuickAmountButtonStyle}"
                           Text="$500"
-                          FontSize="18"
-                          FontAttributes="Bold"
                           HeightRequest="48"
-                          BackgroundColor="#E07A5F"
-                          TextColor="White"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadQuickAmountCommand}"
                           CommandParameter="500"/>
                       <Button Grid.Row="5"
                           Grid.Column="3"
+                          Style="{StaticResource QuickAmountButtonStyle}"
                           Text="$1000"
-                          FontSize="18"
-                          FontAttributes="Bold"
                           HeightRequest="48"
-                          BackgroundColor="#E07A5F"
-                          TextColor="White"
-                          BorderColor="#2A3B4C"
-                          BorderWidth="1"
-                          CornerRadius="10"
                           Command="{Binding MoneyPadQuickAmountCommand}"
                           CommandParameter="1000"/>
                     </Grid>
@@ -836,18 +761,18 @@
                         ColumnSpacing="10">
                     <Button Grid.Column="0"
                             Text="新增付款"
-                            FontSize="14"
+                            FontSize="{DynamicResource FontSizeButtonSmall}"
                             HeightRequest="42"
-                            BackgroundColor="#A2D149"
-                            TextColor="#243600"
+                            BackgroundColor="{DynamicResource ThemeAccentColor}"
+                            TextColor="{DynamicResource ThemePrimaryButtonTextColor}"
                             FontAttributes="Bold"
                             Command="{Binding AddPaymentCommand}"/>
                     <Button Grid.Column="1"
                             Text="確認並收銀"
-                            FontSize="14"
+                            FontSize="{DynamicResource FontSizeButtonSmall}"
                             HeightRequest="42"
-                            BackgroundColor="#A2D149"
-                            TextColor="#243600"
+                            BackgroundColor="{DynamicResource ThemeAccentColor}"
+                            TextColor="{DynamicResource ThemePrimaryButtonTextColor}"
                             FontAttributes="Bold"
                             Command="{Binding ConfirmCheckoutCommand}">
                       <VisualStateManager.VisualStateGroups>
@@ -855,17 +780,17 @@
                           <VisualState Name="Normal">
                             <VisualState.Setters>
                               <Setter Property="BackgroundColor"
-                                  Value="#A2D149"/>
+                                  Value="{DynamicResource ThemeAccentColor}"/>
                               <Setter Property="TextColor"
-                                  Value="#243600"/>
+                                  Value="{DynamicResource ThemePrimaryButtonTextColor}"/>
                             </VisualState.Setters>
                           </VisualState>
                           <VisualState Name="Disabled">
                             <VisualState.Setters>
                               <Setter Property="BackgroundColor"
-                                  Value="#253648"/>
+                                  Value="{DynamicResource ThemeDisabledSurfaceColor}"/>
                               <Setter Property="TextColor"
-                                  Value="#4A6070"/>
+                                  Value="{DynamicResource ThemeDisabledTextColor}"/>
                             </VisualState.Setters>
                           </VisualState>
                         </VisualStateGroup>
@@ -885,41 +810,41 @@
                     Padding="2,0,2,10">
                 <Label Grid.Column="0"
                        Text="{Binding HeaderText}"
-                       FontSize="20"
+                       FontSize="{DynamicResource FontSizeSectionTitle}"
                        FontAttributes="Bold"
-                       TextColor="#D2E4FB"
+                       TextColor="{DynamicResource ThemePrimaryTextColor}"
                        VerticalOptions="Center"/>
                 <HorizontalStackLayout Grid.Column="1"
                                        Spacing="8">
                   <Button Text="◀ 上一日"
-                          BackgroundColor="#253648"
-                          TextColor="#D2E4FB"
+                          BackgroundColor="{DynamicResource ThemeBorderMutedColor}"
+                          TextColor="{DynamicResource ThemePrimaryTextColor}"
                           Padding="12,6"
                           Command="{Binding PrevDayCommand}"/>
                   <Button Text="今日"
-                          BackgroundColor="#1F3D5C"
-                          TextColor="#D2E4FB"
+                          BackgroundColor="{DynamicResource ThemeActionBlueColor}"
+                          TextColor="{DynamicResource ThemePrimaryTextColor}"
                           FontAttributes="Bold"
                           Padding="12,6"
                           Command="{Binding TodayCommand}"/>
                   <Button Text="下一日 ▶"
-                          BackgroundColor="#253648"
-                          TextColor="#D2E4FB"
+                          BackgroundColor="{DynamicResource ThemeBorderMutedColor}"
+                          TextColor="{DynamicResource ThemePrimaryTextColor}"
                           Padding="12,6"
                           Command="{Binding NextDayCommand}"/>
                   <DatePicker Date="{Binding SelectedDate}"
-                              TextColor="#D2E4FB"
-                              BackgroundColor="#1A2B3C"
-                              FontSize="14"/>
+                              TextColor="{DynamicResource ThemePrimaryTextColor}"
+                              BackgroundColor="{DynamicResource ThemeSurfaceAltColor}"
+                              FontSize="{DynamicResource FontSizeBodySmall}"/>
                   <Button Text="📊 匯出 Excel"
-                          BackgroundColor="#A2D149"
-                          TextColor="#243600"
+                          BackgroundColor="{DynamicResource ThemeAccentColor}"
+                          TextColor="{DynamicResource ThemePrimaryButtonTextColor}"
                           FontAttributes="Bold"
                           Padding="12,6"
                           Command="{Binding ExportDailyReportCommand}"/>
                   <Button Text="🗑 清除記錄"
-                          BackgroundColor="#5C1F1F"
-                          TextColor="#FFB4AB"
+                          BackgroundColor="{DynamicResource ThemeDangerColor}"
+                          TextColor="{DynamicResource ThemeDangerTextColor}"
                           FontAttributes="Bold"
                           Padding="12,6"
                           Command="{Binding DeleteDayDataCommand}"/>
@@ -928,43 +853,43 @@
 
               <!-- ── Transaction table ── -->
               <Border Grid.Row="1"
-                      Stroke="#2A3B4C"
+                      Stroke="{DynamicResource ThemeBorderColor}"
                       StrokeThickness="1"
                       StrokeShape="RoundRectangle 12"
-                      BackgroundColor="#0F2131">
+                      BackgroundColor="{DynamicResource ThemeSurfaceColor}">
                 <CollectionView ItemsSource="{Binding Transactions}">
                   <CollectionView.Header>
                     <Grid ColumnDefinitions="60,2*,90,1.5*,88,56"
                           Padding="14,10"
-                          BackgroundColor="#0A1823">
+                          BackgroundColor="{DynamicResource ThemeHeaderBarColor}">
                       <Label Grid.Column="0"
                           Text="編號"
-                          TextColor="#5E7A96"
-                          FontSize="11"
+                          TextColor="{DynamicResource ThemeInfoTextColor}"
+                          FontSize="{DynamicResource FontSizeMicro}"
                           FontAttributes="Bold"
                           CharacterSpacing="1.2"/>
                       <Label Grid.Column="1"
                           Text="產品"
-                          TextColor="#5E7A96"
-                          FontSize="11"
+                          TextColor="{DynamicResource ThemeInfoTextColor}"
+                          FontSize="{DynamicResource FontSizeMicro}"
                           FontAttributes="Bold"
                           CharacterSpacing="1.2"/>
                       <Label Grid.Column="2"
                           Text="時間"
-                          TextColor="#5E7A96"
-                          FontSize="11"
+                          TextColor="{DynamicResource ThemeInfoTextColor}"
+                          FontSize="{DynamicResource FontSizeMicro}"
                           FontAttributes="Bold"
                           CharacterSpacing="1.2"/>
                       <Label Grid.Column="3"
                           Text="付款方式"
-                          TextColor="#5E7A96"
-                          FontSize="11"
+                          TextColor="{DynamicResource ThemeInfoTextColor}"
+                          FontSize="{DynamicResource FontSizeMicro}"
                           FontAttributes="Bold"
                           CharacterSpacing="1.2"/>
                       <Label Grid.Column="4"
                           Text="金額"
-                          TextColor="#5E7A96"
-                          FontSize="11"
+                          TextColor="{DynamicResource ThemeInfoTextColor}"
+                          FontSize="{DynamicResource FontSizeMicro}"
                           FontAttributes="Bold"
                           CharacterSpacing="1.2"
                           HorizontalOptions="End"/>
@@ -973,9 +898,9 @@
                     </Grid>
                   </CollectionView.Header>
                   <CollectionView.EmptyView>
-                    <Label Text="所選日期沒有交易記錄。"
-                           TextColor="#8EA0B9"
-                           FontSize="14"
+                     <Label Text="所選日期沒有交易記錄。"
+                           TextColor="{DynamicResource ThemeSecondaryTextColor}"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
                            Margin="0,40"/>
@@ -988,14 +913,14 @@
                               HorizontalOptions="Fill">
                           <!-- ID -->
                           <Label Grid.Column="0"
-                                 TextColor="#7BABDE"
-                                 FontSize="14"
+                                 TextColor="{DynamicResource ThemePrimaryTextColor}"
+                                 FontSize="{DynamicResource FontSizeBodySmall}"
                                  FontAttributes="Bold"
                                  VerticalOptions="Start">
                             <Label.FormattedText>
                               <FormattedString>
-                                <Span Text="#"
-                                    TextColor="#5E7A96"/>
+                                 <Span Text="#"
+                                    TextColor="{DynamicResource ThemeInfoTextColor}"/>
                                 <Span Text="{Binding Id}"/>
                               </FormattedString>
                             </Label.FormattedText>
@@ -1010,18 +935,18 @@
                             </BindableLayout.ItemsSource>
                             <BindableLayout.ItemTemplate>
                               <DataTemplate>
-                                <Label FontSize="13">
+                                <Label FontSize="{DynamicResource FontSizeCaption}">
                                   <Label.FormattedText>
                                     <FormattedString>
                                       <Span Text="{Binding Quantity}"
-                                          TextColor="#8EA0B9"/>
+                                          TextColor="{DynamicResource ThemeSecondaryTextColor}"/>
                                       <Span Text="× "
-                                          TextColor="#8EA0B9"/>
+                                          TextColor="{DynamicResource ThemeSecondaryTextColor}"/>
                                       <Span Text="{Binding Name}"
-                                          TextColor="#D2E4FB"/>
+                                          TextColor="{DynamicResource ThemePrimaryTextColor}"/>
                                       <Span Text="  "/>
                                       <Span Text="{Binding LineTotal, StringFormat='${0:F2}'}"
-                                          TextColor="#BDEE62"/>
+                                          TextColor="{DynamicResource ThemeSuccessTextColor}"/>
                                     </FormattedString>
                                   </Label.FormattedText>
                                 </Label>
@@ -1034,12 +959,12 @@
                                                Spacing="2"
                                                VerticalOptions="Start">
                             <Label Text="{Binding CreatedAtLocal, StringFormat='{0:yyyy-MM-dd}'}"
-                                   TextColor="#D2E4FB"
-                                   FontSize="12"
+                                   TextColor="{DynamicResource ThemePrimaryTextColor}"
+                                   FontSize="{DynamicResource FontSizeCaption}"
                                    FontAttributes="Bold"/>
                             <Label Text="{Binding CreatedAtLocal, StringFormat='{0:HH:mm:ss}'}"
-                                   TextColor="#8EA0B9"
-                                   FontSize="11"/>
+                                   TextColor="{DynamicResource ThemeSecondaryTextColor}"
+                                   FontSize="{DynamicResource FontSizeMicro}"/>
                           </VerticalStackLayout>
 
                           <!-- Payment methods (BindableLayout) -->
@@ -1051,16 +976,16 @@
                             </BindableLayout.ItemsSource>
                             <BindableLayout.ItemTemplate>
                               <DataTemplate>
-                                <Label FontSize="12">
+                                <Label FontSize="{DynamicResource FontSizeCaption}">
                                   <Label.FormattedText>
                                     <FormattedString>
                                       <Span Text="{Binding Method}"
-                                          TextColor="#8EA0B9"
+                                          TextColor="{DynamicResource ThemeSecondaryTextColor}"
                                           FontAttributes="Bold"/>
                                       <Span Text="  $"
-                                          TextColor="#5E7A96"/>
+                                          TextColor="{DynamicResource ThemeInfoTextColor}"/>
                                       <Span Text="{Binding Amount, StringFormat='{0:F2}'}"
-                                          TextColor="#D2E4FB"/>
+                                          TextColor="{DynamicResource ThemePrimaryTextColor}"/>
                                     </FormattedString>
                                   </Label.FormattedText>
                                 </Label>
@@ -1070,16 +995,16 @@
 
                           <!-- Amount -->
                           <Label Grid.Column="4"
-                                 TextColor="#BDEE62"
-                                 FontSize="16"
+                                 TextColor="{DynamicResource ThemeSuccessTextColor}"
+                                 FontSize="{DynamicResource FontSizeBody}"
                                  FontAttributes="Bold"
                                  HorizontalOptions="End"
                                  VerticalOptions="Start">
                             <Label.FormattedText>
                               <FormattedString>
                                 <Span Text="$"
-                                    TextColor="#8EA0B9"
-                                    FontSize="12"/>
+                                    TextColor="{DynamicResource ThemeSecondaryTextColor}"
+                                    FontSize="{DynamicResource FontSizeCaption}"/>
                                 <Span Text="{Binding Total, StringFormat='{0:F2}'}"/>
                               </FormattedString>
                             </Label.FormattedText>
@@ -1088,10 +1013,10 @@
                           <!-- Void button -->
                           <Button Grid.Column="5"
                                   Text="作廢"
-                                  FontSize="11"
+                                  FontSize="{DynamicResource FontSizeMicro}"
                                   FontAttributes="Bold"
-                                  BackgroundColor="#5C1F1F"
-                                  TextColor="#FFB4AB"
+                                  BackgroundColor="{DynamicResource ThemeDangerColor}"
+                                  TextColor="{DynamicResource ThemeDangerTextColor}"
                                   CornerRadius="6"
                                   Padding="4,2"
                                   HeightRequest="30"
@@ -1101,7 +1026,7 @@
                         </Grid>
                         <!-- Row separator -->
                         <BoxView HeightRequest="1"
-                            BackgroundColor="#162436"
+                            BackgroundColor="{DynamicResource ThemeCardColor}"
                             HorizontalOptions="Fill"/>
                       </VerticalStackLayout>
                     </DataTemplate>
@@ -1111,8 +1036,8 @@
 
               <!-- ── Footer summary bar ── -->
               <Border Grid.Row="2"
-                      BackgroundColor="#0A1823"
-                      Stroke="#2A3B4C"
+                      BackgroundColor="{DynamicResource ThemeHeaderBarColor}"
+                      Stroke="{DynamicResource ThemeBorderColor}"
                       StrokeThickness="1"
                       StrokeShape="RoundRectangle 10"
                       Padding="16,12"
@@ -1126,32 +1051,32 @@
                               AlignItems="Center">
                     <BindableLayout.EmptyView>
                       <Label Text="暫無數據。"
-                          TextColor="#5E7A96"
-                          FontSize="12"/>
+                          TextColor="{DynamicResource ThemeInfoTextColor}"
+                          FontSize="{DynamicResource FontSizeCaption}"/>
                     </BindableLayout.EmptyView>
                     <BindableLayout.ItemTemplate>
                       <DataTemplate>
                         <VerticalStackLayout Spacing="2"
                                              Margin="0,0,28,0">
                           <Label Text="{Binding Method}"
-                                 TextColor="#5E7A96"
-                                 FontSize="10"
+                                 TextColor="{DynamicResource ThemeInfoTextColor}"
+                                 FontSize="{DynamicResource FontSizeTiny}"
                                  FontAttributes="Bold"
                                  CharacterSpacing="1.5"/>
-                          <Label TextColor="#D2E4FB"
-                                 FontSize="20"
+                          <Label TextColor="{DynamicResource ThemePrimaryTextColor}"
+                                 FontSize="{DynamicResource FontSizeButton}"
                                  FontAttributes="Bold">
                             <Label.FormattedText>
                               <FormattedString>
                                 <Span Text="$"
-                                    TextColor="#8EA0B9"
-                                    FontSize="13"/>
+                                    TextColor="{DynamicResource ThemeSecondaryTextColor}"
+                                    FontSize="{DynamicResource FontSizeBodySmall}"/>
                                 <Span Text="{Binding Amount, StringFormat='{0:F2}'}"/>
                               </FormattedString>
                             </Label.FormattedText>
                           </Label>
-                          <Label TextColor="#5E7A96"
-                              FontSize="11">
+                          <Label TextColor="{DynamicResource ThemeInfoTextColor}"
+                              FontSize="{DynamicResource FontSizeMicro}">
                             <Label.FormattedText>
                               <FormattedString>
                                 <Span Text="{Binding Count}"/>
@@ -1166,36 +1091,36 @@
 
                   <!-- Grand total panel -->
                   <Border Grid.Column="1"
-                          BackgroundColor="#162A3E"
-                          Stroke="#2A3B4C"
+                          BackgroundColor="{DynamicResource ThemeCardColor}"
+                          Stroke="{DynamicResource ThemeBorderColor}"
                           StrokeThickness="1"
                           StrokeShape="RoundRectangle 8"
                           Padding="18,10">
                     <HorizontalStackLayout Spacing="0">
                       <VerticalStackLayout Spacing="3">
                         <Label Text="總收入"
-                               TextColor="#5E7A96"
-                               FontSize="9"
+                               TextColor="{DynamicResource ThemeInfoTextColor}"
+                               FontSize="{DynamicResource FontSizeTiny}"
                                FontAttributes="Bold"
                                CharacterSpacing="1.5"/>
                         <Label Text="{Binding GrossTotalText}"
-                               TextColor="#BDEE62"
-                               FontSize="22"
+                               TextColor="{DynamicResource ThemeSuccessTextColor}"
+                               FontSize="{DynamicResource FontSizePageSubTitle}"
                                FontAttributes="Bold"/>
                       </VerticalStackLayout>
-                      <BoxView WidthRequest="1"
-                               BackgroundColor="#2A3B4C"
+                       <BoxView WidthRequest="1"
+                               BackgroundColor="{DynamicResource ThemeBorderColor}"
                                Margin="16,0"
                                VerticalOptions="Fill"/>
                       <VerticalStackLayout Spacing="3">
                         <Label Text="交易次數"
-                               TextColor="#5E7A96"
-                               FontSize="9"
+                               TextColor="{DynamicResource ThemeInfoTextColor}"
+                               FontSize="{DynamicResource FontSizeTiny}"
                                FontAttributes="Bold"
                                CharacterSpacing="1.5"/>
                         <Label Text="{Binding TransactionCountText}"
-                               TextColor="#D2E4FB"
-                               FontSize="22"
+                               TextColor="{DynamicResource ThemePrimaryTextColor}"
+                               FontSize="{DynamicResource FontSizePageSubTitle}"
                                FontAttributes="Bold"/>
                       </VerticalStackLayout>
                     </HorizontalStackLayout>
@@ -1208,13 +1133,13 @@
                   Spacing="0"
                   Padding="2,4,2,0">
                 <Label Text="{Binding StatusMessage}"
-                       TextColor="#8EA0B9"
-                       FontSize="12"
+                       TextColor="{DynamicResource ThemeSecondaryTextColor}"
+                       FontSize="{DynamicResource FontSizeCaption}"
                        VerticalOptions="Center"/>
                 <Label Text="{Binding LastExportFileName}"
                        IsVisible="{Binding HasLastExport}"
-                       TextColor="#4DA3FF"
-                       FontSize="12"
+                       TextColor="{DynamicResource ThemeLinkTextColor}"
+                       FontSize="{DynamicResource FontSizeCaption}"
                        TextDecorations="Underline"
                        VerticalOptions="Center">
                   <Label.GestureRecognizers>
@@ -1229,27 +1154,26 @@
                   RowSpacing="10">
               <!-- ── Product Editor ── -->
               <Border Grid.Row="0"
-                      Stroke="#2A3B4C"
+                      Stroke="{DynamicResource ThemeBorderColor}"
                       StrokeShape="RoundRectangle 14"
-                      BackgroundColor="#162A3E"
+                      BackgroundColor="{DynamicResource ThemeCardColor}"
                       Padding="14">
                 <VerticalStackLayout Spacing="10">
                   <Grid ColumnDefinitions="Auto,*,Auto"
                         ColumnSpacing="10">
                     <Label Grid.Column="0"
                            Text="📦 產品"
-                           TextColor="#D2E4FB"
-                           FontSize="13"
+                           TextColor="{DynamicResource ThemePrimaryTextColor}"
+                           FontSize="{DynamicResource FontSizeSectionTitle}"
                            FontAttributes="Bold"
-                           CharacterSpacing="1.2"
                            VerticalOptions="Center"/>
                     <Button Grid.Column="2"
                             Text="{Binding ProductConfigToggleText}"
-                            FontSize="18"
+                            FontSize="{DynamicResource FontSizeSectionTitle}"
                             FontAttributes="Bold"
                             Padding="4,0"
-                            BackgroundColor="Transparent"
-                            TextColor="#D2E4FB"
+                            BackgroundColor="{DynamicResource ThemeTransparentColor}"
+                            TextColor="{DynamicResource ThemePrimaryTextColor}"
                             Command="{Binding ToggleProductConfigSectionCommand}"/>
                   </Grid>
 
@@ -1261,23 +1185,23 @@
                           ColumnSpacing="10">
                       <Label Grid.Column="2"
                              Text="預設價格"
-                             TextColor="#5E7A96"
-                             FontSize="11"
+                             TextColor="{DynamicResource ThemeInfoTextColor}"
+                             FontSize="{DynamicResource FontSizeMicro}"
                              FontAttributes="Bold"
                              CharacterSpacing="1.2"
                              VerticalOptions="Center"/>
                       <Label Grid.Column="3"
                              Text="儲存"
-                             TextColor="#5E7A96"
-                             FontSize="11"
+                             TextColor="{DynamicResource ThemeInfoTextColor}"
+                             FontSize="{DynamicResource FontSizeMicro}"
                              FontAttributes="Bold"
                              CharacterSpacing="1.2"
                              HorizontalOptions="Center"
                              VerticalOptions="Center"/>
                       <Label Grid.Column="4"
                              Text="刪除"
-                             TextColor="#5E7A96"
-                             FontSize="11"
+                             TextColor="{DynamicResource ThemeInfoTextColor}"
+                             FontSize="{DynamicResource FontSizeMicro}"
                              FontAttributes="Bold"
                              CharacterSpacing="1.2"
                              HorizontalOptions="Center"
@@ -1289,8 +1213,8 @@
                                     HeightRequest="220">
                       <CollectionView.EmptyView>
                         <Label Text="暫無產品。請在產品面板新增產品。"
-                               TextColor="#8EA0B9"
-                               FontSize="13"
+                               TextColor="{DynamicResource ThemeSecondaryTextColor}"
+                               FontSize="{DynamicResource FontSizeBodySmall}"
                                HorizontalOptions="Center"
                                VerticalOptions="Center"
                                Margin="0,20"/>
@@ -1301,8 +1225,8 @@
                                 ColumnSpacing="10"
                                 Padding="0,5">
                             <Label Grid.Column="0"
-                                   TextColor="#5E7A96"
-                                   FontSize="13"
+                                   TextColor="{DynamicResource ThemeInfoTextColor}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}"
                                    VerticalOptions="Center">
                               <Label.FormattedText>
                                 <FormattedString>
@@ -1313,20 +1237,20 @@
                             </Label>
                             <Entry Grid.Column="1"
                                    Text="{Binding Name}"
-                                   TextColor="#D2E4FB"
-                                   BackgroundColor="#0F2131"
-                                   FontSize="14"/>
+                                   TextColor="{DynamicResource ThemePrimaryTextColor}"
+                                   BackgroundColor="{DynamicResource ThemeSurfaceColor}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}"/>
                             <Entry Grid.Column="2"
                                    Text="{Binding PriceText}"
-                                   TextColor="#BDEE62"
-                                   BackgroundColor="#0F2131"
-                                   FontSize="14"
+                                   TextColor="{DynamicResource ThemeSuccessTextColor}"
+                                   BackgroundColor="{DynamicResource ThemeSurfaceColor}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}"
                                    Keyboard="Numeric"/>
                             <Button Grid.Column="3"
                                     Text="💾"
-                                    FontSize="18"
-                                    BackgroundColor="#A2D149"
-                                    TextColor="#243600"
+                                    FontSize="{DynamicResource FontSizeSectionTitle}"
+                                    BackgroundColor="{DynamicResource ThemeAccentColor}"
+                                    TextColor="{DynamicResource ThemePrimaryButtonTextColor}"
                                     HeightRequest="40"
                                     WidthRequest="64"
                                     CornerRadius="8"
@@ -1334,9 +1258,9 @@
                                     CommandParameter="{Binding .}"/>
                             <Button Grid.Column="4"
                                     Text="🗑"
-                                    FontSize="18"
-                                    BackgroundColor="#4A1A1A"
-                                    TextColor="#FF6B6B"
+                                    FontSize="{DynamicResource FontSizeSectionTitle}"
+                                    BackgroundColor="{DynamicResource ThemeDangerColor}"
+                                    TextColor="{DynamicResource ThemeDangerTextColor}"
                                     HeightRequest="40"
                                     WidthRequest="64"
                                     CornerRadius="8"
@@ -1352,27 +1276,26 @@
 
               <!-- ── Payment Methods Editor ── -->
               <Border Grid.Row="1"
-                      Stroke="#2A3B4C"
+                      Stroke="{DynamicResource ThemeBorderColor}"
                       StrokeShape="RoundRectangle 14"
-                      BackgroundColor="#162A3E"
+                      BackgroundColor="{DynamicResource ThemeCardColor}"
                       Padding="14">
                 <VerticalStackLayout Spacing="10">
                   <Grid ColumnDefinitions="Auto,*,Auto"
                         ColumnSpacing="10">
                     <Label Grid.Column="0"
                            Text="💳 付款方式"
-                           TextColor="#D2E4FB"
-                           FontSize="13"
+                           TextColor="{DynamicResource ThemePrimaryTextColor}"
+                           FontSize="{DynamicResource FontSizeSectionTitle}"
                            FontAttributes="Bold"
-                           CharacterSpacing="1.2"
                            VerticalOptions="Center"/>
                     <Button Grid.Column="2"
                             Text="{Binding PaymentMethodsToggleText}"
-                            FontSize="18"
+                            FontSize="{DynamicResource FontSizeSectionTitle}"
                             FontAttributes="Bold"
                             Padding="4,0"
-                            BackgroundColor="Transparent"
-                            TextColor="#D2E4FB"
+                            BackgroundColor="{DynamicResource ThemeTransparentColor}"
+                            TextColor="{DynamicResource ThemePrimaryTextColor}"
                             Command="{Binding TogglePaymentMethodsSectionCommand}"/>
                   </Grid>
 
@@ -1384,16 +1307,16 @@
                           ColumnSpacing="10">
                       <Label Grid.Column="2"
                              Text="儲存"
-                             TextColor="#5E7A96"
-                             FontSize="11"
+                             TextColor="{DynamicResource ThemeInfoTextColor}"
+                             FontSize="{DynamicResource FontSizeMicro}"
                              FontAttributes="Bold"
                              CharacterSpacing="1.2"
                              HorizontalOptions="Center"
                              VerticalOptions="Center"/>
                       <Label Grid.Column="3"
                              Text="刪除"
-                             TextColor="#5E7A96"
-                             FontSize="11"
+                             TextColor="{DynamicResource ThemeInfoTextColor}"
+                             FontSize="{DynamicResource FontSizeMicro}"
                              FontAttributes="Bold"
                              CharacterSpacing="1.2"
                              HorizontalOptions="Center"
@@ -1405,8 +1328,8 @@
                                     HeightRequest="160">
                       <CollectionView.EmptyView>
                         <Label Text="尚未設定付款方式。"
-                               TextColor="#8EA0B9"
-                               FontSize="13"
+                               TextColor="{DynamicResource ThemeSecondaryTextColor}"
+                               FontSize="{DynamicResource FontSizeBodySmall}"
                                HorizontalOptions="Center"
                                VerticalOptions="Center"
                                Margin="0,20"/>
@@ -1418,14 +1341,14 @@
                                 Padding="0,5">
                             <Entry Grid.Column="0"
                                    Text="{Binding Name}"
-                                   TextColor="#D2E4FB"
-                                   BackgroundColor="#0F2131"
-                                   FontSize="14"/>
+                                   TextColor="{DynamicResource ThemePrimaryTextColor}"
+                                   BackgroundColor="{DynamicResource ThemeSurfaceColor}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}"/>
                             <Button Grid.Column="1"
                                     Text="💾"
-                                    FontSize="18"
-                                    BackgroundColor="#A2D149"
-                                    TextColor="#243600"
+                                    FontSize="{DynamicResource FontSizeSectionTitle}"
+                                    BackgroundColor="{DynamicResource ThemeAccentColor}"
+                                    TextColor="{DynamicResource ThemePrimaryButtonTextColor}"
                                     HeightRequest="40"
                                     WidthRequest="64"
                                     CornerRadius="8"
@@ -1433,9 +1356,9 @@
                                     CommandParameter="{Binding .}"/>
                             <Button Grid.Column="2"
                                     Text="🗑"
-                                    FontSize="18"
-                                    BackgroundColor="#4A1A1A"
-                                    TextColor="#FF6B6B"
+                                    FontSize="{DynamicResource FontSizeSectionTitle}"
+                                    BackgroundColor="{DynamicResource ThemeDangerColor}"
+                                    TextColor="{DynamicResource ThemeDangerTextColor}"
                                     HeightRequest="40"
                                     WidthRequest="64"
                                     CornerRadius="8"
@@ -1452,16 +1375,16 @@
                       <Entry Grid.Column="0"
                              Text="{Binding NewPaymentMethodName}"
                              Placeholder="新付款方式名稱（如：微信支付）"
-                             PlaceholderColor="#5E7A96"
-                             TextColor="#D2E4FB"
-                             BackgroundColor="#0F2131"
-                             FontSize="14"/>
+                             PlaceholderColor="{DynamicResource ThemeInfoTextColor}"
+                             TextColor="{DynamicResource ThemePrimaryTextColor}"
+                             BackgroundColor="{DynamicResource ThemeSurfaceColor}"
+                             FontSize="{DynamicResource FontSizeBodySmall}"/>
                       <Button Grid.Column="1"
                               Text="+ 新增"
-                              FontSize="14"
+                              FontSize="{DynamicResource FontSizeButtonSmall}"
                               FontAttributes="Bold"
-                              BackgroundColor="#2563A8"
-                              TextColor="White"
+                              BackgroundColor="{DynamicResource ThemeActionBlueSoftColor}"
+                              TextColor="{DynamicResource ThemeWhiteColor}"
                               HeightRequest="44"
                               CornerRadius="8"
                               Command="{Binding AddPaymentMethodCommand}"/>
@@ -1472,26 +1395,26 @@
 
               <!-- ── Printer Configure (collapsible) ── -->
               <Border Grid.Row="2"
-                      Stroke="#2A3B4C"
+                      Stroke="{DynamicResource ThemeBorderColor}"
                       StrokeShape="RoundRectangle 14"
-                      BackgroundColor="#162A3E"
+                      BackgroundColor="{DynamicResource ThemeCardColor}"
                       Padding="14">
                 <VerticalStackLayout Spacing="10">
                   <Grid ColumnDefinitions="Auto,*,Auto"
                         ColumnSpacing="10">
                     <Label Grid.Column="0"
                            Text="🖨 印表機設置"
-                           FontSize="18"
+                           FontSize="{DynamicResource FontSizeSectionTitle}"
                            FontAttributes="Bold"
-                           TextColor="#D2E4FB"
+                           TextColor="{DynamicResource ThemePrimaryTextColor}"
                            VerticalOptions="Center"/>
                     <Button Grid.Column="2"
                             Text="{Binding PrinterSettingsToggleText}"
-                            FontSize="18"
+                            FontSize="{DynamicResource FontSizeSectionTitle}"
                             FontAttributes="Bold"
                             Padding="4,0"
-                            BackgroundColor="Transparent"
-                            TextColor="#D2E4FB"
+                            BackgroundColor="{DynamicResource ThemeTransparentColor}"
+                            TextColor="{DynamicResource ThemePrimaryTextColor}"
                             Command="{Binding TogglePrinterSettingsSectionCommand}"/>
                   </Grid>
 
@@ -1501,31 +1424,31 @@
                           ColumnSpacing="10">
                       <Label Grid.Column="0"
                              Text="連接狀態"
-                             TextColor="#8EA0B9"
+                             TextColor="{DynamicResource ThemeSecondaryTextColor}"
                              VerticalOptions="Center"/>
                       <Border Grid.Column="1"
                               StrokeThickness="0"
                               StrokeShape="RoundRectangle 999"
-                              BackgroundColor="#0F2131"
+                              BackgroundColor="{DynamicResource ThemeSurfaceColor}"
                               Padding="10,4"
                               HorizontalOptions="Start"
                               VerticalOptions="Center">
                         <Label Text="{Binding ConnectionStateText}"
-                               FontSize="13"
+                               FontSize="{DynamicResource FontSizeBodySmall}"
                                FontAttributes="Bold"
                                TextColor="{Binding IsPrinterConnected, Converter={StaticResource BoolToConnectedColorConverter}}"/>
                       </Border>
                     </Grid>
 
                     <BoxView HeightRequest="1"
-                             BackgroundColor="#2A3B4C"/>
+                             BackgroundColor="{DynamicResource ThemeBorderColor}"/>
 
                     <!-- Mode + Port -->
                     <Grid ColumnDefinitions="Auto,*,Auto,*"
                           ColumnSpacing="10">
                       <Label Grid.Column="0"
                           Text="模式"
-                          TextColor="#8EA0B9"
+                          TextColor="{DynamicResource ThemeSecondaryTextColor}"
                           VerticalOptions="Center"/>
                       <Picker Grid.Column="1"
                               Title="USB 或 COM"
@@ -1533,7 +1456,7 @@
                               SelectedItem="{Binding ConnectionOptions.Mode}"/>
                       <Label Grid.Column="2"
                           Text="連接埠"
-                          TextColor="#8EA0B9"
+                          TextColor="{DynamicResource ThemeSecondaryTextColor}"
                           VerticalOptions="Center"/>
                       <Entry Grid.Column="3"
                              Placeholder="已安裝印表機名稱（如：POS-80）"
@@ -1546,15 +1469,15 @@
                               Text="連接印表機"
                               HeightRequest="48"
                               FontAttributes="Bold"
-                              BackgroundColor="#209DC0"
-                              TextColor="White"
+                              BackgroundColor="{DynamicResource ThemeActionTealColor}"
+                              TextColor="{DynamicResource ThemeWhiteColor}"
                               Command="{Binding ConnectPrinterCommand}"/>
                       <Button Grid.Column="1"
                               Text="中斷連接"
                               HeightRequest="48"
                               FontAttributes="Bold"
-                              BackgroundColor="#253648"
-                              TextColor="#D2E4FB"
+                              BackgroundColor="{DynamicResource ThemeBorderMutedColor}"
+                              TextColor="{DynamicResource ThemePrimaryTextColor}"
                               Command="{Binding DisconnectPrinterCommand}"/>
                     </Grid>
                     <!-- Open Drawer / Print Test -->
@@ -1564,33 +1487,33 @@
                               Text="開錢箱"
                               HeightRequest="48"
                               FontAttributes="Bold"
-                              BackgroundColor="#D18467"
-                              TextColor="White"
+                              BackgroundColor="{DynamicResource ThemeActionWarmColor}"
+                              TextColor="{DynamicResource ThemeWhiteColor}"
                               Command="{Binding OpenDrawerCommand}"/>
                       <Button Grid.Column="1"
                               Text="列印測試"
                               HeightRequest="48"
                               FontAttributes="Bold"
-                              BackgroundColor="#1F3D5C"
-                              TextColor="#D2E4FB"
+                              BackgroundColor="{DynamicResource ThemeActionBlueColor}"
+                              TextColor="{DynamicResource ThemePrimaryTextColor}"
                               Command="{Binding PrintPrinterTestCommand}"/>
                     </Grid>
                     <!-- Console (always visible in expanded card) -->
                     <BoxView HeightRequest="1"
-                             BackgroundColor="#2A3B4C"/>
+                             BackgroundColor="{DynamicResource ThemeBorderColor}"/>
                     <Grid RowDefinitions="Auto,*"
                           RowSpacing="6"
                           Padding="0,2,0,0">
                       <Label Text="印表機控制台"
-                             FontSize="14"
+                             FontSize="{DynamicResource FontSizeBodySmall}"
                              FontAttributes="Bold"
-                             TextColor="#D2E4FB"/>
+                             TextColor="{DynamicResource ThemePrimaryTextColor}"/>
                       <ScrollView Grid.Row="1"
                                   HeightRequest="140">
                         <Label Text="{Binding PrinterConsoleText}"
-                               TextColor="#8EA0B9"
+                               TextColor="{DynamicResource ThemeSecondaryTextColor}"
                                FontFamily="Courier New"
-                               FontSize="13"
+                               FontSize="{DynamicResource FontSizeBodySmall}"
                                LineBreakMode="WordWrap"/>
                       </ScrollView>
                     </Grid>
@@ -1600,9 +1523,9 @@
               </Border>
 
               <Border Grid.Row="3"
-                      Stroke="#2A3B4C"
+                      Stroke="{DynamicResource ThemeBorderColor}"
                       StrokeShape="RoundRectangle 14"
-                      BackgroundColor="#162A3E"
+                      BackgroundColor="{DynamicResource ThemeCardColor}"
                       Padding="14">
                 <VerticalStackLayout Spacing="12">
                   <Grid ColumnDefinitions="Auto,*,Auto"
@@ -1614,10 +1537,10 @@
                            TextColor="{DynamicResource ThemePrimaryTextColor}"/>
                     <Button Grid.Column="2"
                             Text="{Binding AppearanceSettingsToggleText}"
-                            FontSize="18"
+                            FontSize="{DynamicResource FontSizeSectionTitle}"
                             FontAttributes="Bold"
                             Padding="4,0"
-                            BackgroundColor="Transparent"
+                            BackgroundColor="{DynamicResource ThemeTransparentColor}"
                             TextColor="{DynamicResource ThemePrimaryTextColor}"
                             Command="{Binding ToggleAppearanceSectionCommand}"/>
                   </Grid>
@@ -1659,7 +1582,7 @@
                              Text="{Binding UiPrimaryTextColorHex}"
                              Placeholder="#D2E4FB"
                              TextColor="{DynamicResource ThemePrimaryTextColor}"
-                             BackgroundColor="#0F2131"/>
+                             BackgroundColor="{DynamicResource ThemeSurfaceColor}"/>
 
                       <Label Grid.Row="1"
                              Grid.Column="0"
@@ -1676,7 +1599,7 @@
                              Text="{Binding UiSecondaryTextColorHex}"
                              Placeholder="#8EA0B9"
                              TextColor="{DynamicResource ThemePrimaryTextColor}"
-                             BackgroundColor="#0F2131"/>
+                             BackgroundColor="{DynamicResource ThemeSurfaceColor}"/>
                     </Grid>
 
                     <Grid ColumnDefinitions="2*,Auto,2*,Auto"
@@ -1698,7 +1621,7 @@
                              Text="{Binding UiBackgroundColorHex}"
                              Placeholder="#031425"
                              TextColor="{DynamicResource ThemePrimaryTextColor}"
-                             BackgroundColor="#0F2131"/>
+                             BackgroundColor="{DynamicResource ThemeSurfaceColor}"/>
 
                       <Label Grid.Row="1"
                              Grid.Column="0"
@@ -1715,7 +1638,7 @@
                              Text="{Binding UiAccentColorHex}"
                              Placeholder="#A2D149"
                              TextColor="{DynamicResource ThemePrimaryTextColor}"
-                             BackgroundColor="#0F2131"/>
+                             BackgroundColor="{DynamicResource ThemeSurfaceColor}"/>
                     </Grid>
 
                     <Grid ColumnDefinitions="*,*"
@@ -1724,12 +1647,12 @@
                               Text="套用外觀"
                               FontAttributes="Bold"
                               BackgroundColor="{DynamicResource ThemeAccentColor}"
-                              TextColor="#243600"
+                              TextColor="{DynamicResource ThemePrimaryButtonTextColor}"
                               Command="{Binding ApplyAppearanceCommand}"/>
                       <Button Grid.Column="1"
                               Text="重設預設"
                               FontAttributes="Bold"
-                              BackgroundColor="#253648"
+                              BackgroundColor="{DynamicResource ThemeBorderMutedColor}"
                               TextColor="{DynamicResource ThemePrimaryTextColor}"
                               Command="{Binding ResetAppearanceCommand}"/>
                     </Grid>
@@ -1739,8 +1662,8 @@
 
               <Label Grid.Row="4"
                      Text="{Binding StatusMessage}"
-                     TextColor="#8EA0B9"
-                     FontSize="13"
+                     TextColor="{DynamicResource ThemeSecondaryTextColor}"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
                      VerticalOptions="Start"/>
             </Grid>
           </Grid>
@@ -1750,10 +1673,10 @@
       <Grid Grid.Column="0"
             RowDefinitions="Auto,*,Auto"
             RowSpacing="10">
-        <Border Stroke="#2A3B4C"
+        <Border Stroke="{DynamicResource ThemeBorderColor}"
                 StrokeThickness="1"
                 StrokeShape="RoundRectangle 14"
-                BackgroundColor="#0F2131"
+                BackgroundColor="{DynamicResource ThemeSurfaceColor}"
                 Padding="12">
           <VerticalStackLayout Spacing="10">
             <Grid ColumnDefinitions="*,Auto"
@@ -1766,22 +1689,22 @@
                 <VerticalStackLayout Grid.Column="0"
                                      Spacing="2">
                   <Label Text="印表機連接"
-                         FontSize="18"
+                         FontSize="{DynamicResource FontSizeSectionTitle}"
                          FontAttributes="Bold"
-                         TextColor="#D2E4FB"/>
+                         TextColor="{DynamicResource ThemePrimaryTextColor}"/>
                   <Label Text="{Binding ConnectionStateText}">
                     <Label.Triggers>
                       <DataTrigger TargetType="Label"
                                    Binding="{Binding IsPrinterConnected}"
                                    Value="True">
                         <Setter Property="TextColor"
-                                Value="#BDEE62"/>
+                                Value="{DynamicResource ThemeSuccessTextColor}"/>
                       </DataTrigger>
                       <DataTrigger TargetType="Label"
                                    Binding="{Binding IsPrinterConnected}"
                                    Value="False">
                         <Setter Property="TextColor"
-                                Value="#FFB4AB"/>
+                                Value="{DynamicResource ThemeDangerTextColor}"/>
                       </DataTrigger>
                     </Label.Triggers>
                   </Label>
@@ -1789,13 +1712,13 @@
                 <HorizontalStackLayout Grid.Column="1"
                                        Spacing="8">
                   <Button Text="連接"
-                          BackgroundColor="#209DC0"
-                          TextColor="White"
+                          BackgroundColor="{DynamicResource ThemeActionTealColor}"
+                          TextColor="{DynamicResource ThemeWhiteColor}"
                           FontAttributes="Bold"
                           Command="{Binding ConnectPrinterCommand}"/>
                   <Button Text="中斷連接"
-                          BackgroundColor="#253648"
-                          TextColor="#D2E4FB"
+                          BackgroundColor="{DynamicResource ThemeBorderMutedColor}"
+                          TextColor="{DynamicResource ThemePrimaryTextColor}"
                           FontAttributes="Bold"
                           Command="{Binding DisconnectPrinterCommand}"/>
                 </HorizontalStackLayout>
@@ -1806,24 +1729,24 @@
         </Border>
 
         <Grid Grid.Row="1">
-          <Border Stroke="#2A3B4C"
+          <Border Stroke="{DynamicResource ThemeBorderColor}"
                   StrokeThickness="1"
                   StrokeShape="RoundRectangle 14"
-                  BackgroundColor="#0F2131"
+                  BackgroundColor="{DynamicResource ThemeSurfaceColor}"
                   Padding="14">
             <Grid RowDefinitions="Auto,*"
                   RowSpacing="12">
               <Grid ColumnDefinitions="*,Auto"
                     ColumnSpacing="10">
                 <Label Text="產品"
-                       TextColor="#D2E4FB"
-                       FontSize="24"
+                       TextColor="{DynamicResource ThemePrimaryTextColor}"
+                       FontSize="{DynamicResource FontSizePageSubTitle}"
                        FontAttributes="Bold"/>
                 <Button Grid.Column="1"
                         Text="+ 新增產品"
                         FontAttributes="Bold"
-                        BackgroundColor="#A2D149"
-                        TextColor="#243600"
+                        BackgroundColor="{DynamicResource ThemeAccentColor}"
+                        TextColor="{DynamicResource ThemePrimaryButtonTextColor}"
                         Command="{Binding OpenAddProductPopupCommand}"/>
               </Grid>
 
@@ -1838,10 +1761,10 @@
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                   <DataTemplate>
-                    <Border Stroke="#253648"
+                    <Border Stroke="{DynamicResource ThemeBorderMutedColor}"
                             StrokeThickness="1"
                             StrokeShape="RoundRectangle 10"
-                            BackgroundColor="#1A2B3C"
+                            BackgroundColor="{DynamicResource ThemeSurfaceAltColor}"
                             Padding="12"
                             MinimumHeightRequest="110">
                       <Border.GestureRecognizers>
@@ -1852,17 +1775,17 @@
                                            VerticalOptions="Center"
                                            HorizontalOptions="Center">
                         <Label Text="{Binding Name}"
-                               FontSize="18"
+                               FontSize="{DynamicResource FontSizeSectionTitle}"
                                FontAttributes="Bold"
-                               TextColor="#D2E4FB"
+                               TextColor="{DynamicResource ThemePrimaryTextColor}"
                                HorizontalTextAlignment="Center"/>
                         <Label Text="{Binding DefaultPrice, StringFormat='HKD $ {0:F2}'}"
-                               TextColor="#69D4F8"
+                               TextColor="{DynamicResource ThemeHighlightColor}"
                                FontAttributes="Bold"
                                HorizontalTextAlignment="Center"/>
                         <Label Text="點擊新增"
-                               FontSize="12"
-                               TextColor="#8EA0B9"
+                               FontSize="{DynamicResource FontSizeCaption}"
+                               TextColor="{DynamicResource ThemeSecondaryTextColor}"
                                HorizontalTextAlignment="Center"/>
                       </VerticalStackLayout>
                     </Border>
@@ -1876,27 +1799,27 @@
 
         <Label Grid.Row="2"
                Text="在 macOS 上，目前預設印表機為模擬/檔案輸出。"
-               FontSize="12"
-               TextColor="#8EA0B9"
+               FontSize="{DynamicResource FontSizeCaption}"
+               TextColor="{DynamicResource ThemeSecondaryTextColor}"
                Opacity="0.9"/>
       </Grid>
     </Grid>
     <Grid Grid.RowSpan="1"
           IsVisible="{Binding IsAddProductPopupVisible}"
-          BackgroundColor="#80000000">
-      <Border Stroke="#2A3B4C"
+          BackgroundColor="{DynamicResource ThemeOverlayColor}">
+      <Border Stroke="{DynamicResource ThemeBorderColor}"
               StrokeThickness="1"
               StrokeShape="RoundRectangle 14"
-              BackgroundColor="#0F2131"
+              BackgroundColor="{DynamicResource ThemeSurfaceColor}"
               Padding="16"
               HorizontalOptions="Center"
               VerticalOptions="Center"
               WidthRequest="320">
         <VerticalStackLayout Spacing="12">
           <Label Text="新增產品"
-                 FontSize="24"
+                 FontSize="{DynamicResource FontSizePageSubTitle}"
                  FontAttributes="Bold"
-                 TextColor="#D2E4FB"/>
+                 TextColor="{DynamicResource ThemePrimaryTextColor}"/>
 
           <Entry Placeholder="產品名稱"
                  Text="{Binding NewProductName}"/>
@@ -1908,14 +1831,14 @@
                 ColumnSpacing="10">
             <Button Grid.Column="0"
                     Text="取消"
-                    BackgroundColor="#253648"
-                    TextColor="#D2E4FB"
+                    BackgroundColor="{DynamicResource ThemeBorderMutedColor}"
+                    TextColor="{DynamicResource ThemePrimaryTextColor}"
                     FontAttributes="Bold"
                     Command="{Binding CloseAddProductPopupCommand}"/>
             <Button Grid.Column="1"
                     Text="新增"
-                    BackgroundColor="#A2D149"
-                    TextColor="#243600"
+                    BackgroundColor="{DynamicResource ThemeAccentColor}"
+                    TextColor="{DynamicResource ThemePrimaryButtonTextColor}"
                     FontAttributes="Bold"
                     Command="{Binding AddNewProductCommand}"/>
           </Grid>
