@@ -75,6 +75,10 @@
                             ItemsSource="{Binding CartLines}"
                             SelectionMode="Single"
                             SelectedItem="{Binding SelectedCartLine}">
+              <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical"
+                                   ItemSpacing="8" />
+              </CollectionView.ItemsLayout>
               <CollectionView.ItemTemplate>
                 <DataTemplate>
                   <Border Stroke="#253648"
@@ -82,8 +86,26 @@
                           StrokeShape="RoundRectangle 10"
                           BackgroundColor="#1A2B3C"
                           Padding="12"
-                          Margin="0,0,0,10">
-                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                          Margin="0,0,0,4">
+                    <VisualStateManager.VisualStateGroups>
+                      <VisualStateGroupList>
+                        <VisualStateGroup Name="CommonStates">
+                          <VisualState Name="Normal">
+                            <VisualState.Setters>
+                              <Setter Property="StrokeThickness" Value="1" />
+                              <Setter Property="Stroke" Value="#253648" />
+                            </VisualState.Setters>
+                          </VisualState>
+                          <VisualState Name="Selected">
+                            <VisualState.Setters>
+                              <Setter Property="StrokeThickness" Value="4" />
+                              <Setter Property="Stroke" Value="#69D4F8" />
+                            </VisualState.Setters>
+                          </VisualState>
+                        </VisualStateGroup>
+                      </VisualStateGroupList>
+                    </VisualStateManager.VisualStateGroups>
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto"
                           ColumnSpacing="10">
                       <Label FontSize="22"
                              FontAttributes="Bold"
@@ -114,18 +136,6 @@
                              FontAttributes="Bold"
                              VerticalOptions="Center" />
                       <Button Grid.Column="3"
-                              Text="✎"
-                              FontSize="20"
-                              WidthRequest="40"
-                              HeightRequest="40"
-                              Padding="0"
-                              CornerRadius="20"
-                              BackgroundColor="#1F3D5C"
-                              TextColor="#D2E4FB"
-                              VerticalOptions="Center"
-                              Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditCartLineCommand}"
-                              CommandParameter="{Binding}" />
-                      <Button Grid.Column="4"
                               Text="−"
                               FontSize="22"
                               WidthRequest="40"
@@ -162,6 +172,164 @@
                       TextColor="#243600"
                       Command="{Binding PrintReceiptCommand}" />
             </Grid>
+
+            <BoxView Grid.RowSpan="3"
+                     IsVisible="{Binding IsProductControlVisible}"
+                     BackgroundColor="#80000000"
+                     ZIndex="11" />
+            <Border x:Name="ProductControlPopup"
+                    Grid.RowSpan="3"
+                    IsVisible="{Binding IsProductControlVisible}"
+                    Stroke="#2A3B4C"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 14"
+                    BackgroundColor="#0F2131"
+                    Padding="12"
+                    ZIndex="12"
+                    MinimumWidthRequest="500"
+                    MaximumWidthRequest="760"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+              <Border.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="OnProductControlPanUpdated" />
+              </Border.GestureRecognizers>
+              <VerticalStackLayout Spacing="10">
+                <Grid ColumnDefinitions="*,Auto">
+                  <Label Text="產品控制"
+                         FontSize="18"
+                         FontAttributes="Bold"
+                         TextColor="#D2E4FB"
+                         VerticalOptions="Center" />
+                  <Button Grid.Column="1"
+                          Text="✕"
+                          FontSize="16"
+                          FontAttributes="Bold"
+                          WidthRequest="36"
+                          HeightRequest="36"
+                          Padding="0"
+                          CornerRadius="18"
+                          BackgroundColor="#3D1F1F"
+                          TextColor="#FFB4AB"
+                          VerticalOptions="Start"
+                          Command="{Binding DismissProductControlCommand}" />
+                </Grid>
+
+                <Entry Text="{Binding SelectedCartLine.Remark, Mode=TwoWay, FallbackValue=''}"
+                       Placeholder="{Binding SelectedCartLineName}"
+                       PlaceholderColor="#BDEE62"
+                       TextColor="#D2E4FB"
+                       FontSize="28"
+                       BackgroundColor="#1A2B3C"
+                       IsEnabled="{Binding HasSelectedCartLine}" />
+
+                <Border Stroke="#253648"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="#1A2B3C"
+                        Padding="12,8">
+                  <Label Text="{Binding PricePadInputText, StringFormat='HKD $ {0}'}"
+                         TextColor="#BDEE62"
+                         FontSize="28"
+                         FontAttributes="Bold"
+                         HorizontalTextAlignment="End" />
+                </Border>
+
+                <Grid RowDefinitions="*,*,*,*"
+                      ColumnDefinitions="*,*,*,*"
+                      ColumnSpacing="8"
+                      RowSpacing="8"
+                      IsEnabled="{Binding HasSelectedCartLine}">
+                  <Grid.Resources>
+                    <Style x:Key="NumKey" TargetType="Button">
+                      <Setter Property="HeightRequest" Value="60" />
+                      <Setter Property="FontSize" Value="22" />
+                      <Setter Property="FontAttributes" Value="Bold" />
+                      <Setter Property="BackgroundColor" Value="#1A2B3C" />
+                      <Setter Property="TextColor" Value="#D2E4FB" />
+                      <Setter Property="BorderColor" Value="#2A3B4C" />
+                      <Setter Property="BorderWidth" Value="1" />
+                      <Setter Property="CornerRadius" Value="10" />
+                    </Style>
+                    <Style x:Key="QuickAmount" TargetType="Button" BasedOn="{StaticResource NumKey}">
+                      <Setter Property="BackgroundColor" Value="#E07A5F" />
+                      <Setter Property="TextColor" Value="White" />
+                      <Setter Property="FontSize" Value="18" />
+                    </Style>
+                  </Grid.Resources>
+
+                  <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource NumKey}" Text="1"
+                          Command="{Binding PricePadInputCommand}" CommandParameter="1" />
+                  <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource NumKey}" Text="2"
+                          Command="{Binding PricePadInputCommand}" CommandParameter="2" />
+                  <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource NumKey}" Text="3"
+                          Command="{Binding PricePadInputCommand}" CommandParameter="3" />
+                  <Button Grid.Row="0" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$100"
+                          Command="{Binding SetPricePadAmountCommand}" CommandParameter="100" />
+
+                  <Button Grid.Row="1" Grid.Column="0" Style="{StaticResource NumKey}" Text="4"
+                          Command="{Binding PricePadInputCommand}" CommandParameter="4" />
+                  <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource NumKey}" Text="5"
+                          Command="{Binding PricePadInputCommand}" CommandParameter="5" />
+                  <Button Grid.Row="1" Grid.Column="2" Style="{StaticResource NumKey}" Text="6"
+                          Command="{Binding PricePadInputCommand}" CommandParameter="6" />
+                  <Button Grid.Row="1" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$50"
+                          Command="{Binding SetPricePadAmountCommand}" CommandParameter="50" />
+
+                  <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource NumKey}" Text="7"
+                          Command="{Binding PricePadInputCommand}" CommandParameter="7" />
+                  <Button Grid.Row="2" Grid.Column="1" Style="{StaticResource NumKey}" Text="8"
+                          Command="{Binding PricePadInputCommand}" CommandParameter="8" />
+                  <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource NumKey}" Text="9"
+                          Command="{Binding PricePadInputCommand}" CommandParameter="9" />
+                  <Button Grid.Row="2" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$20"
+                          Command="{Binding SetPricePadAmountCommand}" CommandParameter="20" />
+
+                  <Button Grid.Row="3" Grid.Column="0" Style="{StaticResource NumKey}" Text="0"
+                          Command="{Binding PricePadInputCommand}" CommandParameter="0" />
+                  <Button Grid.Row="3" Grid.Column="1" Style="{StaticResource NumKey}" Text="00"
+                          Command="{Binding PricePadInputCommand}" CommandParameter="00" />
+                  <Button Grid.Row="3" Grid.Column="2" Style="{StaticResource NumKey}" Text="."
+                          Command="{Binding PricePadInputCommand}" CommandParameter="." />
+                  <Button Grid.Row="3" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$10"
+                          Command="{Binding SetPricePadAmountCommand}" CommandParameter="10" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,*,2*"
+                      ColumnSpacing="8"
+                      IsEnabled="{Binding HasSelectedCartLine}">
+                  <Button Grid.Column="0"
+                          Text="C"
+                          HeightRequest="56"
+                          FontSize="18"
+                          FontAttributes="Bold"
+                          BackgroundColor="#3D1F1F"
+                          TextColor="#FFB4AB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding PricePadClearCommand}" />
+                  <Button Grid.Column="1"
+                          Text="⌫"
+                          HeightRequest="56"
+                          FontSize="18"
+                          FontAttributes="Bold"
+                          BackgroundColor="#3D1F1F"
+                          TextColor="#FFB4AB"
+                          BorderColor="#2A3B4C"
+                          BorderWidth="1"
+                          CornerRadius="10"
+                          Command="{Binding PricePadBackspaceCommand}" />
+                  <Button Grid.Column="2"
+                          Text="套用價格"
+                          HeightRequest="56"
+                          FontSize="20"
+                          FontAttributes="Bold"
+                          BackgroundColor="#A2D149"
+                          TextColor="#243600"
+                          CornerRadius="10"
+                          Command="{Binding ApplyFinalPriceCommand}" />
+                </Grid>
+              </VerticalStackLayout>
+            </Border>
             </Grid>
 
             <!-- Checkout modal backdrop -->
@@ -357,7 +525,7 @@
                           FontAttributes="Bold"
                           Command="{Binding AddPaymentCommand}" />
                   <Button Grid.Column="1"
-                          Text="確認並列印"
+                          Text="確認並收銀"
                           FontSize="14"
                           HeightRequest="42"
                           BackgroundColor="#A2D149"
@@ -866,12 +1034,9 @@
                 <VerticalStackLayout Spacing="0">
 
                   <!-- Clickable header -->
-                  <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+                  <Grid ColumnDefinitions="Auto,*"
                         ColumnSpacing="10"
                         Padding="16,14">
-                    <Grid.GestureRecognizers>
-                      <TapGestureRecognizer Command="{Binding TogglePrinterPanelCommand}" />
-                    </Grid.GestureRecognizers>
                     <Label Grid.Column="0"
                            Text="🖨 印表機設置"
                            FontSize="18"
@@ -882,7 +1047,7 @@
                     <Border Grid.Column="1"
                             StrokeThickness="0"
                             StrokeShape="RoundRectangle 999"
-                            BackgroundColor="#0F2131"
+                            BackgroundColor="#BDEE62"
                             Padding="10,4"
                             HorizontalOptions="Start"
                             VerticalOptions="Center">
@@ -891,22 +1056,13 @@
                              FontAttributes="Bold"
                              TextColor="{Binding IsPrinterConnected, Converter={StaticResource BoolToConnectedColorConverter}}" />
                     </Border>
-                    <Label Grid.Column="3"
-                           Text="{Binding PrinterPanelToggleText}"
-                           FontSize="18"
-                           TextColor="#8EA0B9"
-                           VerticalOptions="Center"
-                           HorizontalOptions="End" />
                   </Grid>
 
                   <!-- Separator -->
                   <BoxView HeightRequest="1"
-                           BackgroundColor="#2A3B4C"
-                           IsVisible="{Binding IsPrinterPanelExpanded}" />
+                           BackgroundColor="#2A3B4C" />
 
-                  <!-- Collapsible details -->
-                  <VerticalStackLayout IsVisible="{Binding IsPrinterPanelExpanded}"
-                                       Spacing="10"
+                  <VerticalStackLayout Spacing="10"
                                        Padding="16,14">
                     <!-- Mode + Port -->
                     <Grid ColumnDefinitions="Auto,*,Auto,*"
@@ -1007,14 +1163,14 @@
                 <Label Text="{Binding ConnectionStateText}">
                   <Label.Triggers>
                     <DataTrigger TargetType="Label"
-                                 Binding="{Binding ConnectionStateText}"
-                                 Value="Connected">
+                                 Binding="{Binding IsPrinterConnected}"
+                                 Value="True">
                       <Setter Property="TextColor"
                               Value="#BDEE62" />
                     </DataTrigger>
                     <DataTrigger TargetType="Label"
-                                 Binding="{Binding ConnectionStateText}"
-                                 Value="Not Connected">
+                                 Binding="{Binding IsPrinterConnected}"
+                                 Value="False">
                       <Setter Property="TextColor"
                               Value="#FFB4AB" />
                     </DataTrigger>
@@ -1022,15 +1178,20 @@
                 </Label>
               </VerticalStackLayout>
               <Button Grid.Column="1"
-                      Text="{Binding PrinterPanelToggleText}"
-                      FontSize="12"
-                      BackgroundColor="#1A2B3C"
+                      Text="✎"
+                      FontSize="16"
+                      FontAttributes="Bold"
+                      WidthRequest="36"
+                      HeightRequest="36"
+                      Padding="0"
+                      CornerRadius="18"
+                      BackgroundColor="#1F3D5C"
                       TextColor="#D2E4FB"
-                      Command="{Binding TogglePrinterPanelCommand}" />
+                      VerticalOptions="Start"
+                      Command="{Binding BeginEditPrinterConfigCommand}" />
             </Grid>
 
-            <Grid IsVisible="{Binding IsPrinterPanelExpanded}"
-                  RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
                   ColumnDefinitions="*,*"
                   ColumnSpacing="8"
                   RowSpacing="8">
@@ -1038,14 +1199,17 @@
                       Grid.Column="0"
                       Title="模式"
                       ItemsSource="{Binding ConnectionModes}"
-                      SelectedItem="{Binding ConnectionOptions.Mode}" />
+                      ItemDisplayBinding="{Binding .}"
+                      SelectedItem="{Binding EditingConnectionMode, Mode=TwoWay}"
+                      IsEnabled="{Binding IsPrinterConfigEditMode}" />
               <Entry Grid.Row="0"
                      Grid.Column="1"
-                Placeholder="已安裝印表機名稱"
-                     Text="{Binding ConnectionOptions.Endpoint}" />
+                     Placeholder="已安裝印表機名稱"
+                     IsEnabled="{Binding IsPrinterConfigEditMode}"
+                     Text="{Binding EditingConnectionEndpoint, Mode=TwoWay}" />
               <HorizontalStackLayout Grid.Row="4"
-                                     Grid.ColumnSpan="2"
-                                     Spacing="8">
+                                      Grid.ColumnSpan="2"
+                                      Spacing="8">
                 <Button Text="連接"
                         BackgroundColor="#209DC0"
                         TextColor="White"
@@ -1056,14 +1220,19 @@
                         TextColor="#D2E4FB"
                         FontAttributes="Bold"
                         Command="{Binding DisconnectPrinterCommand}" />
+                <Button Text="套用"
+                        FontAttributes="Bold"
+                        BackgroundColor="#A2D149"
+                        TextColor="#243600"
+                        IsVisible="{Binding IsPrinterConfigEditMode}"
+                        IsEnabled="{Binding IsPrinterConfigEditMode}"
+                        Command="{Binding ApplyPrinterConfigCommand}" />
               </HorizontalStackLayout>
             </Grid>
           </VerticalStackLayout>
         </Border>
 
-        <Grid Grid.Row="1"
-              RowDefinitions="*,Auto"
-              RowSpacing="10">
+        <Grid Grid.Row="1">
           <Border Stroke="#2A3B4C"
                   StrokeThickness="1"
                   StrokeShape="RoundRectangle 14"
@@ -1130,155 +1299,6 @@
             </Grid>
           </Border>
 
-          <Border Grid.Row="1"
-                  IsVisible="{Binding IsProductControlVisible}"
-                  Stroke="#2A3B4C"
-                  StrokeThickness="1"
-                  StrokeShape="RoundRectangle 14"
-                  BackgroundColor="#0F2131"
-                  Padding="12">
-            <VerticalStackLayout Spacing="10">
-              <Grid ColumnDefinitions="*,Auto">
-                <Label Text="產品控制"
-                       FontSize="18"
-                       FontAttributes="Bold"
-                       TextColor="#D2E4FB"
-                       VerticalOptions="Center" />
-                <Button Grid.Column="1"
-                        Text="✕"
-                        FontSize="16"
-                        FontAttributes="Bold"
-                        WidthRequest="36"
-                        HeightRequest="36"
-                        Padding="0"
-                        CornerRadius="18"
-                        BackgroundColor="#3D1F1F"
-                        TextColor="#FFB4AB"
-                        VerticalOptions="Start"
-                        Command="{Binding DismissProductControlCommand}" />
-              </Grid>
-              <Label Text="{Binding SelectedCartLineName}"
-                     TextColor="#C4D4E8"
-                     FontAttributes="Bold" />
-              <Label Text="{Binding SelectedCartLineTotalText}"
-                     TextColor="#8EA0B9"
-                     FontSize="12" />
-
-              <Entry Text="{Binding SelectedCartLine.Remark, Mode=TwoWay, FallbackValue=''}"
-                     Placeholder="新增備註..."
-                     PlaceholderColor="#8EA0B9"
-                     TextColor="#D2E4FB"
-                     BackgroundColor="#1A2B3C"
-                     IsEnabled="{Binding HasSelectedCartLine}" />
-
-              <Border Stroke="#253648"
-                      StrokeShape="RoundRectangle 10"
-                      BackgroundColor="#1A2B3C"
-                      Padding="12,8">
-                <Label Text="{Binding PricePadInputText, StringFormat='HKD $ {0}'}"
-                       TextColor="#BDEE62"
-                       FontSize="28"
-                       FontAttributes="Bold"
-                       HorizontalTextAlignment="End" />
-              </Border>
-
-              <Grid RowDefinitions="*,*,*,*"
-                    ColumnDefinitions="*,*,*,*"
-                    ColumnSpacing="8"
-                    RowSpacing="8"
-                    IsEnabled="{Binding HasSelectedCartLine}">
-                <Grid.Resources>
-                  <Style x:Key="NumKey" TargetType="Button">
-                    <Setter Property="HeightRequest" Value="60" />
-                    <Setter Property="FontSize" Value="22" />
-                    <Setter Property="FontAttributes" Value="Bold" />
-                    <Setter Property="BackgroundColor" Value="#1A2B3C" />
-                    <Setter Property="TextColor" Value="#D2E4FB" />
-                    <Setter Property="BorderColor" Value="#2A3B4C" />
-                    <Setter Property="BorderWidth" Value="1" />
-                    <Setter Property="CornerRadius" Value="10" />
-                  </Style>
-                  <Style x:Key="QuickAmount" TargetType="Button" BasedOn="{StaticResource NumKey}">
-                    <Setter Property="BackgroundColor" Value="#E07A5F" />
-                    <Setter Property="TextColor" Value="White" />
-                    <Setter Property="FontSize" Value="18" />
-                  </Style>
-                </Grid.Resources>
-
-                <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource NumKey}" Text="1"
-                        Command="{Binding PricePadInputCommand}" CommandParameter="1" />
-                <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource NumKey}" Text="2"
-                        Command="{Binding PricePadInputCommand}" CommandParameter="2" />
-                <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource NumKey}" Text="3"
-                        Command="{Binding PricePadInputCommand}" CommandParameter="3" />
-                <Button Grid.Row="0" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$100"
-                        Command="{Binding SetPricePadAmountCommand}" CommandParameter="100" />
-
-                <Button Grid.Row="1" Grid.Column="0" Style="{StaticResource NumKey}" Text="4"
-                        Command="{Binding PricePadInputCommand}" CommandParameter="4" />
-                <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource NumKey}" Text="5"
-                        Command="{Binding PricePadInputCommand}" CommandParameter="5" />
-                <Button Grid.Row="1" Grid.Column="2" Style="{StaticResource NumKey}" Text="6"
-                        Command="{Binding PricePadInputCommand}" CommandParameter="6" />
-                <Button Grid.Row="1" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$50"
-                        Command="{Binding SetPricePadAmountCommand}" CommandParameter="50" />
-
-                <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource NumKey}" Text="7"
-                        Command="{Binding PricePadInputCommand}" CommandParameter="7" />
-                <Button Grid.Row="2" Grid.Column="1" Style="{StaticResource NumKey}" Text="8"
-                        Command="{Binding PricePadInputCommand}" CommandParameter="8" />
-                <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource NumKey}" Text="9"
-                        Command="{Binding PricePadInputCommand}" CommandParameter="9" />
-                <Button Grid.Row="2" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$20"
-                        Command="{Binding SetPricePadAmountCommand}" CommandParameter="20" />
-
-                <Button Grid.Row="3" Grid.Column="0" Style="{StaticResource NumKey}" Text="0"
-                        Command="{Binding PricePadInputCommand}" CommandParameter="0" />
-                <Button Grid.Row="3" Grid.Column="1" Style="{StaticResource NumKey}" Text="00"
-                        Command="{Binding PricePadInputCommand}" CommandParameter="00" />
-                <Button Grid.Row="3" Grid.Column="2" Style="{StaticResource NumKey}" Text="."
-                        Command="{Binding PricePadInputCommand}" CommandParameter="." />
-                <Button Grid.Row="3" Grid.Column="3" Style="{StaticResource QuickAmount}" Text="$10"
-                        Command="{Binding SetPricePadAmountCommand}" CommandParameter="10" />
-              </Grid>
-
-              <Grid ColumnDefinitions="*,*,2*"
-                    ColumnSpacing="8"
-                    IsEnabled="{Binding HasSelectedCartLine}">
-                <Button Grid.Column="0"
-                        Text="C"
-                        HeightRequest="56"
-                        FontSize="18"
-                        FontAttributes="Bold"
-                        BackgroundColor="#3D1F1F"
-                        TextColor="#FFB4AB"
-                        BorderColor="#2A3B4C"
-                        BorderWidth="1"
-                        CornerRadius="10"
-                        Command="{Binding PricePadClearCommand}" />
-                <Button Grid.Column="1"
-                        Text="⌫"
-                        HeightRequest="56"
-                        FontSize="18"
-                        FontAttributes="Bold"
-                        BackgroundColor="#3D1F1F"
-                        TextColor="#FFB4AB"
-                        BorderColor="#2A3B4C"
-                        BorderWidth="1"
-                        CornerRadius="10"
-                        Command="{Binding PricePadBackspaceCommand}" />
-                <Button Grid.Column="2"
-                        Text="套用價格"
-                        HeightRequest="56"
-                        FontSize="20"
-                        FontAttributes="Bold"
-                        BackgroundColor="#A2D149"
-                        TextColor="#243600"
-                        CornerRadius="10"
-                        Command="{Binding ApplyFinalPriceCommand}" />
-              </Grid>
-            </VerticalStackLayout>
-          </Border>
         </Grid>
 
         <Label Grid.Row="2"

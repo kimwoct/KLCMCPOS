@@ -8,6 +8,12 @@ namespace KLCMC.Pos.Core.ViewModels;
 
 public sealed class MainViewModel : BindableBase
 {
+    private static readonly PrinterConnectionMode[] SupportedConnectionModes =
+    [
+        PrinterConnectionMode.Usb,
+        PrinterConnectionMode.Serial
+    ];
+
     public event Action? SaleConfirmed;
     private readonly IPrinterService _printerService;
     private readonly IProductRepository _productRepository;
@@ -29,6 +35,8 @@ public sealed class MainViewModel : BindableBase
     private readonly RelayCommand _removeCartLineCommand;
     private readonly RelayCommand _dismissProductControlCommand;
     private readonly RelayCommand _printReceiptCommand;
+    private readonly RelayCommand _beginEditPrinterConfigCommand;
+    private readonly RelayCommand _applyPrinterConfigCommand;
     private readonly RelayCommand _applyFinalPriceCommand;
     private readonly RelayCommand _addPaymentCommand;
     private readonly RelayCommand _confirmCheckoutCommand;
@@ -42,9 +50,12 @@ public sealed class MainViewModel : BindableBase
     private bool _isAddProductPopupVisible;
     private bool _isCheckoutPopupVisible;
     private bool _isProductControlVisible;
+    private bool _isPrinterConfigEditMode;
     private string _newProductName = string.Empty;
     private string _newProductPriceText = string.Empty;
+    private string _editingConnectionEndpoint = string.Empty;
     private string _pricePadInputText = "0";
+    private PrinterConnectionMode _editingConnectionMode;
     private string _moneyPadInputText = "0";
     private string _printerCapabilitiesText = "No capability probe yet.";
     private string _selectedPaymentMethodName = "現金";
@@ -75,8 +86,15 @@ public sealed class MainViewModel : BindableBase
 
         ReloadProductEditorRows();
 
-        ConnectionModes = Enum.GetValues<PrinterConnectionMode>();
+        ConnectionModes = SupportedConnectionModes;
         ConnectionOptions = _printerSettingsRepository.Load();
+        if (!ConnectionModes.Contains(ConnectionOptions.Mode))
+        {
+            ConnectionOptions.Mode = PrinterConnectionMode.Usb;
+            _printerSettingsRepository.Save(ConnectionOptions);
+        }
+        _editingConnectionMode = ConnectionOptions.Mode;
+        _editingConnectionEndpoint = ConnectionOptions.Endpoint;
         PaperWidths = [58, 80];
         CodePages = ["UTF-8", "ASCII", "Big5", "GB18030", "Shift_JIS", "Windows-1252"];
         CutModes = Enum.GetValues<PrinterCutMode>();
@@ -109,6 +127,8 @@ public sealed class MainViewModel : BindableBase
         _removeCartLineCommand = new RelayCommand(RemoveCartLine);
         _dismissProductControlCommand = new RelayCommand(_ => DismissProductControl());
         _printReceiptCommand = new RelayCommand(_ => OpenCheckout(), _ => CartLines.Count > 0);
+        _beginEditPrinterConfigCommand = new RelayCommand(_ => BeginEditPrinterConfig());
+        _applyPrinterConfigCommand = new RelayCommand(_ => ApplyPrinterConfig(), _ => CanApplyPrinterConfig());
         PricePadInputCommand = new RelayCommand(AppendPricePadInput, _ => HasSelectedCartLine);
         PricePadBackspaceCommand = new RelayCommand(_ => BackspacePricePadInput(), _ => HasSelectedCartLine);
         PricePadClearCommand = new RelayCommand(_ => ClearPricePadInput(), _ => HasSelectedCartLine);
@@ -151,7 +171,7 @@ public sealed class MainViewModel : BindableBase
 
     public ObservableCollection<ProductEditorRow> ProductEditorRows { get; } = [];
 
-    public Array ConnectionModes { get; }
+    public IReadOnlyList<PrinterConnectionMode> ConnectionModes { get; }
 
     public PrinterConnectionOptions ConnectionOptions { get; }
 
@@ -186,10 +206,7 @@ public sealed class MainViewModel : BindableBase
             RaisePropertyChanged(nameof(SelectedCartLineName));
             RaisePropertyChanged(nameof(SelectedCartLineTotalText));
             RaisePricePadCommandStateChanged();
-            if (_selectedCartLine is null)
-            {
-                IsProductControlVisible = false;
-            }
+            IsProductControlVisible = _selectedCartLine is not null;
         }
     }
 
@@ -209,6 +226,40 @@ public sealed class MainViewModel : BindableBase
     {
         get => _isPrinterPanelExpanded;
         private set => SetProperty(ref _isPrinterPanelExpanded, value);
+    }
+
+    public bool IsPrinterConfigEditMode
+    {
+        get => _isPrinterConfigEditMode;
+        private set
+        {
+            if (!SetProperty(ref _isPrinterConfigEditMode, value))
+            {
+                return;
+            }
+
+            _applyPrinterConfigCommand.RaiseCanExecuteChanged();
+        }
+    }
+
+    public PrinterConnectionMode EditingConnectionMode
+    {
+        get => _editingConnectionMode;
+        set => SetProperty(ref _editingConnectionMode, value);
+    }
+
+    public string EditingConnectionEndpoint
+    {
+        get => _editingConnectionEndpoint;
+        set
+        {
+            if (!SetProperty(ref _editingConnectionEndpoint, value))
+            {
+                return;
+            }
+
+            _applyPrinterConfigCommand.RaiseCanExecuteChanged();
+        }
     }
 
     public string PricePadInputText
@@ -336,6 +387,10 @@ public sealed class MainViewModel : BindableBase
 
     public RelayCommand PrintReceiptCommand => _printReceiptCommand;
 
+    public RelayCommand BeginEditPrinterConfigCommand => _beginEditPrinterConfigCommand;
+
+    public RelayCommand ApplyPrinterConfigCommand => _applyPrinterConfigCommand;
+
     private void AddPresetItem(object? parameter)
     {
         if (parameter is not PresetItem presetItem)
@@ -348,6 +403,7 @@ public sealed class MainViewModel : BindableBase
         {
             existingLine.Quantity += 1;
             SelectedCartLine = existingLine;
+            IsProductControlVisible = true;
             return;
         }
 
@@ -369,6 +425,7 @@ public sealed class MainViewModel : BindableBase
         };
         CartLines.Add(cartLine);
         SelectedCartLine = cartLine;
+        IsProductControlVisible = true;
     }
 
     private bool CanAddNewProduct()
@@ -422,6 +479,11 @@ public sealed class MainViewModel : BindableBase
         IsAddProductPopupVisible = false;
         StatusMessage = $"產品「{name}」已新增。";
         _addNewProductCommand.RaiseCanExecuteChanged();
+
+        // Auto-add to cart and open Product Control so user can adjust price immediately
+        var newPreset = PresetItems.Last();
+        AddPresetItem(newPreset);
+        IsProductControlVisible = true;
     }
 
     private void ReloadProductEditorRows()
@@ -657,6 +719,56 @@ public sealed class MainViewModel : BindableBase
     {
         IsPrinterPanelExpanded = !IsPrinterPanelExpanded;
         RaisePropertyChanged(nameof(PrinterPanelToggleText));
+    }
+
+    private void BeginEditPrinterConfig()
+    {
+        EditingConnectionMode = ConnectionOptions.Mode;
+        EditingConnectionEndpoint = ConnectionOptions.Endpoint;
+        IsPrinterConfigEditMode = true;
+    }
+
+    private bool CanApplyPrinterConfig()
+    {
+        return IsPrinterConfigEditMode && !string.IsNullOrWhiteSpace(EditingConnectionEndpoint);
+    }
+
+    private void ApplyPrinterConfig()
+    {
+        if (!CanApplyPrinterConfig())
+        {
+            StatusMessage = "請輸入有效的印表機名稱。";
+            return;
+        }
+
+        ConnectionOptions.Mode = EditingConnectionMode;
+        ConnectionOptions.Endpoint = EditingConnectionEndpoint.Trim();
+
+        try
+        {
+            _printerSettingsRepository.Save(ConnectionOptions);
+
+            if (_printerService.IsOpen)
+            {
+                _printerService.Close();
+                _printerService.Open(ConnectionOptions);
+                RaisePropertyChanged(nameof(ConnectionStateText));
+                RaisePropertyChanged(nameof(IsPrinterConnected));
+                StatusMessage = "印表機設定已套用並重新連接。";
+            }
+            else
+            {
+                StatusMessage = "印表機設定已套用。";
+            }
+
+            AppendPrinterConsole(StatusMessage);
+            IsPrinterConfigEditMode = false;
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"套用印表機設定失敗：{ex.Message}";
+            AppendPrinterConsole(StatusMessage);
+        }
     }
 
     private void OpenDrawer()
@@ -1358,14 +1470,13 @@ public sealed class MainViewModel : BindableBase
 
         try
         {
-            var lines = ReceiptComposer.Build("KLCMC POS", CartLines, Total, DateTime.Now, paymentEntries, ConnectionOptions);
             EnsurePrinterReady();
-            _printerService.PrintReceipt(lines);
-            StatusMessage = "銷售已記錄並列印收據。";
+            _printerService.OpenDrawer();
+            StatusMessage = "銷售已記錄並已開啟錢箱。";
         }
         catch (Exception ex)
         {
-            StatusMessage = $"銷售已記錄；列印失敗：{ex.Message}";
+            StatusMessage = $"銷售已記錄；開啟錢箱失敗：{ex.Message}";
         }
 
         IsCheckoutPopupVisible = false;
